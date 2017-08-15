@@ -21,7 +21,7 @@
 	</ion-list>	
 </ion-content>
 <ion-content *ngIf="nodata">  
-	<div style="background-color:blue; text-align:center; color:white">下拉可刷新基础数据</div>	
+	<!--<div style="background-color:blue; text-align:center; color:white">下拉可刷新基础数据</div>	-->
 	<ion-refresher (ionRefresh)="doRefresh($event)">
 		<ion-refresher-content pullingIcon="arrow-dropdown" pullingText="下拉刷新..." refreshingSpinner="circles" refreshingText="开始加载......">
 		</ion-refresher-content>

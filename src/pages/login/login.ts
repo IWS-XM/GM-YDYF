@@ -10,7 +10,7 @@ import { HttpService } from '../../providers/HttpService';
 import { BuilderTabsPage } from '../buildertabs/buildertabs';
 import { ChangePWPage } from '../changepw/changepw';
  //import { ShowimgPage } from '../imageeditor/showimg';
-// import { MyPage } from '../mypage/mypage';
+ //import { AboutPage } from '../about/about';
 
 @Component({
   selector: 'page-login',
@@ -63,7 +63,7 @@ export class LoginPage {
   }
   
   loginclick() {    
-    // this.navCtrl.push(MyPage);
+    // this.navCtrl.push(AboutPage);
     //this.navCtrl.push(ShowimgPage,{ imgdata: ["assets/img/b1f2-103.jpg","assets/img/login.jpg"], num:1 });
     // this.images = [];
     // this.images.push(imageName);
