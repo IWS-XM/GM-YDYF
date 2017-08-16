@@ -102,7 +102,7 @@ export class ReceiptPage {
                     console.log(dt.toLocaleDateString() + "  " + dt.toLocaleTimeString());
                 }
 
-                this.receiptInfo.dlvrDate = dt.toLocaleString();
+                this.receiptInfo.dlvrDate = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
                 console.log(this.receiptInfo.dlvrDate);
                 this.receiptInfo.additionNote = val.rows.item(0).Remark;
                 this.initBaseDB.getimagedata(this.receiptInfo.projId, val.rows.item(0).ImgSign).then(v => {

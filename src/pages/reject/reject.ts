@@ -51,7 +51,7 @@ export class RejectPage {
         for (var i=0;i<val.rows.length;i++){
           console.log(JSON.stringify(val.rows.item(i)));
           let dt = new Date(val.rows.item(i).TransDate);
-          this.logs.push({reason:val.rows.item(i).ReasonNoAcceptId,plusdesc:val.rows.item(i).PlusDesc,date:dt.toLocaleString(),user:val.rows.item(i).UserName});
+          this.logs.push({reason:val.rows.item(i).ReasonNoAcceptId,plusdesc:val.rows.item(i).PlusDesc,date:this.initBaseDB.showdatetime(dt),user:val.rows.item(i).UserName});
         }
       })
     }

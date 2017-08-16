@@ -2321,22 +2321,22 @@ export class initBaseDB {
             if (status == "待派单") {
               console.log("1" + status);
               dpd++;
-              forass.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: dt.toLocaleString(), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
+              forass.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
             } else if (status == "待整改") {
               console.log("2" + status);
               dzg++;
-              forfix.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: dt.toLocaleString(), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
+              forfix.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
             } else if (status == "已整改") {
               console.log("3" + status);
               yzg++;
               dt = new Date(v2.rows.item(i).ReFormDate);
-              fixed.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已整改", date: dt.toLocaleString(), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
+              fixed.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已整改", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
             }
             if (status != "已整改" && v2.rows.item(i).ReturnDate) {
               console.log("4" + status);
               bth++;
               dt = new Date(v2.rows.item(i).ReturnDate);
-              returned.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已退回", date: dt.toLocaleString(), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
+              returned.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已退回", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
             }
 
             console.log(dpd + ";" + dzg + ";" + yzg + ";" + bth);
@@ -2787,6 +2787,10 @@ export class initBaseDB {
     })
   }
 
+  showdatetime(datetime:Date):string{
+    return datetime.toLocaleDateString() + " " + datetime.getHours().toString() + ":" + datetime.getMinutes() + ":" + datetime.getSeconds();
+  }
+
   checkuploadflag(projid, vendrole: boolean): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
@@ -3192,4 +3196,5 @@ export class initBaseDB {
     let v2 = '[{"TableName":"FormalCheckIssues","data":[{"BatchId":"52476447-f177-4633-96d3-045ae45a636c","IssueId":"","RoomId":"1c6e9020-bb76-45e3-a01e-b2c4c92a9286","PositionId":"2c20fd18-c7f0-402b-9a88-2741e6eef621","CheckItemId":"f93dbc03-cd72-414a-a6e7-4a9f5871f6f2","PlusDesc":"","IssueDesc":"灯不亮","UrgencyId":"一般","ImgBefore1":"b657931f7ef39593d0ccf052a6ef4238.jpeg","ImgBefore2":"","ImgBefore3":"","ImgAfter1":"","ImgAfter2":"","ImgAfter3":"","Id":"14998411565190.27814669301733375","IssueStatus":"待派单","VendId":"6e7ea66c-04fa-4504-b34f-eed42597f6d3","ResponVendId":"6e7ea66c-04fa-4504-b34f-eed42597f6d3","ProjId":"6a397ed5-3923-47e4-8f5a-033920062c02","Manager":"","ResponsibleId":"","IssueType":"","RegisterDate":"2017-07-12 14:32:36","AppointDate":"1753-01-01 12:00:00","LimitDate":"1753-01-01 12:00:00","ReFormDate":"1753-01-01 12:00:00","CloseDate":"1753-01-01 12:00:00","CloseReason":"","CancelDate":"1753-01-01 12:00:00","CancelReason":null,"VersionId":0,"ImgClose1":"","ImgClose2":"","ImgClose3":"","ReturnDate":"1753-01-01 12:00:00","ReturnReason":"","ReturnNum":0,"BuildingId":"de9657d4-9c38-46e6-9828-e5cdb86bd4e9","EngineerId":"","ReviewDate":"1753-01-01 12:00:00","x":340,"y":376,"ResponsibleName":"","ResponsiblePhone":"","EngineerName":"TestAccount","EngineerPhone":"12345678901"}]}]';
     this.httpService.post(APP_SERVE_URL + "/DynamicsPack", { Token: "051656197F8479E599FD28ADD8126A89", ProjId: "6a397ed5-3923-47e4-8f5a-033920062c02", BatchId: "52476447-f177-4633-96d3-045ae45a636c", BuildingId: "de9657d4-9c38-46e6-9828-e5cdb86bd4e9", JsonStr: v2 });
   }
+
 }

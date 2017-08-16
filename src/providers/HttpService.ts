@@ -1,15 +1,27 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Dialogs } from '@ionic-native/dialogs';
 import 'rxjs/add/operator/toPromise';
+import { LoginPage } from '../pages/login/login';
+import { LocalStorage } from '../providers/local-storage';
+import { NavController, App } from 'ionic-angular';
+import { MysettingsPage } from '../pages/mysettings/mysettings';
 //import {NativeService } from '../providers/nativeservice';
 
 @Injectable()
+
 export class HttpService {
+  private navCtrl: NavController;
+  constructor(private http: Http, private dialogs: Dialogs, private localStorage: LocalStorage, private app: App) {  //,public nativeservice: NativeService
+    this.navCtrl = app.getActiveNav(); 
+ }
 
-  constructor(private http: Http) {  //,public nativeservice: NativeService
-  }
+ private logout() {
+   this.navCtrl.setRoot(LoginPage);
+   this.navCtrl.popToRoot;
+ }
 
-  public get(url: string, paramObj: any) {    
+  public get(url: string, paramObj: any) {
     console.log(url + this.toQueryString(paramObj));
     return this.http.get(url + this.toQueryString(paramObj))
       .toPromise()
@@ -49,25 +61,59 @@ export class HttpService {
       .catch(error => this.handleError(error));
   }
 
-  public fetchurl(url: string, paramObj: any):string {    
+  public fetchurl(url: string, paramObj: any): string {
     return url + this.toQueryString(paramObj);
   }
 
   private handleSuccessImg(result) {
     let body = result._body;
-    let data = JSON.parse(body);    
-    if (data.errcode == 0){
+    let data = JSON.parse(body);
+    if (data.errcode == 0) {
       return data.data.list;
     }
     else {
       console.log(data.errmsg);
-    }   
+    }
   }
 
   private handleSuccess(result) {
     console.log(result);
     if (result && result[0][0][0] == "false") {//由于和后台约定好,所有请求均返回一个包含success,msg,data三个属性的对象,所以这里可以这样处理
       console.log(result[0][0][1]);//这里使用ToastController
+      let err: string = result[0][0][1];
+      if (err == "用户不存在" || err == "登陆已失效") {
+        this.dialogs.alert(err, '提示', '确定')
+          .then(() => {
+            this.localStorage.removeitem('curuser').then(v=>{
+              this.localStorage.removeitem('curproj').then(v=>{
+                 this.logout();
+              })
+            })
+          })
+          .catch(e => {
+            console.log('Error displaying dialog', e);
+            this.localStorage.removeitem('curuser').then(v=>{
+              this.localStorage.removeitem('curproj').then(v=>{
+                 this.logout();
+              })
+            })
+          })
+      } else if (err == "用户不在此项目中") {
+        this.dialogs.alert(err + ",请到‘我’=>'设置'里选择其他项目.", '提示', '确定')
+          .then(() => {
+            throw err;
+          })
+          .catch(e => {
+            console.log('Error displaying dialog', e);
+            throw err;
+          })
+      } else {
+        this.dialogs.alert(err, '提示', '确定').then(() => {
+          throw err;
+        }).catch(e => {
+          throw err;
+        })
+      }
     }
     else
       return result;
@@ -104,15 +150,15 @@ export class HttpService {
    */
   private toQueryString(obj) {
     let ret = [];
-    for (let key in obj) {      
-      key = encodeURIComponent(key);      
+    for (let key in obj) {
+      key = encodeURIComponent(key);
       let values = obj[key];
       if (values && values.constructor == Array) {//数组
         let queryValues = [];
         for (let i = 0, len = values.length, value; i < len; i++) {
           value = values[i];
           queryValues.push(this.toQueryPair(key, value));
-        }        
+        }
         ret = ret.concat(queryValues);
       } else { //字符串
         ret.push(this.toQueryPair(key, values));
@@ -140,14 +186,14 @@ export class HttpService {
           value = values[i];
           queryValues.push(this.toQueryPair(key, value));
         }
-        ret = ret.concat(queryValues);        
+        ret = ret.concat(queryValues);
       } else { //字符串
         ret.push(this.toQueryPair(key, values));
       }
     }
     //console.log(ret);
     let b = ret.join('&');
-   // console.log(b);
+    // console.log(b);
     return b;//ret.join('&');
   }
 

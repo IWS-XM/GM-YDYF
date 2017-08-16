@@ -73,16 +73,16 @@ export class IssueviewPage {
 			this.resunit = issuelist.Resunit;
 			console.log(issuelist.RegisterDate);
 			let dt = new Date(issuelist.RegisterDate);
-			this.registertime = dt.toLocaleString();
+			this.registertime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
 			console.log(this.registertime);
 			if (issuelist.LimitDate) {
 				dt = new Date(issuelist.LimitDate)
-				this.duetime = dt.toLocaleString();
+				this.duetime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
 			}
 
 			if (issuelist.ReFormDate) {
 				dt = new Date(issuelist.ReFormDate);
-				this.fixtime = dt.toLocaleString();
+				this.fixtime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
 			}
 
 			this.status = issuelist.IssueStatus;

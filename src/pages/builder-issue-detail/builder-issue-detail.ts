@@ -81,20 +81,20 @@ export class BuilderIssueDetail {
         this.fixeddesc = '';
       }
       let dt = new Date(issuelist.RegisterDate);
-      this.registertime = dt.toLocaleString();
+      this.registertime = this.initBaseDB.showdatetime(dt);// dt.toLocaleString();
       if (issuelist.LimitDate) {
         dt = new Date(issuelist.LimitDate)
-        this.duetime = dt.toLocaleString();
+        this.duetime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
       }
 
       if (issuelist.AppointDate) {
         dt = new Date(issuelist.AppointDate);
-        this.assigntime = dt.toLocaleString();
+        this.assigntime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
       }
 
       if (issuelist.ReFormDate) {
         dt = new Date(issuelist.ReFormDate);
-        this.fixedtime = dt.toLocaleString();
+        this.fixedtime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
       }
 
       if (issuelist.ImgBefore1) {
@@ -147,7 +147,7 @@ export class BuilderIssueDetail {
       for (var i = 0; i < log.rows.length; i++) {
         console.log(JSON.stringify(log.rows.item(i)));
         dt = new Date(log.rows.item(i).LogDate);
-        this.return_log.push({ return_person: log.rows.item(i).UserName, return_date: dt.toLocaleString(), return_message: log.rows.item(i).ReturnReason })
+        this.return_log.push({ return_person: log.rows.item(i).UserName, return_date: this.initBaseDB.showdatetime(dt), return_message: log.rows.item(i).ReturnReason })
       }
     })
   }

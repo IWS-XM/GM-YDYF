@@ -33,7 +33,7 @@ export class LoginPage {
         console.log(val.userid);
       }
     })
-  
+
     // this.images.push("assets/img/login.jpg");
     // this.images.push("assets/img/login.jpg");
     // console.log(this.nativeservice.encode64("12345678902$123456csA10fdB1ewA20"));
