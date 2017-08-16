@@ -1945,7 +1945,7 @@ export class initBaseDB {
           }).then((v7) => {
             return this.initBaseTable("imagetable", "projid,fn,src,status integer default 0");
           }).then((v2) => {
-            return this.initBaseTable("tmpIssues", "LimitDate datetime,ReturnNum integer default 0 ,ResponsibleName,FloorName,BuildingName");
+            return this.initBaseTable("tmpIssues", "LimitDate datetime,ReturnNum integer default 0 ,ResponsibleName,FloorName,BuildingName,CheckItemName,ReFormDate datetime");
           }).then((v8) => {
             console.log("downloadbuilderdata");
             return this.httpService.get(APP_SERVE_URL + "/VendPack", { Token: token, projId: projid, appDateStr: null });
@@ -2144,11 +2144,13 @@ export class initBaseDB {
     })
   }
 
-  getissuesumsql(projid, type, assign, build, floor, duedate, returntimes, groupbystr): Array<string> {
+  getissuesumsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, groupbystr): Array<string> {
     let sql = "";
     let filterstr = "";
     let sqls = [];
-    if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层") && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")) {
+    if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层") 
+         && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")
+         && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类")) {
       filterstr = "";
     } else {
       if (assign != "全部" && assign != "负责人" && groupbystr != "ResponsibleName") {
@@ -2163,6 +2165,15 @@ export class initBaseDB {
       if (duedate != "全部" && duedate != "整改时限" && groupbystr != "LimitDate") {
         filterstr += " and LimitDate = '" + duedate + "' ";
       }
+//CheckItemName,ReFormDate
+      if (fixdate != "全部" && fixdate != "整改时间" && groupbystr != "ReFormDate") {
+        filterstr += " and ReFormDate = '" + fixdate + "' ";
+      }
+
+      if (checkitem != "全部" && checkitem != "问题分类" && groupbystr != "CheckItemName") {
+        filterstr += " and CheckItemName = '" + checkitem + "' ";
+      }
+
       if (returntimes != "全部" && returntimes != "退回次数" && groupbystr != "ReturnNum") {
         filterstr += " and ReturnNum = " + returntimes + " ";
       }
@@ -2182,17 +2193,17 @@ export class initBaseDB {
     return sqls;
   }
 
-  getissuesuminfo(projid, type, assign, build, floor, duedate, returntimes, groupbystr): Promise<any> {
+  getissuesuminfo(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem,groupbystr): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(10);
       });
       let ret = [];
       resolve(promise.then((v) => {
-        return this.resetdata("tmpissues");
+        return this.initBaseTable("tmpIssues", "LimitDate datetime,ReturnNum integer default 0 ,ResponsibleName,FloorName,BuildingName,CheckItemName,ReFormDate datetime");          
       }).then((v1: any) => {
         let sqls = [];
-        sqls = this.getissuesumsql(projid, type, assign, build, floor, duedate, returntimes, groupbystr);
+        sqls = this.getissuesumsql(projid, type, assign, build, floor, duedate, returntimes,fixdate, checkitem, groupbystr);
         return this.db.sqlBatch(sqls);
       }).then((v2: any) => {
         let sql = "select #groupbystr# as fieldstr, count(*) as counts from tmpissues group by #groupbystr# ";//
@@ -2228,10 +2239,12 @@ export class initBaseDB {
     })
   }
 
-  getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, sorting): string {
+  getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting): string {
     let sql = "";
     let filterstr = "";
-    if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层") && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")) {
+    if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层") 
+         && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")
+         && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类")) {
       filterstr = "";
     } else {
       if (assign != "全部" && assign != "负责人") {
@@ -2248,6 +2261,14 @@ export class initBaseDB {
       }
       if (returntimes != "全部" && returntimes != "退回次数") {
         filterstr += " and ReturnNum = " + returntimes + " ";
+      }
+
+      if (fixdate != "全部" && fixdate != "整改时间") {
+        filterstr += " and ReFormDate = '" + fixdate + "' ";
+      }
+
+      if (checkitem != "全部" && checkitem != "问题分类") {
+        filterstr += " and CheckItemName = '" + checkitem + "' ";
       }
     }
     if (type == 1) {
@@ -2270,7 +2291,7 @@ export class initBaseDB {
     return sql;
   }
 
-  getbuilderissuelist(projid, type, assign, build, floor, duedate, returntimes, sorting): Promise<Array<any>> {
+  getbuilderissuelist(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting): Promise<Array<any>> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
@@ -2285,7 +2306,7 @@ export class initBaseDB {
           needupd = v1.rows.item(0).Needupd;
         }
         let sql = "";
-        sql = this.getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, sorting);
+        sql = this.getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting);
         // if (type == 1) {
         //   sql = "select Id,1 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate from PreCheckIssues where projid = '#projid#'";
         //   sql += " union select Id,2 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate from OpenCheckIssues where projid = '#projid#'";

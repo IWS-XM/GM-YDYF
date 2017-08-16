@@ -18,7 +18,7 @@ export class OpeninspectionPage {
   token: string;
   type: number;
   versionid: number;
-  nodata: boolean = false;
+  nodata: boolean = true;
   constructor(public navCtrl: NavController, public alertCtrl: AlertController, public localStorage: LocalStorage,
     public initBaseDB: initBaseDB, public dialogs: Dialogs, public nativeservice:NativeService) {
     this.type = 2;
@@ -29,7 +29,7 @@ export class OpeninspectionPage {
     this.localStorage.getItem('curuser').then(val => {
       this.token = val.token;
     })
-
+    console.log("ionViewDidEnter");
     this.localStorage.getItem('curproj').then(val => {
       if (val && val.projid) {
         this.projid = val.projid;
@@ -51,10 +51,9 @@ export class OpeninspectionPage {
     this.initBaseDB.getbatch(this.projid, this.type, this.token, this.versionid).then((batlist: Array<any>) => {
       if (batlist && batlist.length > 0) {
         this.batchbuildings = batlist;
-        this.nodata = false;
-        console.log(this.nodata);
+        this.nodata = false;        
       } else {
-        this.nodata = true;
+        this.nodata = true;        
       }
       console.log("initbatch"+this.nodata);
       console.log(this.batchbuildings);

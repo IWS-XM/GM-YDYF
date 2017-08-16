@@ -18,7 +18,7 @@ export class MaintenancePage {
   token: string;
   type: number;
   versionid: number;
-  nodata: boolean = false;
+  nodata: boolean = true;
   constructor(public navCtrl: NavController, public alertCtrl: AlertController, public localStorage: LocalStorage,
     public initBaseDB: initBaseDB, public dialogs: Dialogs, public nativeservice: NativeService) {
     this.type = 4;

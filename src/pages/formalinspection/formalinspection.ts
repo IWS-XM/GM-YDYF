@@ -18,7 +18,7 @@ export class FormalinspectionPage {
   token: string;
   type: number;
   versionid: number;
-  nodata: boolean = false;
+  nodata: boolean = true;
   constructor(public navCtrl: NavController, public alertCtrl: AlertController, public localStorage: LocalStorage,
     public initBaseDB: initBaseDB, public dialogs: Dialogs, public nativeservice: NativeService) {
     this.type = 3;
@@ -52,7 +52,6 @@ export class FormalinspectionPage {
         if (batlist && batlist.length > 0) {
           this.batchbuildings = batlist;
           this.nodata = false;
-          console.log(this.nodata);
         } else {
           this.nodata = true;
         }

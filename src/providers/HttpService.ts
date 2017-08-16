@@ -13,12 +13,11 @@ import { MysettingsPage } from '../pages/mysettings/mysettings';
 export class HttpService {
   private navCtrl: NavController;
   constructor(private http: Http, private dialogs: Dialogs, private localStorage: LocalStorage, private app: App) {  //,public nativeservice: NativeService
-    this.navCtrl = app.getActiveNav(); 
+    
  }
 
  private logout() {
-   this.navCtrl.setRoot(LoginPage);
-   this.navCtrl.popToRoot;
+   this.app.getActiveNav().push(LoginPage);
  }
 
   public get(url: string, paramObj: any) {
@@ -81,12 +80,15 @@ export class HttpService {
     if (result && result[0][0][0] == "false") {//由于和后台约定好,所有请求均返回一个包含success,msg,data三个属性的对象,所以这里可以这样处理
       console.log(result[0][0][1]);//这里使用ToastController
       let err: string = result[0][0][1];
+      console.log('err'+err);
       if (err == "用户不存在" || err == "登陆已失效") {
+        console.log('uuuuu');
         this.dialogs.alert(err, '提示', '确定')
           .then(() => {
             this.localStorage.removeitem('curuser').then(v=>{
               this.localStorage.removeitem('curproj').then(v=>{
                  this.logout();
+                 //this.app.getActiveNav().push(LoginPage);
               })
             })
           })

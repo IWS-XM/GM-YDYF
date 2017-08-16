@@ -37,6 +37,8 @@ export class BuilderPage {
     buildingfilterstr: string = "楼栋";// + "∨";
     floorfilterstr: string = "楼层";// + "∨";
     duedatefilterstr: string = "整改时限";// + "∨";
+    fixdatefilterstr:string = "整改时间";
+    checkitemfilterstr:string = "问题分类";
     sortingstr: string = "默认排序";// + "∨";
     sortingname: string = "default";
     returntimesfilterstr: string = "退回次数";// + "∨";  "∧"
@@ -46,12 +48,16 @@ export class BuilderPage {
     floorcolor: string = "light";
     duedatecolor: string = "light";
     returncolor: string = "light";
+    fixdatecolor: string = "light";
+    checkitemcolor:string = "light";
     sortingcolor: string = "light";
     assignarrow: string = "∨";
     buildarrow: string = "∨";
     floorarrow: string = "∨";
     duedatearrow: string = "∨";
     returnarrow: string = "∨";
+    fixdatearrow: string = "∨";
+    checkitemarrow: string = "∨";
     sortingarrow: string = "∨";
     constructor(public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController, public dialogs: Dialogs,
         public initBaseDB: initBaseDB, public nativeservice: NativeService, public localStorage: LocalStorage, private clipboard: Clipboard) {
@@ -325,7 +331,7 @@ export class BuilderPage {
                     throw '';
                 }
             }).then((v2) => {
-                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.sortingname);
+                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr,this.fixdatefilterstr,this.checkitemfilterstr, this.sortingname);
             }).then((val: any) => {
                 if (val) {
                     this.issuelist = val;
@@ -349,13 +355,22 @@ export class BuilderPage {
     }
 
     presentfilter(groupbystr) {
-        this.initBaseDB.getissuesuminfo(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, groupbystr).then(val => {
+        this.initBaseDB.getissuesuminfo(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr,this.fixdatefilterstr,this.checkitemfilterstr, groupbystr).then(val => {
             if (val && val.length > 0) {
                 let actionSheet = this.actionSheetCtrl.create({
                     title: '选择过滤条件',
                     buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelfilter(groupbystr); } }]
                 });
                 if (groupbystr == "LimitDate") {
+                    for (let s of val) {
+                        if (s.fieldstr == "全部") {
+                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+                        } else {
+                            let dt = new Date(s.fieldstr);
+                            actionSheet.addButton({ text: dt.toLocaleDateString() + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+                        }
+                    }
+                } else if (groupbystr == "ReFormDate") {
                     for (let s of val) {
                         if (s.fieldstr == "全部") {
                             actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
@@ -387,7 +402,13 @@ export class BuilderPage {
         } else if (groupbystr == "LimitDate") {            
             this.duedatecolor = "light";
             this.duedatearrow = "∨";
-        } else if (groupbystr == "ReturnNum") {            
+        } else if (groupbystr == "CheckItemName") {            
+            this.checkitemcolor = "light";
+            this.checkitemarrow = "∨";
+        } else if (groupbystr == "ReFormDate") {            
+            this.fixdatecolor = "light";
+            this.fixdatearrow = "∨";
+        }else if (groupbystr == "ReturnNum") {            
             this.returncolor = "light";
             this.returnarrow = "∨";
         }
@@ -411,7 +432,16 @@ export class BuilderPage {
             this.duedatefilterstr = dt.toLocaleDateString();
             this.duedatecolor = "light";
             this.duedatearrow = "∨";
-        } else if (groupbystr == "ReturnNum") {
+        } else if (groupbystr == "CheckItemName") {
+            this.checkitemfilterstr = item.fieldstr;
+            this.checkitemcolor = "light";
+            this.checkitemarrow = "∨";
+        } else if (groupbystr == "ReFormDate") {
+            let dt = new Date(item.fieldstr);
+            this.fixdatefilterstr = dt.toLocaleDateString();
+            this.fixdatecolor = "light";
+            this.fixdatearrow = "∨";
+        }else if (groupbystr == "ReturnNum") {
             this.returntimesfilterstr = item.fieldstr;
             this.returncolor = "light";
             this.returnarrow = "∨";
@@ -428,7 +458,7 @@ export class BuilderPage {
             console.log("refreshIssues");
             this.nativeservice.showLoading("处理中，请稍侯...");
             resolve(promise.then((v1) => {
-                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.sortingname);
+                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr,this.fixdatefilterstr,this.checkitemfilterstr, this.sortingname);
             }).then((val: any) => {
                 console.log("refresh end");
                 if (val) {
@@ -473,6 +503,18 @@ export class BuilderPage {
         this.duedatearrow = "∧";
         this.duedatecolor = "primary";
         this.presentfilter("LimitDate");
+    }
+
+    checkitemfilter() {
+        this.checkitemarrow = "∧";
+        this.checkitemcolor = "primary";
+        this.presentfilter("CheckItemName");
+    }
+
+    fixdatefilter() {
+        this.fixdatearrow = "∧";
+        this.fixdatecolor = "primary";
+        this.presentfilter("ReFormDate");
     }
 
     returntimesfilter() {
