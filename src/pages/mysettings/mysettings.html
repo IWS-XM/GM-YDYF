@@ -9,14 +9,14 @@
 <ion-content padding>
 <ion-list>
     <ion-item detail-push>
-      <ion-label>切换项目</ion-label>
-      <ion-select [(ngModel)]="projname" (ionChange)="projchange($event)" okText="确定" cancelText="取消">
+      <ion-label fixed>切换项目</ion-label>
+      <ion-select [(ngModel)]="projname" (ionChange)="projchange($event)" okText="确定" cancelText="取消" style=" white-space:normal">
         <ion-option *ngFor="let item of projnames">{{ item }}</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-toggle [(ngModel)]="networkchecked" (ionChange)="networkchange($event)"></ion-toggle>
-      <ion-label>
+      <ion-label style=" white-space:normal">
         仅在wifi环境上传、下载数据
       </ion-label>
   </ion-item>

@@ -20,13 +20,13 @@
     </ion-item>
     <ion-item>
       <ion-label>描述</ion-label>
-      <ion-select #issuedesc multiple="true" [(ngModel)]="itdesc" (ionChange)="issuedescchange($event)" okText="确定" cancelText="取消">
+      <ion-select #issuedesc multiple="true" [(ngModel)]="itdesc" (ionChange)="issuedescchange($event)" okText="确定" cancelText="取消" style=" white-space:normal">
         <ion-option *ngFor="let item of itemdescs">{{ item }}</ion-option>
       </ion-select>
     </ion-item>
   
     <ion-item>
-      <ion-input type="text" placeholder="补充说明" height=100px [(ngModel)]="descplus"></ion-input>
+      <ion-input type="text" placeholder="补充说明" height=100px [(ngModel)]="descplus" style=" white-space:normal"></ion-input>
     </ion-item>
   
     <ion-item>
@@ -48,14 +48,14 @@
       </ion-select>
     </ion-item>
     <ion-item>
-      <ion-label>承建商(整改单位)</ion-label>
-      <ion-select [(ngModel)]="vend" (ionChange)="vendorchange()" okText="确定" cancelText="取消">
+      <ion-label style=" white-space:normal">承建商(整改单位)</ion-label>
+      <ion-select [(ngModel)]="vend" (ionChange)="vendorchange()" okText="确定" cancelText="取消" style=" white-space:normal">
         <ion-option *ngFor="let item of vendors">{{item}}</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>责任单位</ion-label>
-      <ion-select [(ngModel)]="resunit" (ionChange)="responsibilityunitchange()" okText="确定" cancelText="取消">
+      <ion-select [(ngModel)]="resunit" (ionChange)="responsibilityunitchange()" okText="确定" cancelText="取消" style=" white-space:normal">
         <ion-option *ngFor="let item of responsibilityunits">{{ item }}</ion-option>
       </ion-select>
     </ion-item>

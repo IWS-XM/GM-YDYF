@@ -61,7 +61,7 @@ export class initBaseDB {
           }).then((v8) => {
             return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid");
           }).then((v9) => {
-            return this.initBaseTable("CustSatisfaction", "Id,Type,Name,Sortcode integer");
+            return this.initBaseTable("CustSatisfaction", "Id,Type integer,Name,Sortcode integer");
           }).then((vv) => {
             return this.initBaseTable("ReasonNoAccepts", "Name");
           }).then((v10) => {
@@ -466,6 +466,7 @@ export class initBaseDB {
         }
       }).catch(err => {
         console.log(err);
+        this.nativeservice.hideLoading();
       }))
     })
   }

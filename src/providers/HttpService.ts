@@ -18,6 +18,7 @@ export class HttpService {
 
  private logout() {
    this.app.getActiveNav().push(LoginPage);
+   throw '';
  }
 
   public get(url: string, paramObj: any) {
