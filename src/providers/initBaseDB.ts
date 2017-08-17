@@ -2163,11 +2163,11 @@ export class initBaseDB {
         filterstr += " and FloorName = '" + floor + "' ";
       }
       if (duedate != "全部" && duedate != "整改时限" && groupbystr != "LimitDate") {
-        filterstr += " and LimitDate = '" + duedate + "' ";
+        filterstr += " and LimitDate >= '" + duedate + " 00:00:00' and LimitDate <= '" + duedate + " 23:59:59' ";
       }
 //CheckItemName,ReFormDate
       if (fixdate != "全部" && fixdate != "整改时间" && groupbystr != "ReFormDate") {
-        filterstr += " and ReFormDate = '" + fixdate + "' ";
+        filterstr += " and ReFormDate >= '" + fixdate + " 00:00:00' and ReFormDate <= '" + fixdate + " 23:59:59' ";
       }
 
       if (checkitem != "全部" && checkitem != "问题分类" && groupbystr != "CheckItemName") {
@@ -2178,9 +2178,9 @@ export class initBaseDB {
         filterstr += " and ReturnNum = " + returntimes + " ";
       }
     }
-
-    sql = "insert into tmpissues (#groupbystr#) select #groupbystr# from #tablename# where projid = '#projid#' #filterstr# ";
-    sql = sql.replace("#groupbystr#", groupbystr).replace("#groupbystr#", groupbystr).replace('#projid#', projid).replace('#filterstr#', filterstr);
+    let fieldsstr = "";fieldsstr = groupbystr.replace("LimitDate","date(LimitDate)").replace("ReFormDate","date(ReFormDate)")
+    sql = "insert into tmpissues (#groupbystr#) select #fieldsstr# from #tablename# where projid = '#projid#' #filterstr# ";
+    sql = sql.replace("#groupbystr#", groupbystr).replace("#fieldsstr#", fieldsstr).replace('#projid#', projid).replace('#filterstr#', filterstr);
     if (type == 1) {
       sqls.push(sql.replace("#tablename#", "PreCheckIssues"));
       sqls.push(sql.replace("#tablename#", "OpenCheckIssues"));
@@ -2256,15 +2256,15 @@ export class initBaseDB {
       if (floor != "全部" && floor != "楼层") {
         filterstr += " and FloorName = '" + floor + "' ";
       }
-      if (duedate != "全部" && duedate != "整改时限") {
-        filterstr += " and LimitDate = '" + duedate + "' ";
+      if (duedate != "全部" && duedate != "整改时限") {        
+        filterstr += " and date(LimitDate) = '" + duedate + "'"; 
       }
       if (returntimes != "全部" && returntimes != "退回次数") {
         filterstr += " and ReturnNum = " + returntimes + " ";
       }
 
       if (fixdate != "全部" && fixdate != "整改时间") {
-        filterstr += " and ReFormDate = '" + fixdate + "' ";
+        filterstr += " and date(ReFormDate) = '" + fixdate + "'";
       }
 
       if (checkitem != "全部" && checkitem != "问题分类") {

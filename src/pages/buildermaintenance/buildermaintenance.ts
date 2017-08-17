@@ -337,7 +337,7 @@ export class BuildermaintenancePage {
                             actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
                         } else {
                             let dt = new Date(s.fieldstr);
-                            actionSheet.addButton({ text: dt.toLocaleDateString() + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
                         }
                     }
                 } else if (groupbystr == "ReFormDate") {
@@ -346,7 +346,7 @@ export class BuildermaintenancePage {
                             actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
                         } else {
                             let dt = new Date(s.fieldstr);
-                            actionSheet.addButton({ text: dt.toLocaleDateString() + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
                         }
                     }
                 } else {
@@ -384,7 +384,7 @@ export class BuildermaintenancePage {
         }
     }
 
-    filter(groupbystr, item) {
+     filter(groupbystr, item) {
         if (groupbystr == "ResponsibleName") {
             this.assignfilterstr = item.fieldstr;
             this.assigncolor = "light";
@@ -398,8 +398,12 @@ export class BuildermaintenancePage {
             this.floorcolor = "light";
             this.floorarrow = "∨";
         } else if (groupbystr == "LimitDate") {
-            let dt = new Date(item.fieldstr);
-            this.duedatefilterstr = dt.toLocaleDateString();
+            if (item.fieldstr == "全部") {
+                this.duedatefilterstr = "整改时限";
+            } else {
+                // let dt = new Date(item.fieldstr);console.log(item.fieldstr);
+                this.duedatefilterstr = item.fieldstr;   
+            }
             this.duedatecolor = "light";
             this.duedatearrow = "∨";
         } else if (groupbystr == "CheckItemName") {
@@ -407,11 +411,15 @@ export class BuildermaintenancePage {
             this.checkitemcolor = "light";
             this.checkitemarrow = "∨";
         } else if (groupbystr == "ReFormDate") {
-            let dt = new Date(item.fieldstr);
-            this.fixdatefilterstr = dt.toLocaleDateString();
+            if (item.fieldstr == "全部") {
+                this.fixdatefilterstr = "整改时间";
+            } else {
+                // let dt = new Date(item.fieldstr);
+                this.fixdatefilterstr = item.fieldstr
+            }
             this.fixdatecolor = "light";
             this.fixdatearrow = "∨";
-        }else if (groupbystr == "ReturnNum") {
+        } else if (groupbystr == "ReturnNum") {
             this.returntimesfilterstr = item.fieldstr;
             this.returncolor = "light";
             this.returnarrow = "∨";

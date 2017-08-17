@@ -81,7 +81,7 @@ export class HttpService {
       console.log(result[0][0][1]);//这里使用ToastController
       let err: string = result[0][0][1];
       console.log('err'+err);
-      if (err == "用户不存在" || err == "登陆已失效") {
+      if (err == "用户不存在" || err == "登陆已失效" || err == "未找到用户") {
         console.log('uuuuu');
         this.dialogs.alert(err, '提示', '确定')
           .then(() => {

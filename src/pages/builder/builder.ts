@@ -37,8 +37,8 @@ export class BuilderPage {
     buildingfilterstr: string = "楼栋";// + "∨";
     floorfilterstr: string = "楼层";// + "∨";
     duedatefilterstr: string = "整改时限";// + "∨";
-    fixdatefilterstr:string = "整改时间";
-    checkitemfilterstr:string = "问题分类";
+    fixdatefilterstr: string = "整改时间";
+    checkitemfilterstr: string = "问题分类";
     sortingstr: string = "默认排序";// + "∨";
     sortingname: string = "default";
     returntimesfilterstr: string = "退回次数";// + "∨";  "∧"
@@ -49,7 +49,7 @@ export class BuilderPage {
     duedatecolor: string = "light";
     returncolor: string = "light";
     fixdatecolor: string = "light";
-    checkitemcolor:string = "light";
+    checkitemcolor: string = "light";
     sortingcolor: string = "light";
     assignarrow: string = "∨";
     buildarrow: string = "∨";
@@ -331,7 +331,7 @@ export class BuilderPage {
                     throw '';
                 }
             }).then((v2) => {
-                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr,this.fixdatefilterstr,this.checkitemfilterstr, this.sortingname);
+                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname);
             }).then((val: any) => {
                 if (val) {
                     this.issuelist = val;
@@ -355,7 +355,7 @@ export class BuilderPage {
     }
 
     presentfilter(groupbystr) {
-        this.initBaseDB.getissuesuminfo(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr,this.fixdatefilterstr,this.checkitemfilterstr, groupbystr).then(val => {
+        this.initBaseDB.getissuesuminfo(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, groupbystr).then(val => {
             if (val && val.length > 0) {
                 let actionSheet = this.actionSheetCtrl.create({
                     title: '选择过滤条件',
@@ -366,8 +366,8 @@ export class BuilderPage {
                         if (s.fieldstr == "全部") {
                             actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
                         } else {
-                            let dt = new Date(s.fieldstr);
-                            actionSheet.addButton({ text: dt.toLocaleDateString() + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+                            // let dt = new Date(s.fieldstr);
+                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
                         }
                     }
                 } else if (groupbystr == "ReFormDate") {
@@ -375,8 +375,8 @@ export class BuilderPage {
                         if (s.fieldstr == "全部") {
                             actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
                         } else {
-                            let dt = new Date(s.fieldstr);
-                            actionSheet.addButton({ text: dt.toLocaleDateString() + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+                            // let dt = new Date(s.fieldstr);
+                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
                         }
                     }
                 } else {
@@ -393,22 +393,22 @@ export class BuilderPage {
         if (groupbystr == "ResponsibleName") {
             this.assigncolor = "light";
             this.assignarrow = "∨";
-        } else if (groupbystr == "BuildingName") {            
+        } else if (groupbystr == "BuildingName") {
             this.buildcolor = "light";
             this.buildarrow = "∨";
-        } else if (groupbystr == "FloorName") {            
+        } else if (groupbystr == "FloorName") {
             this.floorcolor = "light";
             this.floorarrow = "∨";
-        } else if (groupbystr == "LimitDate") {            
+        } else if (groupbystr == "LimitDate") {
             this.duedatecolor = "light";
             this.duedatearrow = "∨";
-        } else if (groupbystr == "CheckItemName") {            
+        } else if (groupbystr == "CheckItemName") {
             this.checkitemcolor = "light";
             this.checkitemarrow = "∨";
-        } else if (groupbystr == "ReFormDate") {            
+        } else if (groupbystr == "ReFormDate") {
             this.fixdatecolor = "light";
             this.fixdatearrow = "∨";
-        }else if (groupbystr == "ReturnNum") {            
+        } else if (groupbystr == "ReturnNum") {
             this.returncolor = "light";
             this.returnarrow = "∨";
         }
@@ -428,8 +428,12 @@ export class BuilderPage {
             this.floorcolor = "light";
             this.floorarrow = "∨";
         } else if (groupbystr == "LimitDate") {
-            let dt = new Date(item.fieldstr);
-            this.duedatefilterstr = dt.toLocaleDateString();
+            if (item.fieldstr == "全部") {
+                this.duedatefilterstr = "整改时限";
+            } else {
+                // let dt = new Date(item.fieldstr);console.log(item.fieldstr);
+                this.duedatefilterstr = item.fieldstr;   
+            }
             this.duedatecolor = "light";
             this.duedatearrow = "∨";
         } else if (groupbystr == "CheckItemName") {
@@ -437,11 +441,15 @@ export class BuilderPage {
             this.checkitemcolor = "light";
             this.checkitemarrow = "∨";
         } else if (groupbystr == "ReFormDate") {
-            let dt = new Date(item.fieldstr);
-            this.fixdatefilterstr = dt.toLocaleDateString();
+            if (item.fieldstr == "全部") {
+                this.fixdatefilterstr = "整改时间";
+            } else {
+                // let dt = new Date(item.fieldstr);
+                this.fixdatefilterstr = item.fieldstr
+            }
             this.fixdatecolor = "light";
             this.fixdatearrow = "∨";
-        }else if (groupbystr == "ReturnNum") {
+        } else if (groupbystr == "ReturnNum") {
             this.returntimesfilterstr = item.fieldstr;
             this.returncolor = "light";
             this.returnarrow = "∨";
@@ -458,7 +466,7 @@ export class BuilderPage {
             console.log("refreshIssues");
             this.nativeservice.showLoading("处理中，请稍侯...");
             resolve(promise.then((v1) => {
-                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr,this.fixdatefilterstr,this.checkitemfilterstr, this.sortingname);
+                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname);
             }).then((val: any) => {
                 console.log("refresh end");
                 if (val) {
@@ -526,7 +534,7 @@ export class BuilderPage {
     presentsorting() {
         let actionSheet = this.actionSheetCtrl.create({
             title: '选择排序规则',
-            buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelsorting(); }}]
+            buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelsorting(); } }]
         });
         for (let s of this.sortings) {
             actionSheet.addButton({ text: s.fieldstr, handler: () => { this.sorting(s); } });
