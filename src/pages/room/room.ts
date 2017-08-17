@@ -9,7 +9,7 @@ import { initBaseDB } from '../../providers/initBaseDB';
 import { PreroomspassPage } from '../preroomspass/preroomspass';
 
 @Component({
-	selector: 'page-room',    
+	selector: 'page-room',
 	templateUrl: 'room.html',
 })
 export class RoomPage implements OnInit {
@@ -163,14 +163,16 @@ export class RoomPage implements OnInit {
 				this.drawIssue(issue.id, issue);
 			});
 		})
-		this.initBaseDB.getroomdetails(this.roomid, this.batchid, this.type).then(val => {
-			console.log("roomdetails:"+val);
-			if (val && val.rows.length > 0) {
-				if (val.rows.item(0).RoomStatus == "已交付" || val.rows.item(0).RoomStatus == "已通过" || val.rows.item(0).RoomStatus == "已接待") {
-					this.readonly = true;
+		if (this.type != 4) {
+			this.initBaseDB.getroomdetails(this.roomid, this.batchid, this.type).then(val => {
+				console.log("roomdetails:" + val);
+				if (val && val.rows.length > 0) {
+					if (val.rows.item(0).RoomStatus == "已交付" || val.rows.item(0).RoomStatus == "已通过" || val.rows.item(0).RoomStatus == "已接待") {
+						this.readonly = true;
+					}
 				}
-			}
-		})
+			})
+		}
 	}
 
 	ngOnInit() {
@@ -179,9 +181,9 @@ export class RoomPage implements OnInit {
 		var jQuery = window['jQuery'];
 		let $stage = jQuery(stage);
 		var $ = window['$'];
-        var container = document.getElementById('container');
-		this.stage.style.height = window.innerHeight+"px";
-		container.style.height = window.innerHeight*0.588+"px";
+		var container = document.getElementById('container');
+		this.stage.style.height = window.innerHeight + "px";
+		container.style.height = window.innerHeight * 0.588 + "px";
 		// create a manager for that element
 		var Hammer = window['Hammer'];
 		var manager = new Hammer.Manager(stage);

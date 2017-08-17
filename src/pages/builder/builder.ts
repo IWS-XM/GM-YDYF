@@ -15,6 +15,7 @@ export class BuilderPage {
     issues = [];
     selectedIssues = [];
     selectedTab = "待派单";
+    lastselectedTab = "待派单";
     selectAll = false;
     stage = "前期交付";
     isMultiSelect = false;
@@ -71,6 +72,32 @@ export class BuilderPage {
 
     ionViewDidEnter() {
         console.log("builderload");
+        this.assignfilterstr = "负责人";
+        this.assigncolor = "light";
+        this.assignarrow = "∨";
+        this.buildingfilterstr = "楼栋";
+        this.buildcolor = "light";
+        this.buildarrow = "∨";
+        this.floorfilterstr = "楼层";
+        this.floorcolor = "light";
+        this.floorarrow = "∨";
+        this.duedatefilterstr = "整改时限";
+        this.duedatecolor = "light";
+        this.duedatearrow = "∨";
+        this.checkitemfilterstr = "问题分类";
+        this.checkitemcolor = "light";
+        this.checkitemarrow = "∨";
+        this.fixdatefilterstr = "整改时间";
+        this.fixdatecolor = "light";
+        this.fixdatearrow = "∨";
+        this.returntimesfilterstr = "退回次数";
+        this.returncolor = "light";
+        this.returnarrow = "∨";
+        this.sortingstr = "默认排序";
+        this.sortingname = "default";
+        this.sortingcolor = "light";
+        this.sortingarrow = "∨";
+        this.lastselectedTab = this.selectedTab;
         this.loadIssues();
     }
 
@@ -108,6 +135,33 @@ export class BuilderPage {
 
     clearSelection() {
         for (let issue of this.getIssues(this.selectedTab)) { issue['selected'] = false; }
+
+        this.assignfilterstr = "负责人";
+        this.assigncolor = "light";
+        this.assignarrow = "∨";
+        this.buildingfilterstr = "楼栋";
+        this.buildcolor = "light";
+        this.buildarrow = "∨";
+        this.floorfilterstr = "楼层";
+        this.floorcolor = "light";
+        this.floorarrow = "∨";
+        this.duedatefilterstr = "整改时限";
+        this.duedatecolor = "light";
+        this.duedatearrow = "∨";
+        this.checkitemfilterstr = "问题分类";
+        this.checkitemcolor = "light";
+        this.checkitemarrow = "∨";
+        this.fixdatefilterstr = "整改时间";
+        this.fixdatecolor = "light";
+        this.fixdatearrow = "∨";
+        this.returntimesfilterstr = "退回次数";
+        this.returncolor = "light";
+        this.returnarrow = "∨";
+        this.sortingstr = "默认排序";
+        this.sortingname = "default";
+        this.sortingcolor = "light";
+        this.sortingarrow = "∨";
+        this.refresh();
     }
 
     itemHold() {
@@ -331,7 +385,7 @@ export class BuilderPage {
                     throw '';
                 }
             }).then((v2) => {
-                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname);
+                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, "全部");
             }).then((val: any) => {
                 if (val) {
                     this.issuelist = val;
@@ -355,7 +409,7 @@ export class BuilderPage {
     }
 
     presentfilter(groupbystr) {
-        this.initBaseDB.getissuesuminfo(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, groupbystr).then(val => {
+        this.initBaseDB.getissuesuminfo(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, groupbystr, this.selectedTab).then(val => {
             if (val && val.length > 0) {
                 let actionSheet = this.actionSheetCtrl.create({
                     title: '选择过滤条件',
@@ -432,7 +486,7 @@ export class BuilderPage {
                 this.duedatefilterstr = "整改时限";
             } else {
                 // let dt = new Date(item.fieldstr);console.log(item.fieldstr);
-                this.duedatefilterstr = item.fieldstr;   
+                this.duedatefilterstr = item.fieldstr;
             }
             this.duedatecolor = "light";
             this.duedatearrow = "∨";
@@ -459,30 +513,43 @@ export class BuilderPage {
 
     refresh(): Promise<any> {
         return new Promise((resolve) => {
-            this.issuelist = []; this.teammembers = [];
+            // if (changetab == false){
+            //   this.issuelist = []; 
+            // }            
             let promise = new Promise((resolve) => {
                 resolve(100);
             });
             console.log("refreshIssues");
-            this.nativeservice.showLoading("处理中，请稍侯...");
+            // this.nativeservice.showLoading("处理中，请稍侯...");
             resolve(promise.then((v1) => {
-                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname);
+                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, this.lastselectedTab);
             }).then((val: any) => {
                 console.log("refresh end");
                 if (val) {
-                    this.issuelist = val;
-                    this.needupd = val[8];
-                    this.asscounts = val[4];
-                    this.forfixcounts = val[5];
-                    this.fixedcounts = val[6];
-                    this.returncounts = val[7];
+                    let list: Array<any>; list = [];
+                    if (this.lastselectedTab == "待派单") {
+                        list.push(val[0]);list.push(this.issuelist[1]); list.push(this.issuelist[2]);list.push(this.issuelist[3]);
+                        this.asscounts = val[4];list.push(val[4]);list.push(this.issuelist[5]);list.push(this.issuelist[6]);list.push(this.issuelist[7]);
+                    } else if (this.lastselectedTab == "待整改") {
+                        list.push(this.issuelist[0]); list.push(val[1]); list.push(this.issuelist[2]);list.push(this.issuelist[3]);
+                        list.push(this.issuelist[4]);this.forfixcounts = val[5];list.push(val[5]);list.push(this.issuelist[6]);list.push(this.issuelist[7]);
+                    } else if (this.lastselectedTab == "已整改") {
+                        list.push(this.issuelist[0]); list.push(this.issuelist[1]);list.push(val[2]); list.push(this.issuelist[3]);
+                        list.push(this.issuelist[4]);list.push(this.issuelist[5]);this.fixedcounts = val[6];list.push(val[6]);list.push(this.issuelist[7]);
+                    } else {
+                        list.push(this.issuelist[0]); list.push(this.issuelist[1]);list.push(this.issuelist[2]);list.push(val[3]); 
+                        list.push(this.issuelist[4]);list.push(this.issuelist[5]);list.push(this.issuelist[6]);this.fixedcounts = val[7];list.push(val[7]);
+                    }
+                    list.push(this.needupd);
+                    this.issuelist = list;
                 }
+                this.lastselectedTab = this.selectedTab;
                 return 1;
             }).then((v: any) => {
-                this.nativeservice.hideLoading();
+                // this.nativeservice.hideLoading();
                 return 1;
             }).catch(err => {
-                this.nativeservice.hideLoading();
+                // this.nativeservice.hideLoading();
                 console.log('问题加载失败:' + err);
                 throw '问题加载失败';
             }))

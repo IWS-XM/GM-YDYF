@@ -15,6 +15,7 @@ export class BuildermaintenancePage {
   issues = [];
   selectedIssues = [];
   selectedTab = "待派单";
+  lastselectedTab = "待派单";
   selectAll = false;
   stage = "后期维保";
   isMultiSelect = false;
@@ -71,6 +72,32 @@ export class BuildermaintenancePage {
 
   ionViewDidEnter() {
     console.log("builderload");
+    this.assignfilterstr = "负责人";
+    this.assigncolor = "light";
+    this.assignarrow = "∨";
+    this.buildingfilterstr = "楼栋";
+    this.buildcolor = "light";
+    this.buildarrow = "∨";
+    this.floorfilterstr = "楼层";
+    this.floorcolor = "light";
+    this.floorarrow = "∨";
+    this.duedatefilterstr = "整改时限";
+    this.duedatecolor = "light";
+    this.duedatearrow = "∨";
+    this.checkitemfilterstr = "问题分类";
+    this.checkitemcolor = "light";
+    this.checkitemarrow = "∨";
+    this.fixdatefilterstr = "整改时间";
+    this.fixdatecolor = "light";
+    this.fixdatearrow = "∨";
+    this.returntimesfilterstr = "退回次数";
+    this.returncolor = "light";
+    this.returnarrow = "∨";
+    this.sortingstr = "默认排序";
+    this.sortingname = "default";
+    this.sortingcolor = "light";
+    this.sortingarrow = "∨";
+    this.lastselectedTab = this.selectedTab;
     this.loadIssues();
   }
 
@@ -100,6 +127,33 @@ export class BuildermaintenancePage {
 
   clearSelection() {
     for (let issue of this.getIssues(this.selectedTab)) { issue['selected'] = false; }
+
+    this.assignfilterstr = "负责人";
+    this.assigncolor = "light";
+    this.assignarrow = "∨";
+    this.buildingfilterstr = "楼栋";
+    this.buildcolor = "light";
+    this.buildarrow = "∨";
+    this.floorfilterstr = "楼层";
+    this.floorcolor = "light";
+    this.floorarrow = "∨";
+    this.duedatefilterstr = "整改时限";
+    this.duedatecolor = "light";
+    this.duedatearrow = "∨";
+    this.checkitemfilterstr = "问题分类";
+    this.checkitemcolor = "light";
+    this.checkitemarrow = "∨";
+    this.fixdatefilterstr = "整改时间";
+    this.fixdatecolor = "light";
+    this.fixdatearrow = "∨";
+    this.returntimesfilterstr = "退回次数";
+    this.returncolor = "light";
+    this.returnarrow = "∨";
+    this.sortingstr = "默认排序";
+    this.sortingname = "default";
+    this.sortingcolor = "light";
+    this.sortingarrow = "∨";
+    this.refresh();
   }
 
   itemHold() {
@@ -301,7 +355,7 @@ export class BuildermaintenancePage {
           throw '';
         }
       }).then((v2) => {
-        return this.initBaseDB.getbuilderissuelist(this.projid, 4, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr,this.checkitemfilterstr,this.sortingname);
+        return this.initBaseDB.getbuilderissuelist(this.projid, 4, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, "全部");
       }).then((val: any) => {
         if (val) {
           this.issuelist = val;
@@ -325,209 +379,220 @@ export class BuildermaintenancePage {
   }
 
   presentfilter(groupbystr) {
-        this.initBaseDB.getissuesuminfo(this.projid, 4, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr,this.fixdatefilterstr,this.checkitemfilterstr, groupbystr).then(val => {
-            if (val && val.length > 0) {
-                let actionSheet = this.actionSheetCtrl.create({
-                    title: '选择过滤条件',
-                    buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelfilter(groupbystr); } }]
-                });
-                if (groupbystr == "LimitDate") {
-                    for (let s of val) {
-                        if (s.fieldstr == "全部") {
-                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                        } else {
-                            let dt = new Date(s.fieldstr);
-                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                        }
-                    }
-                } else if (groupbystr == "ReFormDate") {
-                    for (let s of val) {
-                        if (s.fieldstr == "全部") {
-                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                        } else {
-                            let dt = new Date(s.fieldstr);
-                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                        }
-                    }
-                } else {
-                    for (let s of val) {
-                        actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                    }
-                }
-                actionSheet.present();
-            }
-        })
-    }
-
-    cancelfilter(groupbystr) {
-        if (groupbystr == "ResponsibleName") {
-            this.assigncolor = "light";
-            this.assignarrow = "∨";
-        } else if (groupbystr == "BuildingName") {            
-            this.buildcolor = "light";
-            this.buildarrow = "∨";
-        } else if (groupbystr == "FloorName") {            
-            this.floorcolor = "light";
-            this.floorarrow = "∨";
-        } else if (groupbystr == "LimitDate") {            
-            this.duedatecolor = "light";
-            this.duedatearrow = "∨";
-        } else if (groupbystr == "CheckItemName") {            
-            this.checkitemcolor = "light";
-            this.checkitemarrow = "∨";
-        } else if (groupbystr == "ReFormDate") {            
-            this.fixdatecolor = "light";
-            this.fixdatearrow = "∨";
-        }else if (groupbystr == "ReturnNum") {            
-            this.returncolor = "light";
-            this.returnarrow = "∨";
-        }
-    }
-
-     filter(groupbystr, item) {
-        if (groupbystr == "ResponsibleName") {
-            this.assignfilterstr = item.fieldstr;
-            this.assigncolor = "light";
-            this.assignarrow = "∨";
-        } else if (groupbystr == "BuildingName") {
-            this.buildingfilterstr = item.fieldstr;
-            this.buildcolor = "light";
-            this.buildarrow = "∨";
-        } else if (groupbystr == "FloorName") {
-            this.floorfilterstr = item.fieldstr;
-            this.floorcolor = "light";
-            this.floorarrow = "∨";
-        } else if (groupbystr == "LimitDate") {
-            if (item.fieldstr == "全部") {
-                this.duedatefilterstr = "整改时限";
-            } else {
-                // let dt = new Date(item.fieldstr);console.log(item.fieldstr);
-                this.duedatefilterstr = item.fieldstr;   
-            }
-            this.duedatecolor = "light";
-            this.duedatearrow = "∨";
-        } else if (groupbystr == "CheckItemName") {
-            this.checkitemfilterstr = item.fieldstr;
-            this.checkitemcolor = "light";
-            this.checkitemarrow = "∨";
-        } else if (groupbystr == "ReFormDate") {
-            if (item.fieldstr == "全部") {
-                this.fixdatefilterstr = "整改时间";
-            } else {
-                // let dt = new Date(item.fieldstr);
-                this.fixdatefilterstr = item.fieldstr
-            }
-            this.fixdatecolor = "light";
-            this.fixdatearrow = "∨";
-        } else if (groupbystr == "ReturnNum") {
-            this.returntimesfilterstr = item.fieldstr;
-            this.returncolor = "light";
-            this.returnarrow = "∨";
-        }
-        this.refresh();
-    }
-
-    refresh(): Promise<any> {
-        return new Promise((resolve) => {
-            this.issuelist = []; this.teammembers = [];
-            let promise = new Promise((resolve) => {
-                resolve(100);
-            });
-            console.log("refreshIssues");
-            this.nativeservice.showLoading("处理中，请稍侯...");
-            resolve(promise.then((v1) => {
-                return this.initBaseDB.getbuilderissuelist(this.projid, 4, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr,this.fixdatefilterstr,this.checkitemfilterstr, this.sortingname);
-            }).then((val: any) => {
-                console.log("refresh end");
-                if (val) {
-                    this.issuelist = val;
-                    this.needupd = val[8];
-                    this.asscounts = val[4];
-                    this.forfixcounts = val[5];
-                    this.fixedcounts = val[6];
-                    this.returncounts = val[7];
-                }
-                return 1;
-            }).then((v: any) => {
-                this.nativeservice.hideLoading();
-                return 1;
-            }).catch(err => {
-                this.nativeservice.hideLoading();
-                console.log('问题加载失败:' + err);
-                throw '问题加载失败';
-            }))
-        })
-    }
-
-    assignfilter() {
-        this.assignarrow = "∧";
-        this.assigncolor = "primary";
-        this.presentfilter("ResponsibleName");
-    }
-
-    buildfilter() {
-        this.buildarrow = "∧";
-        this.buildcolor = "primary";
-        this.presentfilter("BuildingName");
-    }
-
-    floorfilter() {
-        this.floorarrow = "∧";
-        this.floorcolor = "primary";
-        this.presentfilter("FloorName");
-    }
-
-    duedatefilter() {
-        this.duedatearrow = "∧";
-        this.duedatecolor = "primary";
-        this.presentfilter("LimitDate");
-    }
-
-    checkitemfilter() {
-        this.checkitemarrow = "∧";
-        this.checkitemcolor = "primary";
-        this.presentfilter("CheckItemName");
-    }
-
-    fixdatefilter() {
-        this.fixdatearrow = "∧";
-        this.fixdatecolor = "primary";
-        this.presentfilter("ReFormDate");
-    }
-
-    returntimesfilter() {
-        this.returnarrow = "∧";
-        this.returncolor = "primary";
-        this.presentfilter("ReturnNum");
-    }
-
-    presentsorting() {
+    this.initBaseDB.getissuesuminfo(this.projid, 4, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, groupbystr, this.selectedTab).then(val => {
+      if (val && val.length > 0) {
         let actionSheet = this.actionSheetCtrl.create({
-            title: '选择排序规则',
-            buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelsorting(); }}]
+          title: '选择过滤条件',
+          buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelfilter(groupbystr); } }]
         });
-        for (let s of this.sortings) {
-            actionSheet.addButton({ text: s.fieldstr, handler: () => { this.sorting(s); } });
+        if (groupbystr == "LimitDate") {
+          for (let s of val) {
+            if (s.fieldstr == "全部") {
+              actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            } else {
+              let dt = new Date(s.fieldstr);
+              actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            }
+          }
+        } else if (groupbystr == "ReFormDate") {
+          for (let s of val) {
+            if (s.fieldstr == "全部") {
+              actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            } else {
+              let dt = new Date(s.fieldstr);
+              actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            }
+          }
+        } else {
+          for (let s of val) {
+            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+          }
         }
         actionSheet.present();
-    }
+      }
+    })
+  }
 
-    sorting(item) {
-        this.sortingstr = item.fieldstr;
-        this.sortingname = item.fieldname;
-        this.sortingcolor = "light";
-        this.sortingarrow = "∨";
-        this.refresh();
+  cancelfilter(groupbystr) {
+    if (groupbystr == "ResponsibleName") {
+      this.assigncolor = "light";
+      this.assignarrow = "∨";
+    } else if (groupbystr == "BuildingName") {
+      this.buildcolor = "light";
+      this.buildarrow = "∨";
+    } else if (groupbystr == "FloorName") {
+      this.floorcolor = "light";
+      this.floorarrow = "∨";
+    } else if (groupbystr == "LimitDate") {
+      this.duedatecolor = "light";
+      this.duedatearrow = "∨";
+    } else if (groupbystr == "CheckItemName") {
+      this.checkitemcolor = "light";
+      this.checkitemarrow = "∨";
+    } else if (groupbystr == "ReFormDate") {
+      this.fixdatecolor = "light";
+      this.fixdatearrow = "∨";
+    } else if (groupbystr == "ReturnNum") {
+      this.returncolor = "light";
+      this.returnarrow = "∨";
     }
+  }
 
-    sortingclick() {
-        this.sortingcolor = "primary";
-        this.sortingarrow = "∧";
-        this.presentsorting();
+  filter(groupbystr, item) {
+    if (groupbystr == "ResponsibleName") {
+      this.assignfilterstr = item.fieldstr;
+      this.assigncolor = "light";
+      this.assignarrow = "∨";
+    } else if (groupbystr == "BuildingName") {
+      this.buildingfilterstr = item.fieldstr;
+      this.buildcolor = "light";
+      this.buildarrow = "∨";
+    } else if (groupbystr == "FloorName") {
+      this.floorfilterstr = item.fieldstr;
+      this.floorcolor = "light";
+      this.floorarrow = "∨";
+    } else if (groupbystr == "LimitDate") {
+      if (item.fieldstr == "全部") {
+        this.duedatefilterstr = "整改时限";
+      } else {
+        // let dt = new Date(item.fieldstr);console.log(item.fieldstr);
+        this.duedatefilterstr = item.fieldstr;
+      }
+      this.duedatecolor = "light";
+      this.duedatearrow = "∨";
+    } else if (groupbystr == "CheckItemName") {
+      this.checkitemfilterstr = item.fieldstr;
+      this.checkitemcolor = "light";
+      this.checkitemarrow = "∨";
+    } else if (groupbystr == "ReFormDate") {
+      if (item.fieldstr == "全部") {
+        this.fixdatefilterstr = "整改时间";
+      } else {
+        // let dt = new Date(item.fieldstr);
+        this.fixdatefilterstr = item.fieldstr
+      }
+      this.fixdatecolor = "light";
+      this.fixdatearrow = "∨";
+    } else if (groupbystr == "ReturnNum") {
+      this.returntimesfilterstr = item.fieldstr;
+      this.returncolor = "light";
+      this.returnarrow = "∨";
     }
+    this.refresh();
+  }
 
-    cancelsorting() {
-        this.sortingcolor = "light";
-        this.sortingarrow = "∨";
+  refresh(): Promise<any> {
+    return new Promise((resolve) => {
+      this.issuelist = []; this.teammembers = [];
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("refreshIssues");
+      this.nativeservice.showLoading("处理中，请稍侯...");
+      resolve(promise.then((v1) => {
+        return this.initBaseDB.getbuilderissuelist(this.projid, 4, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, this.lastselectedTab);
+      }).then((val: any) => {
+        console.log("refresh end");
+        if (val) {
+          let list: Array<any>; list = [];
+          if (this.lastselectedTab == "待派单") {
+            list.push(val[0]); list.push(this.issuelist[1]); list.push(this.issuelist[2]); list.push(this.issuelist[3]);
+            this.asscounts = val[4]; list.push(val[4]); list.push(this.issuelist[5]); list.push(this.issuelist[6]); list.push(this.issuelist[7]);
+          } else if (this.lastselectedTab == "待整改") {
+            list.push(this.issuelist[0]); list.push(val[1]); list.push(this.issuelist[2]); list.push(this.issuelist[3]);
+            list.push(this.issuelist[4]); this.forfixcounts = val[5]; list.push(val[5]); list.push(this.issuelist[6]); list.push(this.issuelist[7]);
+          } else if (this.lastselectedTab == "已整改") {
+            list.push(this.issuelist[0]); list.push(this.issuelist[1]); list.push(val[2]); list.push(this.issuelist[3]);
+            list.push(this.issuelist[4]); list.push(this.issuelist[5]); this.fixedcounts = val[6]; list.push(val[6]); list.push(this.issuelist[7]);
+          } else {
+            list.push(this.issuelist[0]); list.push(this.issuelist[1]); list.push(this.issuelist[2]); list.push(val[3]);
+            list.push(this.issuelist[4]); list.push(this.issuelist[5]); list.push(this.issuelist[6]); this.fixedcounts = val[7]; list.push(val[7]);
+          }
+          list.push(this.needupd);
+          this.issuelist = list;
+        }
+        this.lastselectedTab = this.selectedTab;
+        return 1;
+      }).then((v: any) => {
+        this.nativeservice.hideLoading();
+        return 1;
+      }).catch(err => {
+        this.nativeservice.hideLoading();
+        console.log('问题加载失败:' + err);
+        throw '问题加载失败';
+      }))
+    })
+  }
+
+  assignfilter() {
+    this.assignarrow = "∧";
+    this.assigncolor = "primary";
+    this.presentfilter("ResponsibleName");
+  }
+
+  buildfilter() {
+    this.buildarrow = "∧";
+    this.buildcolor = "primary";
+    this.presentfilter("BuildingName");
+  }
+
+  floorfilter() {
+    this.floorarrow = "∧";
+    this.floorcolor = "primary";
+    this.presentfilter("FloorName");
+  }
+
+  duedatefilter() {
+    this.duedatearrow = "∧";
+    this.duedatecolor = "primary";
+    this.presentfilter("LimitDate");
+  }
+
+  checkitemfilter() {
+    this.checkitemarrow = "∧";
+    this.checkitemcolor = "primary";
+    this.presentfilter("CheckItemName");
+  }
+
+  fixdatefilter() {
+    this.fixdatearrow = "∧";
+    this.fixdatecolor = "primary";
+    this.presentfilter("ReFormDate");
+  }
+
+  returntimesfilter() {
+    this.returnarrow = "∧";
+    this.returncolor = "primary";
+    this.presentfilter("ReturnNum");
+  }
+
+  presentsorting() {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: '选择排序规则',
+      buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelsorting(); } }]
+    });
+    for (let s of this.sortings) {
+      actionSheet.addButton({ text: s.fieldstr, handler: () => { this.sorting(s); } });
     }
+    actionSheet.present();
+  }
+
+  sorting(item) {
+    this.sortingstr = item.fieldstr;
+    this.sortingname = item.fieldname;
+    this.sortingcolor = "light";
+    this.sortingarrow = "∨";
+    this.refresh();
+  }
+
+  sortingclick() {
+    this.sortingcolor = "primary";
+    this.sortingarrow = "∧";
+    this.presentsorting();
+  }
+
+  cancelsorting() {
+    this.sortingcolor = "light";
+    this.sortingarrow = "∨";
+  }
 }

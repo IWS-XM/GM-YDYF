@@ -2145,13 +2145,13 @@ export class initBaseDB {
     })
   }
 
-  getissuesumsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, groupbystr): Array<string> {
+  getissuesumsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, groupbystr, issuestatus): Array<string> {
     let sql = "";
     let filterstr = "";
     let sqls = [];
     if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层") 
          && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")
-         && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类")) {
+         && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类") && issuestatus == "全部") {
       filterstr = "";
     } else {
       if (assign != "全部" && assign != "负责人" && groupbystr != "ResponsibleName") {
@@ -2178,9 +2178,16 @@ export class initBaseDB {
       if (returntimes != "全部" && returntimes != "退回次数" && groupbystr != "ReturnNum") {
         filterstr += " and ReturnNum = " + returntimes + " ";
       }
+
+      if (issuestatus == "被退回") {
+        filterstr += " and ReturnNum > 0";
+      } else if (issuestatus != "全部") {
+        filterstr += " and issuestatus = '" + issuestatus + "' ";
+      }
+
     }
     let fieldsstr = "";fieldsstr = groupbystr.replace("LimitDate","date(LimitDate)").replace("ReFormDate","date(ReFormDate)")
-    sql = "insert into tmpissues (#groupbystr#) select #fieldsstr# from #tablename# where projid = '#projid#' #filterstr# ";
+    sql = "insert into tmpissues (#groupbystr#,issuestatus) select #fieldsstr#,issuestatus from #tablename# where projid = '#projid#' #filterstr# ";
     sql = sql.replace("#groupbystr#", groupbystr).replace("#fieldsstr#", fieldsstr).replace('#projid#', projid).replace('#filterstr#', filterstr);
     if (type == 1) {
       sqls.push(sql.replace("#tablename#", "PreCheckIssues"));
@@ -2194,17 +2201,17 @@ export class initBaseDB {
     return sqls;
   }
 
-  getissuesuminfo(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem,groupbystr): Promise<any> {
+  getissuesuminfo(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, groupbystr, issuestatus): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(10);
       });
       let ret = [];
       resolve(promise.then((v) => {
-        return this.initBaseTable("tmpIssues", "LimitDate datetime,ReturnNum integer default 0 ,ResponsibleName,FloorName,BuildingName,CheckItemName,ReFormDate datetime");          
+        return this.initBaseTable("tmpIssues", "LimitDate datetime,ReturnNum integer default 0 ,ResponsibleName,FloorName,BuildingName,CheckItemName,ReFormDate datetime,issuestatus");          
       }).then((v1: any) => {
         let sqls = [];
-        sqls = this.getissuesumsql(projid, type, assign, build, floor, duedate, returntimes,fixdate, checkitem, groupbystr);
+        sqls = this.getissuesumsql(projid, type, assign, build, floor, duedate, returntimes,fixdate, checkitem, groupbystr,issuestatus);
         return this.db.sqlBatch(sqls);
       }).then((v2: any) => {
         let sql = "select #groupbystr# as fieldstr, count(*) as counts from tmpissues group by #groupbystr# ";//
@@ -2240,12 +2247,12 @@ export class initBaseDB {
     })
   }
 
-  getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting): string {
+  getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting, issuestatus): string {
     let sql = "";
     let filterstr = "";
     if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层") 
          && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")
-         && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类")) {
+         && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类") && issuestatus == "全部") {
       filterstr = "";
     } else {
       if (assign != "全部" && assign != "负责人") {
@@ -2271,6 +2278,12 @@ export class initBaseDB {
       if (checkitem != "全部" && checkitem != "问题分类") {
         filterstr += " and CheckItemName = '" + checkitem + "' ";
       }
+
+      if (issuestatus == "被退回") {
+        filterstr += " and ReturnNum > 0";
+      } else if (issuestatus != "全部") {
+        filterstr += " and issuestatus = '" + issuestatus + "' ";
+      }
     }
     if (type == 1) {
       sql = "select Id,1 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId from PreCheckIssues where projid = '#projid#' #filterstr# ";
@@ -2292,7 +2305,7 @@ export class initBaseDB {
     return sql;
   }
 
-  getbuilderissuelist(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting): Promise<Array<any>> {
+  getbuilderissuelist(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting, issuestatus): Promise<Array<any>> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
@@ -2307,19 +2320,7 @@ export class initBaseDB {
           needupd = v1.rows.item(0).Needupd;
         }
         let sql = "";
-        sql = this.getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting);
-        // if (type == 1) {
-        //   sql = "select Id,1 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate from PreCheckIssues where projid = '#projid#'";
-        //   sql += " union select Id,2 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate from OpenCheckIssues where projid = '#projid#'";
-        //   sql += " union select Id,3 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate from FormalCheckIssues where projid = '#projid#' order by issueid desc";
-        //   sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid);
-
-        // } else {
-        //   sql = " select Id,4 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate from ServiceCheckIssues where projid = '#projid#' order by issueid desc";
-        //   sql = sql.replace('#projid#', projid);
-
-        // }
-        // console.log(sql);
+        sql = this.getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting, issuestatus);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
         console.log(v2);
@@ -2340,21 +2341,21 @@ export class initBaseDB {
             }
             status = v2.rows.item(i).IssueStatus;
             console.log(status)
-            if (status == "待派单") {
+            if ((issuestatus == "全部" || issuestatus == "待派单") && status == "待派单") {
               console.log("1" + status);
               dpd++;
               forass.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
-            } else if (status == "待整改") {
+            } else if ((issuestatus == "全部" || issuestatus == "待整改") && status == "待整改") {
               console.log("2" + status);
               dzg++;
               forfix.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
-            } else if (status == "已整改") {
+            } else if ((issuestatus == "全部" || issuestatus == "已整改") && status == "已整改") {
               console.log("3" + status);
               yzg++;
               dt = new Date(v2.rows.item(i).ReFormDate);
               fixed.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已整改", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
             }
-            if (status != "已整改" && v2.rows.item(i).ReturnDate) {
+            if ((issuestatus == "全部" || issuestatus == "被退回") && status != "已整改" && v2.rows.item(i).ReturnDate) {
               console.log("4" + status);
               bth++;
               dt = new Date(v2.rows.item(i).ReturnDate);
