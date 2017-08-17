@@ -95,11 +95,11 @@ export class HttpService {
           })
           .catch(e => {
             console.log('Error displaying dialog', e);
-            this.localStorage.removeitem('curuser').then(v=>{
-              this.localStorage.removeitem('curproj').then(v=>{
-                 this.logout();
-              })
-            })
+            // this.localStorage.removeitem('curuser').then(v=>{
+            //   this.localStorage.removeitem('curproj').then(v=>{
+            //      this.logout();
+            //   })
+            // })
           })
       } else if (err == "用户不在此项目中") {
         this.dialogs.alert(err + ",请到‘我’=>'设置'里选择其他项目.", '提示', '确定')

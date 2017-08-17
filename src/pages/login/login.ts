@@ -9,8 +9,8 @@ import { APP_SERVE_URL } from '../../providers/Constants';
 import { HttpService } from '../../providers/HttpService';
 import { BuilderTabsPage } from '../buildertabs/buildertabs';
 import { ChangePWPage } from '../changepw/changepw';
- //import { ShowimgPage } from '../imageeditor/showimg';
- //import { AboutPage } from '../about/about';
+//import { ShowimgPage } from '../imageeditor/showimg';
+//import { AboutPage } from '../about/about';
 
 @Component({
   selector: 'page-login',
@@ -19,13 +19,12 @@ import { ChangePWPage } from '../changepw/changepw';
 export class LoginPage {
   imgheight: any;
   userid: string;
-  password: string; 
-  
-   //images:Array<any> = [];
+  password: string;
+  //images:Array<any> = [];
   constructor(public navCtrl: NavController, public alertCtrl: AlertController, public localStorage: LocalStorage, public initBaseDB: initBaseDB,
     public nativeservice: NativeService, private httpService: HttpService) {
-    console.log("login start app");  
-    
+    console.log("login start app");
+
     this.imgheight = window.innerHeight / 1.8;
     this.localStorage.getItem('curuser').then(val => {
       if (val && val.userid) {
@@ -43,7 +42,7 @@ export class LoginPage {
     // console.log(value);
     //       value = value.replace("CB2DEE59DAD310B98B76330AA024E3CA",'');
     //       console.log(value);
-          
+
     //       while(value.length > 0){
     //         userrole.push(value.substr(2,2));
     //         value = value.substr(4,value.length-4);            
@@ -61,8 +60,26 @@ export class LoginPage {
     //   });
     // }
   }
-  
-  loginclick() {    
+
+  loginclick() {
+    // let promise = new Promise((resolve) => {
+    //   resolve(100);
+    // });
+    // promise.then((v1) => {
+    //   console.log(v1);
+    //   return 10;
+    // }).then((v2) => {
+    //   console.log(v2);
+    //   throw '';
+    // }).then((v3) => {   
+    //   console.log("v3:"+v3);   
+    //   return 12;
+    // }).then((v4) => {
+    //   console.log(v4);
+    //   return 11
+    // }).catch(e=>{
+    //   console.log(e);
+    // })
     // this.navCtrl.push(AboutPage);
     //this.navCtrl.push(ShowimgPage,{ imgdata: ["assets/img/b1f2-103.jpg","assets/img/login.jpg"], num:1 });
     // this.images = [];
@@ -81,7 +98,7 @@ export class LoginPage {
     //this.initBaseDB.testupdate();
     //data:image/jpg;base64,
     //this.initBaseDB.downloadimg('0f2b58a05f491323efd14a43bc095511.jpg');
- 
+
     //this.initBaseDB.testsql();
     // let d = []; var i = 0; i++;
     // console.log('dde'+i.toString());
@@ -113,7 +130,7 @@ export class LoginPage {
     // console.log(w.toLocaleString());
     // console.log(t.toLocaleString());
     // console.log(t.toTimeString());
-    
+
     this.nativeservice.isConnecting().then((val: boolean) => {
       if (val == false) {
         throw '无网络登陆失败';
@@ -135,57 +152,57 @@ export class LoginPage {
 
   initData(items): Promise<any> {
     return new Promise((resolve) => {
-      let item = items[1];      
+      let item = items[1];
       let userrole = [];
-      let userrolestr:string = items[3][0];
+      let userrolestr: string = items[3][0];
       console.log(userrolestr);
-      if (item.VendRole == false){
-          let value:string = this.nativeservice.base64decode(userrolestr);
-          value = value.replace(item.Token,'');
-          let tmpvalue:string;
-          while(value.length > 0){
-            userrole.push(value.substr(2,2));
-            value = value.substr(4,value.length-4);            
-          } 
-          console.log(userrole);
-      }      
+      if (item.VendRole == false) {
+        let value: string = this.nativeservice.base64decode(userrolestr);
+        value = value.replace(item.Token, '');
+        let tmpvalue: string;
+        while (value.length > 0) {
+          userrole.push(value.substr(2, 2));
+          value = value.substr(4, value.length - 4);
+        }
+        console.log(userrole);
+      }
       let promise = new Promise((resolve) => {
         resolve(100);
       });
       // userrole = ["A1","A2","A3","A4","A5","A6","B1"];
       resolve(promise.then((v1) => {
-        return this.localStorage.setItem('curuser', { userid: this.userid, token: item.Token, duetime: item.AllowEnd, username: item.UserName, vendrole: item.VendRole, id: item.UserId, userrole:userrole });
+        return this.localStorage.setItem('curuser', { userid: this.userid, token: item.Token, duetime: item.AllowEnd, username: item.UserName, vendrole: item.VendRole, id: item.UserId, userrole: userrole });
       }).then((v2) => {
         return this.initBaseDB.initdb(this.userid + ".db", false);
       }).then((v3) => {
-        if (item.VendRole == false && userrole.indexOf('A1') == -1){
-          return this.nativeservice.alert("没有APP授权，请联系管理员.").then(v=>{
+        if (item.VendRole == false && userrole.indexOf('A1') == -1) {
+          return this.nativeservice.alert("没有APP授权，请联系管理员.").then(v => {
             return "no proj";
-          }).catch(e=>{
+          }).catch(e => {
             return "no proj";
-          })          
+          })
         } else {
           return this.initBaseDB.initProjVersion(item.Token, item.VendRole);
-        }        
+        }
       }).then((v4) => {
         console.log(v4);
         // if (v4 == "no proj") {
-          this.nativeservice.hideLoading();
-          if (item.VendRole == true) {
-            if (item.First == true) {
-              this.navCtrl.push(ChangePWPage, { "first": item.first });
-            } else {
-              console.log(item.First);
-              this.navCtrl.push(BuilderTabsPage);
-            }
+        this.nativeservice.hideLoading();
+        if (item.VendRole == true) {
+          if (item.First == true) {
+            this.navCtrl.push(ChangePWPage, { "first": item.first });
           } else {
-            if (item.First == true && userrole.indexOf('B1') != -1) {
-              this.navCtrl.push(ChangePWPage, { "first": item.first });
-            } else {
-              this.navCtrl.push(TabsPage);
-            }
+            console.log(item.First);
+            this.navCtrl.push(BuilderTabsPage);
           }
-          return 10;
+        } else {
+          if (item.First == true && userrole.indexOf('B1') != -1) {
+            this.navCtrl.push(ChangePWPage, { "first": item.first });
+          } else {
+            this.navCtrl.push(TabsPage);
+          }
+        }
+        return 10;
         // } else {
         //   if (item.VendRole == true) {
         //     return this.initBaseDB.downloadbuilderdata(item.Token, v4).then(v => {
@@ -237,6 +254,6 @@ export class LoginPage {
       // }
     })
   }
-  
+
 
 }

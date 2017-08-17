@@ -8,9 +8,9 @@
 
 <ion-content padding>
 <ion-list>
-    <ion-item detail-push>
+    <ion-item>
       <ion-label fixed>切换项目</ion-label>
-      <ion-select [(ngModel)]="projname" (ionChange)="projchange($event)" okText="确定" cancelText="取消" style=" white-space:normal">
+      <ion-select [(ngModel)]="projname" (ionChange)="projchange($event)" okText="确定" cancelText="取消" style=" white-space:normal;max-width:100%;padding:0">
         <ion-option *ngFor="let item of projnames">{{ item }}</ion-option>
       </ion-select>
     </ion-item>

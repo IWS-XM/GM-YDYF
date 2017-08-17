@@ -46,7 +46,7 @@
 
     <ion-item *ngIf="overdays > 0">
       <ion-label>超时原因</ion-label>
-      <ion-select [(ngModel)]="reasonovertime" okText="确定" cancelText="取消">
+      <ion-select [(ngModel)]="reasonovertime" okText="确定" cancelText="取消" style=" white-space:normal;max-width:100%;padding:0">
         <ion-option *ngFor="let item of reasonsovertimes">{{item}}</ion-option>
       </ion-select>
     </ion-item>
