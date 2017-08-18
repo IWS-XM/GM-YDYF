@@ -1311,11 +1311,12 @@ export class initBaseDB {
             all = { id: floorid, value: [] };
           }
           let color: string;
-          if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
-            pass.value.push({ roomid: items.Id, name: items.Name });
-            color = "secondary";
-            passcounts++;
-          } else if (items.dzg > 0) {
+          // if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+          //   pass.value.push({ roomid: items.Id, name: items.Name });
+          //   color = "secondary";
+          //   passcounts++;
+          // } else 
+          if (items.dzg > 0) {
             forfix.value.push({ roomid: items.Id, name: items.Name });
             color = "danger";
             forfixcounts++;
@@ -1326,14 +1327,26 @@ export class initBaseDB {
             fixedcounts++;
           }
           else if (items.ytg > 0) {
-            pass.value.push({ roomid: items.Id, name: items.Name });
-            color = "secondary";
-            passcounts++;
+            if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+              pass.value.push({ roomid: items.Id, name: items.Name });
+              color = "secondary";
+              passcounts++;
+            } else {
+              fixed.value.push({ roomid: items.Id, name: items.Name });
+              color = "primary";
+              fixedcounts++;
+            }
           }
           else {
-            ready.value.push({ roomid: items.Id, name: items.Name });
-            color = "light";
-            readycounts++;
+            if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+              pass.value.push({ roomid: items.Id, name: items.Name });
+              color = "secondary";
+              passcounts++;
+            } else {
+              ready.value.push({ roomid: items.Id, name: items.Name });
+              color = "light";
+              readycounts++;
+            }
           }
           allcounts++;
           all.value.push({ roomid: items.Id, name: items.Name, color: color });
@@ -2149,9 +2162,9 @@ export class initBaseDB {
     let sql = "";
     let filterstr = "";
     let sqls = [];
-    if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层") 
-         && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")
-         && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类") && issuestatus == "全部") {
+    if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层")
+      && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")
+      && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类") && issuestatus == "全部") {
       filterstr = "";
     } else {
       if (assign != "全部" && assign != "负责人" && groupbystr != "ResponsibleName") {
@@ -2166,7 +2179,7 @@ export class initBaseDB {
       if (duedate != "全部" && duedate != "整改时限" && groupbystr != "LimitDate") {
         filterstr += " and LimitDate >= '" + duedate + " 00:00:00' and LimitDate <= '" + duedate + " 23:59:59' ";
       }
-//CheckItemName,ReFormDate
+      //CheckItemName,ReFormDate
       if (fixdate != "全部" && fixdate != "整改时间" && groupbystr != "ReFormDate") {
         filterstr += " and ReFormDate >= '" + fixdate + " 00:00:00' and ReFormDate <= '" + fixdate + " 23:59:59' ";
       }
@@ -2186,7 +2199,7 @@ export class initBaseDB {
       }
 
     }
-    let fieldsstr = "";fieldsstr = groupbystr.replace("LimitDate","date(LimitDate)").replace("ReFormDate","date(ReFormDate)")
+    let fieldsstr = ""; fieldsstr = groupbystr.replace("LimitDate", "date(LimitDate)").replace("ReFormDate", "date(ReFormDate)")
     sql = "insert into tmpissues (#groupbystr#,issuestatus) select #fieldsstr#,issuestatus from #tablename# where projid = '#projid#' #filterstr# ";
     sql = sql.replace("#groupbystr#", groupbystr).replace("#fieldsstr#", fieldsstr).replace('#projid#', projid).replace('#filterstr#', filterstr);
     if (type == 1) {
@@ -2194,10 +2207,10 @@ export class initBaseDB {
       sqls.push(sql.replace("#tablename#", "OpenCheckIssues"));
       sqls.push(sql.replace("#tablename#", "FormalCheckIssues"));
     } else {
-      sqls.push(sql.replace("#tablename#", "ServiceCheckIssues"));      
+      sqls.push(sql.replace("#tablename#", "ServiceCheckIssues"));
     }
     console.log(sqls);
-    
+
     return sqls;
   }
 
@@ -2208,10 +2221,10 @@ export class initBaseDB {
       });
       let ret = [];
       resolve(promise.then((v) => {
-        return this.initBaseTable("tmpIssues", "LimitDate datetime,ReturnNum integer default 0 ,ResponsibleName,FloorName,BuildingName,CheckItemName,ReFormDate datetime,issuestatus");          
+        return this.initBaseTable("tmpIssues", "LimitDate datetime,ReturnNum integer default 0 ,ResponsibleName,FloorName,BuildingName,CheckItemName,ReFormDate datetime,issuestatus");
       }).then((v1: any) => {
         let sqls = [];
-        sqls = this.getissuesumsql(projid, type, assign, build, floor, duedate, returntimes,fixdate, checkitem, groupbystr,issuestatus);
+        sqls = this.getissuesumsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, groupbystr, issuestatus);
         return this.db.sqlBatch(sqls);
       }).then((v2: any) => {
         let sql = "select #groupbystr# as fieldstr, count(*) as counts from tmpissues group by #groupbystr# ";//
@@ -2220,25 +2233,25 @@ export class initBaseDB {
         return this.db.executeSql(sql, []);
       }).then((v3: any) => {
         let tmppromise = Promise.resolve(0);
-        let sum:number = 0;
-        let data:any; data = []; data = v3;        
-        for (let i = 0; i < data.rows.length; i++) {         
+        let sum: number = 0;
+        let data: any; data = []; data = v3;
+        for (let i = 0; i < data.rows.length; i++) {
           console.log('suminfo:' + JSON.stringify(data.rows.item(i)));
-          let item:any; item = [];
+          let item: any; item = [];
           item = data.rows.item(i);
-          console.log("item:"+item);
+          console.log("item:" + item);
           tmppromise = tmppromise.then(() => {
             console.log(item.fieldstr);
-            ret.push({fieldstr:item.fieldstr,counts:item.counts});
+            ret.push({ fieldstr: item.fieldstr, counts: item.counts });
             return item.counts;
-          }).then((v:number) => {
+          }).then((v: number) => {
             sum += v;
             return sum;
           })
         }
         return tmppromise;
       }).then((v4: number) => {
-        ret.push({fieldstr:"全部",counts:v4});
+        ret.push({ fieldstr: "全部", counts: v4 });
         return ret;
       }).catch(err => {
         this.warn('问题加载失败:' + err);
@@ -2250,9 +2263,9 @@ export class initBaseDB {
   getissuelistsql(projid, type, assign, build, floor, duedate, returntimes, fixdate, checkitem, sorting, issuestatus): string {
     let sql = "";
     let filterstr = "";
-    if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层") 
-         && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")
-         && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类") && issuestatus == "全部") {
+    if ((assign == "全部" || assign == "负责人") && (build == "全部" || build == "楼栋") && (floor == "全部" || floor == "楼层")
+      && (duedate == "全部" || duedate == "整改时限") && (returntimes == "全部" || returntimes == "退回次数")
+      && (fixdate == "全部" || fixdate == "整改时间") && (checkitem == "全部" || checkitem == "问题分类") && issuestatus == "全部") {
       filterstr = "";
     } else {
       if (assign != "全部" && assign != "负责人") {
@@ -2264,8 +2277,8 @@ export class initBaseDB {
       if (floor != "全部" && floor != "楼层") {
         filterstr += " and FloorName = '" + floor + "' ";
       }
-      if (duedate != "全部" && duedate != "整改时限") {        
-        filterstr += " and date(LimitDate) = '" + duedate + "'"; 
+      if (duedate != "全部" && duedate != "整改时限") {
+        filterstr += " and date(LimitDate) = '" + duedate + "'";
       }
       if (returntimes != "全部" && returntimes != "退回次数") {
         filterstr += " and ReturnNum = " + returntimes + " ";
@@ -2810,7 +2823,7 @@ export class initBaseDB {
     })
   }
 
-  showdatetime(datetime:Date):string{
+  showdatetime(datetime: Date): string {
     return datetime.toLocaleDateString() + " " + datetime.getHours().toString() + ":" + datetime.getMinutes() + ":" + datetime.getSeconds();
   }
 
@@ -2906,8 +2919,9 @@ export class initBaseDB {
               let tmppromise = Promise.resolve(false);
               for (var i = 0; i < v1.rows.length; i++) {
                 console.log(JSON.stringify(v1.rows.item(i)));
+                let batchid = v1.rows.item(i).Batchid; let buildingid = v1.rows.item(i).Buildingid; let type:number = v1.rows.item(i).Type;
                 tmppromise = tmppromise.then(() => {
-                  return this.uploadbuildinginfo(token, projid, v1.rows.item(i).Batchid, v1.rows.item(i).Buildingid, v1.rows.item(i).Type);
+                  return this.uploadbuildinginfo(token, projid, batchid, buildingid, type);
                 }).then((v) => {
                   return true;
                 })
