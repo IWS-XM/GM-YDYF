@@ -20,7 +20,7 @@
     </ion-item>
     <ion-item>
       <ion-label>描述</ion-label>
-      <ion-select #issuedesc multiple="true" [(ngModel)]="itdesc" (ionChange)="issuedescchange($event)" okText="确定" cancelText="取消" style=" white-space:normal;max-width:100%;padding:0">
+      <ion-select #issuedesc multiple="true" [(ngModel)]="itdesc" (ionChange)="issuedescchange($event)" okText="确定" cancelText="取消" style=" white-space:normal;max-width:80%;padding:0">
         <ion-option *ngFor="let item of itemdescs">{{ item }}</ion-option>
       </ion-select>
     </ion-item>

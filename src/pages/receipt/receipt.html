@@ -28,7 +28,7 @@
       <ion-item *ngIf="type==3"><ion-label fixed>钥匙留用</ion-label><span style="width:70px;" item-right>把　</span><ion-input [readonly] = "readonly" type="number" [(ngModel)]="receiptInfo.keyReserve"></ion-input></ion-item>
       <button ion-item (click)="doSignature()" fixed>
         <ion-label fixed>业主签名</ion-label>
-        <span style="width:160px;" item-right><img style="background-color:white;height:40px;" src="{{receiptInfo.ownerSign}}" /></span>
+        <span style="width:140px;" item-right><img style="background-color:white;height:40px;" src="{{receiptInfo.ownerSign}}" /></span>
       </button>
       <!--<ion-item><ion-label fixed>交付日期</ion-label><ion-input type="text" value="{{receiptInfo.dlvrDate}}"></ion-input></ion-item>-->
       <ion-item *ngIf="readonly"><ion-label>{{titlestr}}日期&nbsp;&nbsp;&nbsp;&nbsp;{{receiptInfo.dlvrDate}}</ion-label></ion-item>
