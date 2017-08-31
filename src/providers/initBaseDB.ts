@@ -2999,7 +2999,7 @@ export class initBaseDB {
       console.log(filename);
       //ydyf_DownLoadFile
       this.httpService.postimg(FILE_SERVE_URL + "/ydyf_UpLoadFileString", { token: FILE_TOKEN, FileName: src, MD5: filename }).then(v => {
-        resolve(1);
+          resolve(1);
       }).catch(err => {
         this.warn('图片上传失败:' + err);
         resolve(0);

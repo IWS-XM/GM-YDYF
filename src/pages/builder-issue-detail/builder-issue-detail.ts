@@ -227,9 +227,11 @@ export class BuilderIssueDetail {
 
   showBigImage(imagesrc, fixedflag: number = 0) {  //传递一个参数（图片的URl）
     let i = 0;
+    console.log(fixedflag);
     if (fixedflag == 0) {
       this.images.forEach(element => {
         if (element == imagesrc) {
+          console.log('ee');
           this.navCtrl.push(ShowimgPage, { imgdata: this.images, num: i });
         }
         i++;
@@ -237,6 +239,7 @@ export class BuilderIssueDetail {
     } else {
       this.imagesfixed.forEach(element => {
         if (element == imagesrc) {
+          console.log('ee');
           this.navCtrl.push(ShowimgPage, { imgdata: this.imagesfixed, num: i });
         }
         i++;

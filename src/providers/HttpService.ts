@@ -65,7 +65,7 @@ export class HttpService {
     return url + this.toQueryString(paramObj);
   }
 
-  private handleSuccessImg(result) {
+  private handleSuccessImg(result) {    
     let body = result._body;
     let data = JSON.parse(body);
     if (data.errcode == 0) {
@@ -76,15 +76,13 @@ export class HttpService {
     }
   }
 
-  private handleSuccess(result) {
-    console.log(result);
-    if (result && result[0][0][0] == "false") {//由于和后台约定好,所有请求均返回一个包含success,msg,data三个属性的对象,所以这里可以这样处理
-      console.log(result[0][0][1]);//这里使用ToastController
+  private handleSuccess(result) {    
+    if (result && result[0][0][0] == "false") {//由于和后台约定好,所有请求均返回一个包含success,msg,data三个属性的对象,所以这里可以这样处理     
       let err: string = result[0][0][1];
       console.log('err'+err);
       if (err == "用户不存在" || err == "登陆已失效" || err == "未找到用户") {
         console.log('uuuuu');
-        this.dialogs.alert(err, '提示', '确定')
+        this.dialogs.alert("用户不存在或登录已失效，请重新登录", '提示', '确定')
           .then(() => {
             this.localStorage.removeitem('curuser').then(v=>{
               this.localStorage.removeitem('curproj').then(v=>{
