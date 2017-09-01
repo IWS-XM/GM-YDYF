@@ -21,27 +21,27 @@
 <ion-content padding>
   <ion-list>
     <ion-item>
-      <ion-label fixed>编号</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">编号</ion-label>
       <!--<ion-label item-right>{{issueId}}</ion-label>-->
       <ion-input type="text" value="{{issue.issueid}}" readonly></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label fixed>房号</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">房号</ion-label>
       <ion-input value="{{issue.buildingname}}-{{issue.floorname}}-{{issue.roomname}}" readonly style=" white-space:normal"></ion-input>
     </ion-item>
     <ion-item class="item-input" (click)="positionview()">
-      <ion-label fixed>部位</ion-label>
-      <ion-label item-right style="margin:0;">
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">部位</ion-label>
+      <ion-label item-right >
         <button ion-button clear style="padding:0 6px;" (click)="positionview()">{{issue.position}}
       &nbsp;&nbsp;<ion-icon name="pin"></ion-icon></button>
       </ion-label>
     </ion-item>
     <ion-item>
-      <ion-label fixed>问题分类</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">问题分类</ion-label>
       <ion-input value="{{issue.checkitem}}" readonly></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label fixed>描述</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">描述</ion-label>
       <ion-input value="{{issue.IssueDesc}}" readonly style=" white-space:normal"></ion-input>
     </ion-item>
     <ion-item>
@@ -65,28 +65,28 @@
 
     </ion-item>
     <ion-item>
-      <ion-label fixed>整改说明</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">整改说明</ion-label>
       <ion-input readonly value="{{fixeddesc}}" style=" white-space:normal"></ion-input>
       <!--<ion-textarea  [(ngModel)]="fixeddesc"></ion-textarea>-->
     </ion-item>
     <ion-item>
-      <ion-label fixed>登记时间</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">登记时间</ion-label>
       <ion-input value="{{registertime}}" readonly></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label fixed>指派时间</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">指派时间</ion-label>
       <ion-input readonly value="{{assigntime}}"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label fixed>整改时限</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">整改时限</ion-label>
       <ion-input readonly value="{{duetime}}"></ion-input>
     </ion-item>    
     <ion-item>
-      <ion-label fixed>负责人</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">负责人</ion-label>
       <ion-input readonly value="{{issue.ResponsibleName}}"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label fixed>整改时间</ion-label>
+      <ion-label fixed style="width:28%;min-width:28%;max-width:28%">整改时间</ion-label>
       <ion-input value="{{fixedtime}}" readonly style='color:red'></ion-input>
     </ion-item>
     <!--*ngIf="return_log!=undefined && return_log.length > 0"-->

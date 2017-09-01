@@ -32,7 +32,7 @@
       </button>
       <!--<ion-item><ion-label fixed>交付日期</ion-label><ion-input type="text" value="{{receiptInfo.dlvrDate}}"></ion-input></ion-item>-->
       <ion-item *ngIf="readonly"><ion-label>{{titlestr}}日期&nbsp;&nbsp;&nbsp;&nbsp;{{receiptInfo.dlvrDate}}</ion-label></ion-item>
-      <ion-item  *ngFor="let item of satDim" ><ion-label>{{item.dim}}</ion-label>
+      <ion-item  *ngFor="let item of satDim" ><ion-label style=" white-space:normal">{{item.dim}}</ion-label>
         <ion-icon name="{{i<item.score?'star':'star-outline'}}" item-right color="danger" *ngFor="let s of getStars(5); let i = index;"
                   (click)="starClick(item,i+1)" on-touch="starClick(item,i+1)"
                   on-tap="starClick(item,i+1)" on-swipe="starClick(item,i+1)"

@@ -94,6 +94,7 @@ export class ReceiptPage {
                 }
                 let dt: Date;
                 if (val.rows.item(0).TransDate) {
+                    console.log("dt");
                     dt = new Date(val.rows.item(0).TransDate);
                     console.log(dt);
                     console.log(dt.toLocaleDateString());
@@ -229,6 +230,7 @@ export class ReceiptPage {
                 let sqls = [];
 
                 let curtime: string = now.toLocaleDateString() + " " + now.getHours().toString() + ":" + now.getMinutes() + ":" + now.getSeconds();
+                console.log(curtime);
                 let sql = '';
                 if (this.type == 3) {
                     sql = "update FormalRoomDetails set versionid = 0,RoomStatus = '已交付', Transdate ='" + curtime + "', Remark = '#Remark#',EngineerPhone = '#userid#',EngineerName = '#username#',ImgSign = '#imgsign#',AmmeterReading=#ammeter#,WaterMeterReading=#water#,GasMeterReading=#gas#,KeyRetentionStatus=#key# where roomid = '#roomid#' ";
@@ -237,6 +239,7 @@ export class ReceiptPage {
                 }
                 sql = sql.replace('#Remark#', this.receiptInfo.additionNote).replace('#userid#', this.userid).replace('#username#', this.username).replace('#roomid#', this.receiptInfo.roomId);
                 console.log(this.receiptInfo.electricMeter);
+                console.log(sql);
                 if (v2) {
                     sql = sql.replace('#imgsign#', v2);
                 } else {

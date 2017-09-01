@@ -63,7 +63,7 @@ export class RejectPage {
     let sql = "insert into RoomNoAcceptLogs (ProjId,BatchId,RoomId,BuildingId,PlusDesc,VersionId,ID,ReasonNoAcceptId,UserName,TransDate) values(#values#)";
     let now = new Date();
     
-    let curtime:string = now.toLocaleDateString()+" "+now.getHours().toString()+":"+now.getMinutes()+":"+now.getSeconds();
+    let curtime: string = now.toLocaleDateString() + " " + now.getHours().toString() + ":" + now.getMinutes() + ":" + now.getSeconds();
         
     let value = [];
     value.push("'" + this.projid + "'");
