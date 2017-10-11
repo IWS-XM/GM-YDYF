@@ -58,6 +58,7 @@ export class BuilderIssueDetail {
   images: Array<any>;
   imagesfixed: Array<any>;
   teammembers: Array<any>;
+  userrole: Array<string> = [];
   constructor(public navCtrl: NavController, public navParams: NavParams, public initBaseDB: initBaseDB, private modalCtrl: ModalController, public nativeservice: NativeService, public actionSheetCtrl: ActionSheetController) {
     this.issueid = navParams.get('Id');
     this.projid = navParams.get('projid');
@@ -66,6 +67,7 @@ export class BuilderIssueDetail {
     this.username = navParams.get('username');
     this.issue = navParams.get('issue');
     this.teammembers = []; this.teammembers = navParams.get('teammembers');
+    this.userrole = navParams.get('userrole');
   }
 
   loadissueinfo() {

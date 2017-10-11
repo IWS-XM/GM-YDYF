@@ -41,6 +41,7 @@ export class ShowimgPage {
 	ionViewDidLoad() {       
 	   setTimeout(() => {//最长显示10秒
         this.slides.slideTo(this.num,50);
+		this.slides._allowSwipeToNext = (this.num+1 < this.length);	
       }, 50);
 	   //
 	}

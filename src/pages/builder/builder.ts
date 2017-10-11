@@ -60,12 +60,14 @@ export class BuilderPage {
     fixdatearrow: string = "∨";
     checkitemarrow: string = "∨";
     sortingarrow: string = "∨";
+    userrole: Array<string> = [];
     constructor(public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController, public dialogs: Dialogs,
         public initBaseDB: initBaseDB, public nativeservice: NativeService, public localStorage: LocalStorage, private clipboard: Clipboard) {
         this.localStorage.getItem('curuser').then(val => {
             this.userid = val.userid;
             this.username = val.username;
             this.token = val.token;
+            this.userrole = val.userrole;
         })
         this.sortings = [{ fieldstr: "默认排序", fieldname: "default" }, { fieldstr: "工序批次", fieldname: "BatchName" }, { fieldstr: "紧急程度", fieldname: "UrgencyId" }, { fieldstr: "整改时限", fieldname: "LimitDate" }, { fieldstr: "退回次数", fieldname: "ReturnNum" }];
     }
@@ -234,7 +236,7 @@ export class BuilderPage {
 
     showDetail(issue) {
         //alert(issue['issueId']);
-        this.navCtrl.push(BuilderIssueDetail, { "Id": issue.id, "issue": issue, "projid": this.projid, "projname": this.projname, "userid": this.userid, "username": this.username, "teammembers": this.teammembers });
+        this.navCtrl.push(BuilderIssueDetail, { "Id": issue.id, "issue": issue, "projid": this.projid, "projname": this.projname, "userid": this.userid, "username": this.username, "teammembers": this.teammembers, "userrole": this.userrole});
     }
 
     changeAssignto() {

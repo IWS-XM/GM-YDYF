@@ -148,7 +148,7 @@ export class LoginPage {
       }
     })
   }
-  
+
 
   initData(items): Promise<any> {
     return new Promise((resolve) => {
@@ -156,8 +156,9 @@ export class LoginPage {
       let userrole = [];
       let userrolestr: string = items[3][0];
       console.log(userrolestr);
-      if (item.VendRole == false) {
-        let value: string = this.nativeservice.base64decode(userrolestr);
+      //if (item.VendRole == false) {
+      let value: string = this.nativeservice.base64decode(userrolestr);
+      if (value != '') {
         value = value.replace(item.Token, '');
         let tmpvalue: string;
         while (value.length > 0) {
@@ -166,6 +167,7 @@ export class LoginPage {
         }
         console.log(userrole);
       }
+      //}
       let promise = new Promise((resolve) => {
         resolve(100);
       });

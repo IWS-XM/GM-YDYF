@@ -137,7 +137,7 @@ export class NativeService {
           console.log(apk);
           fileTransfer.download(url, apk).then(() => {
             //window['INSTALL'].install(apk.replace('file://', ''));
-            this.fileOpener.open(apk.replace('file://',''), 'application/vnd.android.package-archive')
+            this.fileOpener.open(apk.replace('file://', ''), 'application/vnd.android.package-archive')
               .then(() => console.log('File is opened'))
               .catch(e => console.log('Error openening file', e));
           });
