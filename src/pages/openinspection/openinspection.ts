@@ -6,6 +6,7 @@ import { LocalStorage } from '../../providers/local-storage';
 import { initBaseDB } from '../../providers/initBaseDB';
 import { Dialogs } from '@ionic-native/dialogs';
 import { NativeService } from '../../providers/nativeservice';
+import { ReportPage } from '../report/report';
 
 @Component({
   selector: 'page-openinspection',
@@ -19,6 +20,7 @@ export class OpeninspectionPage {
   type: number;
   versionid: number;
   nodata: boolean = true;
+  userrole: Array<string> = [];
   constructor(public navCtrl: NavController, public alertCtrl: AlertController, public localStorage: LocalStorage,
     public initBaseDB: initBaseDB, public dialogs: Dialogs, public nativeservice:NativeService) {
     this.type = 2;
@@ -28,6 +30,7 @@ export class OpeninspectionPage {
     this.batchbuildings = [];
     this.localStorage.getItem('curuser').then(val => {
       this.token = val.token;
+      this.userrole = val.userrole;
     })
     console.log("ionViewDidEnter");
     this.localStorage.getItem('curproj').then(val => {
@@ -200,5 +203,9 @@ export class OpeninspectionPage {
         console.log('楼栋更新错误:' + err);
       }))
     })
+  }
+
+  ShowReport() {
+    this.navCtrl.push(ReportPage, { ProjId: this.projid ,ReportType: "2" });
   }
 }

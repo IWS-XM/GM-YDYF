@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>移动报表</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+
+  <ion-list>
+    <ion-item color="light" style="background-image: url(assets/img/rpt-summary.jpg);text-align:center; color:ivory">
+      <strong>整改完成率</strong>
+      <ion-icon name='help-circle' item-end item-right (click)="ShowHelp()" ></ion-icon>
+    </ion-item>
+    <div style="background-image: url(assets/img/rpt-summary.jpg); 
+      background-size: cover; background-repeat: repeat-x; 
+      text-align:center; padding-bottom:18px; color:ivory ">
+      <canvas #charDoughnut width="200" height="180"></canvas>
+      <!-- <div style="text-align:left; padding-left: 12px;"> -->
+      <table style="width:100%;margin-left:12px; text-align:left; ">
+        <tr>
+          <td style=" border-left:3px solid lime; padding:3px 6px; font-size:medium;">
+            <small>户均缺陷率</small>
+            <br/>
+            <strong>{{HJQXL}}</strong>
+            <small>条/户</small>
+          </td>
+          <td style=" border-left:3px solid green; padding:3px 6px; font-size:medium;">
+            <small>渗漏发生率</small>
+            <br/>
+            <strong>{{SLFSL}}</strong>
+            <small>%</small>
+          </td>
+          <td style=" border-left:3px solid yellow; padding:3px 6px; font-size:medium;">
+            <small>户均渗漏发生率</small>
+            <br/>
+            <strong>{{HJSLFSL}}</strong>
+            <small>条/户
+            </small>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button ion-item (click)="ReportRoom()">
+      <ion-icon name="pie" color="primary" item-start></ion-icon>
+      <strong>房间统计</strong>
+      <p>模拟验房/工地开放/正式交付 </p>
+      <p>房间状态分布及相关分析</p>
+    </button>
+  </ion-list>
+</ion-content>

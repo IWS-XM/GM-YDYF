@@ -43,6 +43,8 @@ import { BuilderReturnIssue } from '../pages/builder-return-issue/builder-return
 import { AssignreturnPage } from '../pages/assignreturn/assignreturn'; 
 import { BuildermaintenancePage } from '../pages/buildermaintenance/buildermaintenance'; 
 import { PreroomspassPage } from '../pages/preroomspass/preroomspass'; 
+import { ReportPage } from '../pages/report/report';
+import { ReportRoomPage } from '../pages/report-room/report-room';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -102,7 +104,9 @@ import { FileOpener } from '@ionic-native/file-opener';
     BuilderReturnIssue,
     AssignreturnPage,
     BuildermaintenancePage,
-    PreroomspassPage
+    PreroomspassPage,
+    ReportPage,
+    ReportRoomPage
   ],
   imports: [
     BrowserModule,
@@ -153,12 +157,14 @@ import { FileOpener } from '@ionic-native/file-opener';
     BuilderReturnIssue,
     AssignreturnPage,
     BuildermaintenancePage,
-    PreroomspassPage
+    PreroomspassPage,
+    ReportPage,
+    ReportRoomPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
-     Camera,
+    Camera,
     LocalStorage,
     SQLite,
     SQLitePorter,

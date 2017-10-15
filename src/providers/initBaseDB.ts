@@ -2919,7 +2919,7 @@ export class initBaseDB {
               let tmppromise = Promise.resolve(false);
               for (var i = 0; i < v1.rows.length; i++) {
                 console.log(JSON.stringify(v1.rows.item(i)));
-                let batchid = v1.rows.item(i).Batchid; let buildingid = v1.rows.item(i).Buildingid; let type:number = v1.rows.item(i).Type;
+                let batchid = v1.rows.item(i).Batchid; let buildingid = v1.rows.item(i).Buildingid; let type: number = v1.rows.item(i).Type;
                 tmppromise = tmppromise.then(() => {
                   return this.uploadbuildinginfo(token, projid, batchid, buildingid, type);
                 }).then((v) => {
@@ -2999,7 +2999,7 @@ export class initBaseDB {
       console.log(filename);
       //ydyf_DownLoadFile
       this.httpService.postimg(FILE_SERVE_URL + "/ydyf_UpLoadFileString", { token: FILE_TOKEN, FileName: src, MD5: filename }).then(v => {
-          resolve(1);
+        resolve(1);
       }).catch(err => {
         this.warn('图片上传失败:' + err);
         resolve(0);
@@ -3168,6 +3168,281 @@ export class initBaseDB {
           console.log(err);
         }))
       }
+    })
+  }
+
+  //report
+  //整改通过率
+  reportZGTGL(projid): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("reportZGTGL");
+      let issuecounts = 0;
+      let passcounts = 0;
+      resolve(promise.then((v1) => {
+        let sql = "select count(*) as isscounts from PreCheckIssues where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as isscounts from OpenCheckIssues where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as isscounts from FormalCheckIssues where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as passcounts from PreCheckIssues where IssueStatus = '已通过' and projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          passcounts = v2.rows.item(0).passcounts;
+        }
+        let sql = "select count(*) as passcounts from OpenCheckIssues where IssueStatus = '已通过' and projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          passcounts += v2.rows.item(0).passcounts;
+        }
+        let sql = "select count(*) as passcounts from FormalCheckIssues where IssueStatus = '已通过' and projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          passcounts += v2.rows.item(0).passcounts;
+        }
+        if (issuecounts == 0) {
+          return 0;
+        } else {
+          return Math.round(passcounts / issuecounts * 10000) / 100;
+        }
+      }).catch(err => {
+        this.warn('户均缺陷率错误:' + err);
+        throw '户均缺陷率加载失败';
+      }))
+    })
+  }
+  //户均缺陷率
+  reportHJQXL(projid): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("reportHJQXL");
+      let issuecounts = 0;
+      let roomcounts = 0;
+      resolve(promise.then((v1) => {
+        let sql = "select count(*) as isscounts from PreCheckIssues where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as isscounts from OpenCheckIssues where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as isscounts from FormalCheckIssues where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as rooms from rooms where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          roomcounts = v2.rows.item(0).rooms;
+        }
+        if (roomcounts == 0) {
+          return 0;
+        } else {
+          return Math.round(issuecounts / roomcounts * 100) / 100;
+        }
+      }).catch(err => {
+        this.warn('整改通过率错误:' + err);
+        throw '整改通过率加载失败';
+      }))
+    })
+  }
+
+  //渗漏发生率
+  reportSLFSL(projid): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("reportSLFSL");
+      let issuecounts = 0;
+      let roomcounts = 0;
+      resolve(promise.then((v1) => {
+        let sql = "select count(*) as isscounts from rooms where projid = '#projid#' and id in (select roomid from PreCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%' union select roomid from OpenCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%' union select roomid from FormalCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%')";        
+        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid);
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts = v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as rooms from rooms where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          roomcounts = v2.rows.item(0).rooms;
+        }
+        console.log("issuecounts:"+issuecounts);
+        console.log("roomcounts:"+roomcounts);
+        if (roomcounts == 0) {
+          return 0;
+        } else {
+          return Math.round(issuecounts / roomcounts * 10000) / 100;
+        }
+      }).catch(err => {
+        this.warn('渗漏发生率错误:' + err);
+        throw '渗漏发生率加载失败';
+      }))
+    })
+  }
+
+  //户均渗漏发生率
+  reportHJSLFSL(projid): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("reportHJSLFSL");
+      let issuecounts = 0;
+      let roomcounts = 0;
+      resolve(promise.then((v1) => {
+        let sql = "select count(*) as isscounts from PreCheckIssues where IssueDesc like '%渗漏%' and projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as isscounts from OpenCheckIssues where IssueDesc like '%渗漏%' and projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as isscounts from FormalCheckIssues where IssueDesc like '%渗漏%' and projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          issuecounts += v2.rows.item(0).isscounts;
+        }
+        let sql = "select count(*) as rooms from rooms where projid = '" + projid + "'";
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        if (v2.rows.length > 0) {
+          roomcounts = v2.rows.item(0).rooms;
+        }
+        if (roomcounts == 0) {
+          return 0;
+        } else {
+          return Math.round(issuecounts / roomcounts * 100) / 100;
+        }
+      }).catch(err => {
+        this.warn('户均渗漏发生率错误:' + err);
+        throw '户均渗漏发生率加载失败';
+      }))
+    })
+  }
+
+  //房间状态分布
+  reportFJZTFB(projid,type): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });  //FormalRoomDetails", "RoomId,TransDate DateTime,RoomStatus,C
+      resolve(promise.then((v1) => {
+        let tn = ''; tn = this.getissuetablename(type);
+        let sql = "select * from rooms ";
+        if (type == 1) {
+          sql = sql + "left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
+        } else if (type == 2) {
+          sql = sql + "left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
+        } else if (type == 3) {
+          sql = sql + "left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
+        }
+        sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单' group by roomid) fdzg on fdzg.roomid = rooms.id "
+          + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
+          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
+          //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
+          //+ "order by rooms.sortcode, rooms.unit";
+        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
+        
+        //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((floorlist: any) => {
+        console.log(floorlist);
+        let readycounts: number; readycounts = 0;
+        let forfixcounts: number; forfixcounts = 0;
+        let fixedcounts: number; fixedcounts = 0;
+        let passcounts: number; passcounts = 0;
+        let allcounts: number; allcounts = 0;
+
+        for (var i = 0; i < floorlist.rows.length; i++) {
+          console.log(JSON.stringify(floorlist.rows.item(i)));
+          let items = floorlist.rows.item(i);
+          if (items.dzg > 0) {
+            forfixcounts++;
+          }
+          else if (items.yzg > 0) {
+            fixedcounts++;
+          }
+          else if (items.ytg > 0) {
+            if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+              passcounts++;
+            } else {
+              fixedcounts++;
+            }
+          }
+          else {
+            if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+              passcounts++;
+            } else {
+              readycounts++;
+            }
+          }
+          allcounts++;
+        }
+        let res: Array<any>;        
+        res = [[
+          { name: '待检查', value: readycounts },
+          { name: '待整改', value: forfixcounts },
+          { name: '已整改', value: fixedcounts },
+          { name: '已通过', value: passcounts }],allcounts];
+        return res;
+      }).catch(err => {
+        console.log("房间状态分布加载失败:" + err);
+      }))
     })
   }
 

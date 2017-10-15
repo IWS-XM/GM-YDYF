@@ -6,6 +6,7 @@ import { LocalStorage } from '../../providers/local-storage';
 import { initBaseDB } from '../../providers/initBaseDB';
 import { Dialogs } from '@ionic-native/dialogs';
 import { NativeService } from '../../providers/nativeservice';
+import { ReportPage } from '../report/report';
 
 @Component({
   selector: 'page-preinspection',
@@ -19,6 +20,7 @@ export class PreinspectionPage {
   type: number;
   versionid: number;
   nodata: boolean = true;
+  userrole: Array<string> = [];
   constructor(public navCtrl: NavController, public alertCtrl: AlertController, public localStorage: LocalStorage,
     public initBaseDB: initBaseDB, public dialogs: Dialogs, public nativeservice: NativeService) {
     this.type = 1;
@@ -28,6 +30,7 @@ export class PreinspectionPage {
     this.batchbuildings = [];
     this.localStorage.getItem('curuser').then(val => {
       this.token = val.token;
+      this.userrole = val.userrole;
     })
 
     this.localStorage.getItem('curproj').then(val => {
@@ -38,7 +41,7 @@ export class PreinspectionPage {
         this.initbatch();
       } else {
         this.nodata = true;
-        this.nativeservice.alert("项目或App没授权，请联系系统管理员.");        
+        this.nativeservice.alert("项目或App没授权，请联系系统管理员.");
       }
     })
   }
@@ -47,7 +50,7 @@ export class PreinspectionPage {
 
   }
 
-  initbatch() {  
+  initbatch() {
     this.initBaseDB.getbatch(this.projid, this.type, this.token, this.versionid).then((batlist: Array<any>) => {
       if (batlist && batlist.length > 0) {
         this.batchbuildings = batlist;
@@ -75,7 +78,7 @@ export class PreinspectionPage {
           this.nodata = true;
         }
         console.log("initbatch" + this.nodata);
-        console.log(this.batchbuildings);        
+        console.log(this.batchbuildings);
         this.nativeservice.hideLoading();
         refresher.complete();
       }).catch(e => {
@@ -95,17 +98,17 @@ export class PreinspectionPage {
       this.navCtrl.push(FloorPage, { "projid": this.projid, "batchid": batchid, "building": building, "type": this.type, "projname": this.projname });
     }
     else {
-      this.dialogs.confirm('有数据未更新，请先更新数据', '', ['暂不更新', '立即更新']).then(val => {        
-        if (val == 1) {          
+      this.dialogs.confirm('有数据未更新，请先更新数据', '', ['暂不更新', '立即更新']).then(val => {
+        if (val == 1) {
           this.navCtrl.push(FloorPage, { "projid": this.projid, "batchid": batchid, "building": building, "type": this.type, "projname": this.projname });
         }
-        else {          
+        else {
           if (building.needtype == 1) {
             this.downloadclicked(batchid, building).then(v => {
               this.navCtrl.push(FloorPage, { "projid": this.projid, "batchid": batchid, "building": building, "type": this.type, "projname": this.projname });
             })
           }
-          else if (building.needtype == 2) {            
+          else if (building.needtype == 2) {
             this.uploadclicked(batchid, building).then(v => {
               this.navCtrl.push(FloorPage, { "projid": this.projid, "batchid": batchid, "building": building, "type": this.type, "projname": this.projname });
             })
@@ -119,7 +122,7 @@ export class PreinspectionPage {
       })
     }
   }
-  
+
   uploadclicked(batchid, building): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
@@ -199,6 +202,10 @@ export class PreinspectionPage {
         console.log('楼栋更新错误:' + err);
       }))
     })
+  }
+
+  ShowReport() {
+    this.navCtrl.push(ReportPage, { ProjId: this.projid ,ReportType: "1" });
   }
 
 }

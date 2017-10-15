@@ -1,6 +1,11 @@
 <ion-header>
   <ion-navbar color="primary">
-    <ion-title>正式交付</ion-title>
+		<ion-title>正式交付</ion-title>
+		<ion-buttons right *ngIf="userrole.indexOf('A8') != -1">
+				<button ion-button (click)="ShowReport()">报表
+						<ion-icon name="pie"></ion-icon>
+				</button>
+			</ion-buttons>
   </ion-navbar>
 </ion-header>
 

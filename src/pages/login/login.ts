@@ -9,7 +9,7 @@ import { APP_SERVE_URL } from '../../providers/Constants';
 import { HttpService } from '../../providers/HttpService';
 import { BuilderTabsPage } from '../buildertabs/buildertabs';
 import { ChangePWPage } from '../changepw/changepw';
-//import { ShowimgPage } from '../imageeditor/showimg';
+//import { PreinspectionPage } from '../preinspection/preinspection';
 //import { AboutPage } from '../about/about';
 
 @Component({
@@ -62,6 +62,7 @@ export class LoginPage {
   }
 
   loginclick() {
+    //this.navCtrl.push(PreinspectionPage); 
     // let promise = new Promise((resolve) => {
     //   resolve(100);
     // });
@@ -171,7 +172,7 @@ export class LoginPage {
       let promise = new Promise((resolve) => {
         resolve(100);
       });
-      // userrole = ["A1","A2","A3","A4","A5","A6","B1"];
+      // userrole = ["A1","A2","A3","A4","A5","A6","A7","B1","C1"];
       resolve(promise.then((v1) => {
         return this.localStorage.setItem('curuser', { userid: this.userid, token: item.Token, duetime: item.AllowEnd, username: item.UserName, vendrole: item.VendRole, id: item.UserId, userrole: userrole });
       }).then((v2) => {
