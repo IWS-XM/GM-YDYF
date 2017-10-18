@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>移动报表 </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div style="padding:6px 12px; font-size:medium;">
+    <ion-icon name="pie" color="primary"></ion-icon>{{title}}</div>
+
+  <ion-grid style="font-size:small; " *ngIf="status == '已整改'">
+    <ion-row align-items-center *ngIf="detailTitle!=''" style="border-bottom:1px solid #c8c7cc; background-color:#f8f7fc; font-weight:bold; height:40px;">
+      <ion-col col-4>验房工程师姓名</ion-col>
+      <ion-col>待复验问题数</ion-col>
+      <ion-col>涉及房间数</ion-col>
+    </ion-row>
+    <ion-row align-items-center *ngFor="let item of data" style="border-bottom:1px solid #c8c7cc; height:48px;">
+      <ion-col col-4>
+        {{item.name}}
+      </ion-col>
+      <ion-col>{{item.toReview}}</ion-col>
+      <ion-col>{{item.roomCount}}</ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid style="font-size:small; " *ngIf="status != '已整改'">
+      <ion-row align-items-center *ngIf="detailTitle!=''" style="border-bottom:1px solid #c8c7cc; background-color:#f8f7fc; font-weight:bold; height:40px;">
+        <ion-col col-4>承建商名称</ion-col>
+        <ion-col>待派单</ion-col>       
+        <ion-col>待整改</ion-col>
+        <ion-col>涉及房间数</ion-col>
+      </ion-row>
+      <ion-row align-items-center *ngFor="let item of data" style="border-bottom:1px solid #c8c7cc; height:48px;">
+        <ion-col col-4>
+          {{item.name}}
+        </ion-col>
+        <ion-col>{{item.toDistribute}}</ion-col>
+        <ion-col>{{item.toReform}}</ion-col>
+        <ion-col>{{item.roomCount}}</ion-col>
+      </ion-row>
+    </ion-grid>
+    
+</ion-content>

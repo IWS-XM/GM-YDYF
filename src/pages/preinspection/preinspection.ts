@@ -205,7 +205,7 @@ export class PreinspectionPage {
   }
 
   ShowReport() {
-    this.navCtrl.push(ReportPage, { ProjId: this.projid ,ReportType: "1" });
+    this.navCtrl.push(ReportPage, { ProjId: this.projid, ProjName: this.projname, ReportType: "1" });
   }
 
 }

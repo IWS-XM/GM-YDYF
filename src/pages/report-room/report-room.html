@@ -2,9 +2,9 @@
   <ion-navbar>
     <ion-title>移动报表</ion-title>
   </ion-navbar>
-  <ion-segment [(ngModel)]="reportType" (click)="changetab()">
+  <ion-segment [(ngModel)]="reportType" *ngIf="!reportTitle">
     <ion-segment-button value="1" style="font-size:large;">
-      模拟验房
+      内部验房
     </ion-segment-button>
     <ion-segment-button value="2" style="font-size:large;">
       工地开放
@@ -13,11 +13,14 @@
       正式交付
     </ion-segment-button>
   </ion-segment>
+
 </ion-header>
 
 
 <ion-content padding>
-  <ion-list >
+  <div style="background-color:dodgerblue;color:white; padding:8px 18px; font-size:medium;" *ngIf="reportTitle">{{reportTitle}}</div>
+  <ion-list>
+
     <ion-item>
       <ion-icon name="paper"></ion-icon>
       <span>房间状态分布</span>
@@ -27,12 +30,37 @@
         <canvas #chartPie height="150"></canvas>
       </div>
     </ion-item>
+    <div *ngFor="let val of chartdata; let i=index">
+      <button ion-item style="font-size:small;" *ngIf="statuses[i]=='待整改' || statuses[i]=='已整改'" (click)="ShowReportDetail(statuses[i])">
+        <span style="width:24px;height:16px;" [style.background-color]="colors[i]" item-start item-left></span>
+        &nbsp;{{statuses[i]}} &nbsp;{{(val / valuesum * 100).toFixed(2)}}%
+        <span item-end item-right>{{val}}</span>
+      </button>
+      <ion-item style="font-size:small;" *ngIf="!(statuses[i]=='待整改' || statuses[i]=='已整改')">
+          <span style="width:24px;height:16px;" [style.background-color]="colors[i]" item-start item-left></span>
+          &nbsp;{{statuses[i]}} &nbsp;{{(val / valuesum * 100).toFixed(2)}}%
+          <span item-end item-right style="margin-right:32px;">{{val}}</span>
+      </ion-item>
+    </div>
+    <ion-item *ngIf="detailTitle">
+      <ion-icon name="paper"></ion-icon>
+      <span>{{detailTitle}}</span>
+    </ion-item>
+    <ion-grid style="font-size:small; ">
+      <ion-row align-items-center *ngIf="detailTitle!=''" style="border-bottom:1px solid #c8c7cc; background-color:#f8f7fc; font-weight:bold; height:40px;">
+        <ion-col col-4>{{(reportLevel==0?'批次':'楼栋')}}</ion-col>
+        <ion-col *ngFor="let status of statuses">{{status}}</ion-col>
+      </ion-row>
 
-    <button ion-item *ngFor="let item of data; let i=index" style="font-size:small;">
-      <span style="width:24px; height:16px;"  [style.background-color]="colors[i]" item-start item-left></span>
-      &nbsp;{{item.name}} &nbsp;{{(item.value / valuesum * 100).toFixed(2)}}%
-      <span item-end item-right>{{item.value}}</span>
-    </button>
+      <ion-row align-items-center *ngFor="let item of datasource;let i=index" style="border-bottom:1px solid #c8c7cc; height:48px;">
+        <ion-col col-4>
+          <a (click)="DetailReport(item, reportLevel==0? item.dataname:navParams.get('BatchName'))"
+            id={{item.id}}>{{item.dataname}}</a>
+        </ion-col>
+        <ion-col *ngFor="let issuecnt of item.issues">{{issuecnt}}</ion-col>
+      </ion-row>
 
+    </ion-grid>
   </ion-list>
+
 </ion-content>

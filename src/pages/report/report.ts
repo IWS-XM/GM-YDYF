@@ -18,8 +18,10 @@ export class ReportPage  {
 
   reportType = "1";
   projid = '';
+  projname = '';
   constructor(public navCtrl: NavController, public navParams: NavParams, public nativeservice: NativeService, public initBaseDB: initBaseDB) {
     this.projid = navParams.get('ProjId');
+    this.projname = navParams.get('ProjName');
     var t = navParams.get('ReportType');
     if(t) this.reportType=t;
   }
@@ -73,7 +75,7 @@ export class ReportPage  {
   }
 
   ReportRoom(){
-    this.navCtrl.push(ReportRoomPage,{ProjId: this.projid, ReportType: this.reportType});
+    this.navCtrl.push(ReportRoomPage,{ProjId: this.projid, ProjName: this.projname, ReportType: this.reportType, ReportLevel: 0});
   }
 
   ShowHelp(){

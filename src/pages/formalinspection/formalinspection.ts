@@ -207,6 +207,6 @@ export class FormalinspectionPage {
   }
 
   ShowReport() {
-    this.navCtrl.push(ReportPage, { ProjId: this.projid ,ReportType: "3" });
+    this.navCtrl.push(ReportPage, { ProjId: this.projid, ProjName: this.projname, ReportType: "3" });
   }
 }

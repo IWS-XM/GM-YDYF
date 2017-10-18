@@ -206,6 +206,6 @@ export class OpeninspectionPage {
   }
 
   ShowReport() {
-    this.navCtrl.push(ReportPage, { ProjId: this.projid ,ReportType: "2" });
+    this.navCtrl.push(ReportPage, { ProjId: this.projid, ProjName: this.projname, ReportType: "2" });
   }
 }

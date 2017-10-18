@@ -59,7 +59,7 @@ export class initBaseDB {
           }).then((v7) => {
             return this.initBaseTable("positioncheckitemlink", "Projid,Positionid,Checkitemid");
           }).then((v8) => {
-            return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid");
+            return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid");//增加责任单位
           }).then((v9) => {
             return this.initBaseTable("CustSatisfaction", "Id,Type integer,Name,Sortcode integer");
           }).then((vv) => {
@@ -526,11 +526,7 @@ export class initBaseDB {
                 return this.db.executeSql("update buildingversion set needupd = 1 where exists (select * from tmpbuildingversion where buildingversion.projid = tmpbuildingversion.projid and buildingversion.buildingid = tmpbuildingversion.buildingid and buildingversion.batchid = tmpbuildingversion.batchid and buildingversion.versionid != tmpbuildingversion.versionid)", []);
               }).then((v55) => {
                 console.log("v55");
-                return this.db.executeSql("select * from tmpbuildingversion", []).then(v => {
-                  for (let i = 0; i < v.rows.length; i++) {
-                    console.log(v.rows.item(i));
-                  }
-                })
+                return this.db.executeSql("select * from tmpbuildingversion", []);
               }).then((v5) => {
                 console.log("v5");
                 return this.db.executeSql("update buildingversion set needdownload = 1 where exists (select projid from tmpbuildingversion where buildingversion.projid = tmpbuildingversion.projid and buildingversion.buildingid = tmpbuildingversion.buildingid and buildingversion.batchid = tmpbuildingversion.batchid and buildingversion.downloadversionId != tmpbuildingversion.downloadversionId)", []);
@@ -3295,7 +3291,7 @@ export class initBaseDB {
       let issuecounts = 0;
       let roomcounts = 0;
       resolve(promise.then((v1) => {
-        let sql = "select count(*) as isscounts from rooms where projid = '#projid#' and id in (select roomid from PreCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%' union select roomid from OpenCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%' union select roomid from FormalCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%')";        
+        let sql = "select count(*) as isscounts from rooms where projid = '#projid#' and id in (select roomid from PreCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%' union select roomid from OpenCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%' union select roomid from FormalCheckIssues where projid = '#projid#' and IssueDesc like '%渗漏%')";
         sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid);
         console.log(sql);
         return this.db.executeSql(sql, []);
@@ -3310,8 +3306,8 @@ export class initBaseDB {
         if (v2.rows.length > 0) {
           roomcounts = v2.rows.item(0).rooms;
         }
-        console.log("issuecounts:"+issuecounts);
-        console.log("roomcounts:"+roomcounts);
+        console.log("issuecounts:" + issuecounts);
+        console.log("roomcounts:" + roomcounts);
         if (roomcounts == 0) {
           return 0;
         } else {
@@ -3375,7 +3371,7 @@ export class initBaseDB {
   }
 
   //房间状态分布
-  reportFJZTFB(projid,type): Promise<any> {
+  reportFJZTFB(projid, type): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
@@ -3393,10 +3389,10 @@ export class initBaseDB {
         sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单' group by roomid) fdzg on fdzg.roomid = rooms.id "
           + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
           + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
-          //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
-          //+ "order by rooms.sortcode, rooms.unit";
+        //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
+        //+ "order by rooms.sortcode, rooms.unit";
         sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
-        
+
         //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
         console.log(sql);
         return this.db.executeSql(sql, []);
@@ -3433,15 +3429,259 @@ export class initBaseDB {
           }
           allcounts++;
         }
-        let res: Array<any>;        
-        res = [[
-          { name: '待检查', value: readycounts },
-          { name: '待整改', value: forfixcounts },
-          { name: '已整改', value: fixedcounts },
-          { name: '已通过', value: passcounts }],allcounts];
+        let res: Array<any>;
+        res = [readycounts, forfixcounts, fixedcounts, passcounts];
+        // res = [[
+        //   { name: '待检查', value: readycounts },
+        //   { name: '待整改', value: forfixcounts },
+        //   { name: '已整改', value: fixedcounts },
+        //   { name: '已通过', value: passcounts }], allcounts];
         return res;
       }).catch(err => {
         console.log("房间状态分布加载失败:" + err);
+      }))
+    })
+  }
+
+  //房间状态分布细分批次
+  reportFJZTFBPC(projid, type): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });  //FormalRoomDetails", "RoomId,TransDate DateTime,RoomStatus,C
+      resolve(promise.then((v1) => {
+        let sql = "select Batchid,BatchName from buildingversion where Projid = '#projid#' group by batchid,BatchName";
+        sql = sql.replace('#projid#', projid);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        let tn = ''; tn = this.getissuetablename(type);
+        let sql = "select * from rooms ";
+        if (type == 1) {
+          sql = sql + "left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id"
+        } else if (type == 2) {
+          sql = sql + "left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
+        } else if (type == 3) {
+          sql = sql + "left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
+        }
+        sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
+          + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
+          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
+        //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
+        //+ "order by rooms.sortcode, rooms.unit";
+        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
+
+        //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
+        console.log(sql);
+        let res: Array<any>; res = [];
+        let tmppromise = Promise.resolve([]);
+        for (var i = 0; i < v2.rows.length; i++) {
+          console.log(JSON.stringify(v2.rows.item(i)));
+          let batchid = v2.rows.item(i).Batchid;
+          let batchname = v2.rows.item(i).BatchName;
+          tmppromise = tmppromise.then(() => {
+            let tmpsql = sql.replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid);
+            return this.db.executeSql(tmpsql, []);
+          }).then((floorlist: any) => {
+            console.log(floorlist);
+            let readycounts: number; readycounts = 0;
+            let forfixcounts: number; forfixcounts = 0;
+            let fixedcounts: number; fixedcounts = 0;
+            let passcounts: number; passcounts = 0;
+            let allcounts: number; allcounts = 0;
+
+            for (var i = 0; i < floorlist.rows.length; i++) {
+              console.log(JSON.stringify(floorlist.rows.item(i)));
+              let items = floorlist.rows.item(i);
+              if (items.dzg > 0) {
+                forfixcounts++;
+              }
+              else if (items.yzg > 0) {
+                fixedcounts++;
+              }
+              else if (items.ytg > 0) {
+                if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+                  passcounts++;
+                } else {
+                  fixedcounts++;
+                }
+              }
+              else {
+                if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+                  passcounts++;
+                } else {
+                  readycounts++;
+                }
+              }
+              allcounts++;
+            }
+            res.push({ dataname: batchname, id: batchid, issues: [readycounts, forfixcounts, fixedcounts, passcounts] });
+            return res;
+          })
+        }
+        return tmppromise;
+      }).catch(err => {
+        console.log("房间状态分布批次加载失败:" + err);
+      }))
+    })
+  }
+
+  //房间状态分布细分楼栋
+  reportFJZTFBLD(projid, type, batchid): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });  //FormalRoomDetails", "RoomId,TransDate DateTime,RoomStatus,C
+      resolve(promise.then((v1) => {
+        let sql = "select Buildingid,BuildingName from buildingversion where Projid = '#projid#' and batchid = '#batchid#' group by Buildingid,BuildingName";
+        sql = sql.replace('#projid#', projid);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        let tn = ''; tn = this.getissuetablename(type);
+        let sql = "select * from rooms ";
+        if (type == 1) {
+          sql = sql + "left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id"
+        } else if (type == 2) {
+          sql = sql + "left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
+        } else if (type == 3) {
+          sql = sql + "left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
+        }
+        sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and fci2.buildingid = '#buildingid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
+          + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.buildingid = '#buildingid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
+          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.buildingid = '#buildingid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
+        //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
+        //+ "order by rooms.sortcode, rooms.unit";
+        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
+        sql = sql.replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid);
+        //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
+        console.log(sql);
+        let res: Array<any>; res = [];
+        let tmppromise = Promise.resolve([]);
+        for (var i = 0; i < v2.rows.length; i++) {
+          console.log(JSON.stringify(v2.rows.item(i)));
+          let buildingid = v2.rows.item(i).Buildingid;
+          let buildingname = v2.rows.item(i).BuildingName;
+          tmppromise = tmppromise.then(() => {
+            let tmpsql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#buildingid#', buildingid);
+            return this.db.executeSql(tmpsql, []);
+          }).then((floorlist: any) => {
+            console.log(floorlist);
+            let readycounts: number; readycounts = 0;
+            let forfixcounts: number; forfixcounts = 0;
+            let fixedcounts: number; fixedcounts = 0;
+            let passcounts: number; passcounts = 0;
+            let allcounts: number; allcounts = 0;
+
+            for (var i = 0; i < floorlist.rows.length; i++) {
+              console.log(JSON.stringify(floorlist.rows.item(i)));
+              let items = floorlist.rows.item(i);
+              if (items.dzg > 0) {
+                forfixcounts++;
+              }
+              else if (items.yzg > 0) {
+                fixedcounts++;
+              }
+              else if (items.ytg > 0) {
+                if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+                  passcounts++;
+                } else {
+                  fixedcounts++;
+                }
+              }
+              else {
+                if ((type == 1 && items.RoomStatus == '已通过') || (type == 2 && items.RoomStatus == '已接待') || (type == 3 && items.RoomStatus == '已交付')) {
+                  passcounts++;
+                } else {
+                  readycounts++;
+                }
+              }
+              allcounts++;
+            }
+            res.push({ dataname: buildingname, id: buildingid, issues: [readycounts, forfixcounts, fixedcounts, passcounts] });
+            return res;
+          })
+        }
+        return tmppromise;
+      }).catch(err => {
+        console.log("房间状态分布批次楼栋加载失败:" + err);
+      }))
+    })
+  }
+
+  //明细报表
+  reportDetails(projid, type, batchid, buildingid, status): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("reportDetails");
+      let tn = ''; tn = this.getissuetablename(type);
+      let plusranges = '';
+      if (status == '已整改') {
+        plusranges = " fci.issuestatus = '已整改' ";
+      } else {
+        plusranges = " fci.issuestatus = '待派单' or fci.issuestatus = '待整改' "
+      }
+      if (batchid) {
+        if (buildingid) {
+          plusranges += " and fci.batchid = '" + batchid + "' and fci.buildingid = '" + buildingid + "' ";
+        } else {
+          plusranges += " and fci.batchid = '" + batchid + "' ";
+        }
+      }
+      resolve(promise.then((v1) => {
+        let sql;
+        if (status == '已整改') {
+          sql = "select EngineerName, count(*) as counts from #issuename# fci where fci.projid = '#projid#' and #plusranges# group by EngineerName ";
+          sql = sql.replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges);
+        } else {
+          sql = "select vend.NameAlias, fci.VendId, count(*) as counts from #issuename# fci inner join vend on vend.id = fci.vendid where fci.projid = '#projid#' and #plusranges# group by fci.VendId, vend.NameAlias ";
+          sql += " left outer join (select fci1.VendId, count(*) as dpd from #issuename# fci1 where fci1.projid = '#projid#' and fci1.issuestatus = '待派单') fcidpd on fcidpd.vendid = fci.vendid ";
+          sql += " left outer join (select fci2.VendId, count(*) as dzg from #issuename# fci2 where fci2.projid = '#projid#' and fci2.issuestatus = '待整改') fcidzg on fcidzg.vendid = fci.vendid ";
+          sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace('#issuename#', tn).replace('#issuename#', tn).replace('#issuename#', tn).replace('#plusranges#', plusranges);
+        }
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        let tmppromise = Promise.resolve([]);
+        let res: Array<any>; res = [];
+        if (status == '已整改') {
+          for (var i = 0; i < v2.rows.length; i++) {
+            console.log(JSON.stringify(v2.rows.item(i)));
+            let EngineerName = v2.rows.item(i).EngineerName;
+            let counts = v2.rows.item(i).counts;
+            tmppromise = tmppromise.then(() => {
+              let tmpsql = " select count(*) as rooms from rooms where projid = '#projid#' and id in (select roomid from #issuename# fci where fci.projid = '#projid#' and EngineerName = '#EngineerName#' and #plusranges#)";
+              tmpsql = tmpsql.replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges).replace('#EngineerName#', EngineerName);
+              return this.db.executeSql(tmpsql, []);
+            }).then((v3: any) => {
+              console.log(JSON.stringify(v3.rows.item(0)));
+              res.push({ name: EngineerName, toReview: counts, roomCount: v3.rows.item(0).rooms });
+              return res;
+            })
+          }
+        } else {
+          for (var i = 0; i < v2.rows.length; i++) {
+            console.log(JSON.stringify(v2.rows.item(i)));
+            let NameAlias = v2.rows.item(i).NameAlias;
+            let VendId = v2.rows.item(i).VendId;
+            let dpd = 0; dpd = v2.rows.item(i).dpd;
+            let dzg = 0; dpd = v2.rows.item(i).dzg;
+            tmppromise = tmppromise.then(() => {
+              let tmpsql = " select count(*) as rooms from rooms where projid = '#projid#' and id in (select roomid from #issuename# fci where fci.projid = '#projid#' and vendid = '#vendid#' and #plusranges#)";
+              tmpsql = tmpsql.replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges).replace('#vendid#', VendId);
+              return this.db.executeSql(tmpsql, []);
+            }).then((v3: any) => {
+              console.log(JSON.stringify(v3.rows.item(0)));
+              res.push({ name: NameAlias, toDistribute: dpd, toReform: dzg, roomCount: v3.rows.item(0).rooms });
+              return res;
+            })
+          }
+        }
+
+        return tmppromise;
+      }).catch(err => {
+        this.warn('明细报表错误:' + err);
+        throw '明细报表加载失败';
       }))
     })
   }
