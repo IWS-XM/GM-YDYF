@@ -45,6 +45,7 @@ import { BuildermaintenancePage } from '../pages/buildermaintenance/buildermaint
 import { PreroomspassPage } from '../pages/preroomspass/preroomspass'; 
 import { ReportPage } from '../pages/report/report';
 import { ReportRoomPage } from '../pages/report-room/report-room';
+import { ReportDetailsPage } from '../pages/report-details/report-details';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -106,7 +107,8 @@ import { FileOpener } from '@ionic-native/file-opener';
     BuildermaintenancePage,
     PreroomspassPage,
     ReportPage,
-    ReportRoomPage
+    ReportRoomPage,
+    ReportDetailsPage
   ],
   imports: [
     BrowserModule,
@@ -159,7 +161,8 @@ import { FileOpener } from '@ionic-native/file-opener';
     BuildermaintenancePage,
     PreroomspassPage,
     ReportPage,
-    ReportRoomPage
+    ReportRoomPage,
+    ReportDetailsPage
   ],
   providers: [
     StatusBar,
