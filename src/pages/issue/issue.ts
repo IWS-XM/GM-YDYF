@@ -181,8 +181,15 @@ export class IssuePage {
 					if (i > 0) {
 						this.vend = this.vendors[0];
 						this.vendid = this.vendids[0];
-						this.resunit = this.responsibilityunits[0];
-						this.resunitid = this.responsibilityunitids[0];
+						this.initBaseDB.getResponsibility(this.vendid).then((v:any)=>{
+							if (v && v.rows && v.rows.length > 0){
+								this.resunit = v.rows.item(0).NameAlias;
+								this.resunitid = v.rows.item(0).Responsible;
+							} else {
+								this.resunit = this.responsibilityunits[0];
+								this.resunitid = this.responsibilityunitids[0];
+							}
+						})
 						this.manager = this.vendmanagers[0];
 						this.managername = this.vendmanagernames[0];
 						this.managerphone = this.vendmanagerphone[0];
@@ -196,8 +203,15 @@ export class IssuePage {
 			} else {
 				this.vend = this.vendors[0];
 				this.vendid = this.vendids[0];
-				this.resunit = this.responsibilityunits[0];
-				this.resunitid = this.responsibilityunitids[0];
+				this.initBaseDB.getResponsibility(this.vendid).then((v:any)=>{
+					if (v && v.rows && v.rows.length > 0){
+						this.resunit = v.rows.item(0).NameAlias;
+						this.resunitid = v.rows.item(0).Responsible;
+					} else {
+						this.resunit = this.responsibilityunits[0];
+						this.resunitid = this.responsibilityunitids[0];
+					}
+				})
 				this.manager = this.vendmanagers[0];
 				this.managername = this.vendmanagernames[0];
 				this.managerphone = this.vendmanagerphone[0];

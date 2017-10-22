@@ -1,30 +1,30 @@
 <ion-header>
 	<ion-navbar>
-		 <ion-title>{{buildingname}}{{roomname}}</ion-title>
+		<ion-title>{{buildingname}}{{roomname}}</ion-title>
 	</ion-navbar>
+	<div>
+			<ion-segment [(ngModel)]="selectedTab" style="padding:0; margin:0;text-align:center">
+				<ion-segment-button value="全部" style="padding:0; margin:0;line-height:1.6rem;">
+					全部 <br /> ({{allcounts}})
+				</ion-segment-button>
+				<ion-segment-button *ngIf="type != 4" [(value)]="readystr" style="padding:0; margin:0;line-height:1.6rem;">
+					<div id="p1" style="background-color:#f4f4f4;width:8px;height:8px;border-radius:8px;display:inline-block;"></div>{{readystr}}<br />({{readycounts}})
+				</ion-segment-button>
+				<ion-segment-button value="待整改" style="padding:0; margin:0;line-height:1.6rem;">
+					<div id="p1" style="background-color:red;width:8px;height:8px;border-radius:8px;display:inline-block;"></div>待整改<br />({{forfixcounts}})
+				</ion-segment-button>
+				<ion-segment-button value="已整改" style="padding:0; margin:0;line-height:1.6rem;">
+					<div id="p1" style="background-color:blue;width:8px;height:8px;border-radius:8px;display:inline-block;"></div>已整改<br />({{fixedcounts}})
+				</ion-segment-button>
+				<ion-segment-button *ngIf="type != 4" [(value)]="passstr" style="padding:0; margin:0;line-height:1.6rem;">
+					<div id="p1" style="background-color:green;width:8px;height:8px;border-radius:8px;display:inline-block;"></div>{{passstr}}<br />({{passcounts}})
+				</ion-segment-button>
+			</ion-segment>
+		</div>
 </ion-header>
 
-<ion-content padding>
-	<div>
-		<ion-segment [(ngModel)]="selectedTab" style="padding:0; margin:0;text-align:center" >
-			<ion-segment-button value="全部" style="padding:0; margin:0;line-height:1.6rem;">
-			全部 <br /> ({{allcounts}})
-			</ion-segment-button>
-			<ion-segment-button *ngIf="type != 4" [(value)]="readystr" style="padding:0; margin:0;line-height:1.6rem;">
-			<div id="p1" style="background-color:#f4f4f4;width:8px;height:8px;border-radius:8px;display:inline-block;"></div>{{readystr}}<br />({{readycounts}})
-			</ion-segment-button>
-			<ion-segment-button value="待整改" style="padding:0; margin:0;line-height:1.6rem;">
-				<div id="p1" style="background-color:red;width:8px;height:8px;border-radius:8px;display:inline-block;"></div>待整改<br />({{forfixcounts}})
-			</ion-segment-button>
-			<ion-segment-button value="已整改" style="padding:0; margin:0;line-height:1.6rem;">
-				<div id="p1" style="background-color:blue;width:8px;height:8px;border-radius:8px;display:inline-block;"></div>已整改<br />({{fixedcounts}})
-			</ion-segment-button>
-			<ion-segment-button *ngIf="type != 4" [(value)]="passstr" style="padding:0; margin:0;line-height:1.6rem;">
-				<div id="p1" style="background-color:green;width:8px;height:8px;border-radius:8px;display:inline-block;"></div>{{passstr}}<br />({{passcounts}})
-			</ion-segment-button>
-		</ion-segment>
-	</div>
-
+<ion-content padding top="30">
+		
 	<div [ngSwitch]="selectedTab">
 		<ion-list *ngSwitchCase="'全部'">
 			<ion-list-header *ngFor="let floor of floors">
@@ -33,7 +33,7 @@
 				<p> </p>
 				<button ion-button class="ionbutton" *ngFor="let room of floor.value" color={{room.color}} round (click)="itemSelected(room)"> 
 		  {{room.name}}
-		  </button> 
+		  </button>
 			</ion-list-header>
 		</ion-list>
 		<ion-list *ngSwitchCase="readystr">
@@ -45,7 +45,7 @@
 						<p> </p>
 						<button ion-button class="ionbutton" color="light" round *ngFor="let room of floor.value" (click)="itemSelected(room)"> 
 		   {{room.name}}  
-		  </button> 
+		  </button>
 					</ion-list-header>
 				</div>
 			</div>

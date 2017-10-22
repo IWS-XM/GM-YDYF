@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams } from 'ionic-angular';
 import { initBaseDB } from '../../providers/initBaseDB';
 
 @Component({
@@ -17,12 +17,14 @@ export class ReportDetailsPage {
   type = 1;
   constructor(public navCtrl: NavController, public navParams: NavParams, public initBaseDB: initBaseDB) {
     this.status = this.navParams.get('Status');
-    this.projid = this.navParams.get('ProjId');
+    this.projid = this.navParams.get('ProjId'); 
     this.batchid = this.navParams.get('BatchId');
     this.buildingid = this.navParams.get('BuildingId');
     this.type = this.navParams.get('Type');
     this.initBaseDB.reportDetails(this.projid,this.type,this.batchid,this.buildingid,this.status).then((val:any)=>{
+      console.log(val);
        this.data = val;
+       console.log(this.data);
     })
     if (this.status == '已整改') {
       this.title = "已整改房间-工程师待复验问题统计";      

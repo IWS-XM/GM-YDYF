@@ -3,6 +3,7 @@ import { NavController, NavParams } from 'ionic-angular';
 import { ReportRoomPage } from '../report-room/report-room';
 import { NativeService } from '../../providers/nativeservice';
 import { initBaseDB } from '../../providers/initBaseDB';
+import { LocalStorage } from '../../providers/local-storage';
 
 @Component({
   selector: 'page-reporrt',
@@ -19,11 +20,17 @@ export class ReportPage  {
   reportType = "1";
   projid = '';
   projname = '';
-  constructor(public navCtrl: NavController, public navParams: NavParams, public nativeservice: NativeService, public initBaseDB: initBaseDB) {
-    this.projid = navParams.get('ProjId');
-    this.projname = navParams.get('ProjName');
+  constructor(public navCtrl: NavController, public navParams: NavParams, public nativeservice: NativeService, public localStorage: LocalStorage,
+    public initBaseDB: initBaseDB) {
     var t = navParams.get('ReportType');
     if(t) this.reportType=t;
+    this.localStorage.getItem('curproj').then(val => {
+      if (val && val.projid) {
+        this.projid = val.projid;
+        this.projname = val.projname;
+      }
+      console.log("AAAreport:"+this.projid);
+    })
   }
 
   ionViewDidEnter() {
@@ -75,7 +82,8 @@ export class ReportPage  {
   }
 
   ReportRoom(){
-    this.navCtrl.push(ReportRoomPage,{ProjId: this.projid, ProjName: this.projname, ReportType: this.reportType, ReportLevel: 0});
+    console.log("areportroom:"+this.projid);
+    this.navCtrl.push(ReportRoomPage,{"ProjId": this.projid, "ProjName": this.projname, "ReportType": this.reportType, "ReportLevel": 0});
   }
 
   ShowHelp(){

@@ -48,7 +48,7 @@ export class ReportRoomPage {
   buildingid = '';
   constructor(public navCtrl: NavController, public navParams: NavParams, public initBaseDB: initBaseDB) {
     this.reportType = navParams.get('ReportType');
-    this.projid = navParams.get('PorjId');
+    this.projid = navParams.get('ProjId');console.log('report:'+this.projid);
     this.reportlevel = this.navParams.get('ReportLevel');
     this.statuses = ['待检查', '待整改', '已整改', '已通过'];
     this.projname = navParams.get('ProjName');
@@ -74,25 +74,35 @@ export class ReportRoomPage {
     //   });
       
     // })
+    
     switch (this.reportlevel) {
       case 0:
         //首层报表
         this.initBaseDB.reportFJZTFB(this.projid, Number.parseInt(this.reportType)).then((val: any) => {
            this.chartdata = val;
            this.valuesum = 0;
-           if (this.chartdata != null) this.chartdata.forEach(e => this.valuesum += e);
+           if (this.chartdata != null) this.chartdata.forEach(e => this.valuesum += e);           
+           //new Chart(this.chartPie.nativeElement.getContext("2d"), this.config);
+           this.config.data.datasets[0].data = this.chartdata;
+           this.config.data.labels = this.statuses;
+           new Chart(this.chartPie.nativeElement.getContext("2d"), this.config);
+           this.initBaseDB.reportFJZTFBPC(this.projid, Number.parseInt(this.reportType)).then((val: any) => {
+            this.datasource = val;
+         })
         })
-        this.initBaseDB.reportFJZTFBPC(this.projid, Number.parseInt(this.reportType)).then((val: any) => {
-           this.datasource = val;
-        })
+        
         this.detailTitle = this.projname + '-' + this.reporttypestr + '批次统计';
         this.buildingid = '';
         this.batchid = '';
         break;
       case 1:
         this.calleritem = this.navParams.get('Item');
+        console.log(this.calleritem);
         //按批次统计的报表
         this.chartdata = this.calleritem[0].issues;
+        this.config.data.datasets[0].data = this.chartdata;
+        this.config.data.labels = this.statuses;
+        new Chart(this.chartPie.nativeElement.getContext("2d"), this.config);
         this.valuesum = 0;
         if (this.chartdata != null) this.chartdata.forEach(e => this.valuesum += e);
         this.initBaseDB.reportFJZTFBLD(this.projid, Number.parseInt(this.reportType), this.calleritem[0].id).then((val:any)=>{
@@ -102,20 +112,25 @@ export class ReportRoomPage {
         this.detailTitle = this.calleritem[0].dataname + '楼栋统计';
         this.batchid = this.calleritem[0].id;
         this.buildingid = '';
+        //new Chart(this.chartPie.nativeElement.getContext("2d"), this.config);
         break;
       case 2:        
         this.calleritem = this.navParams.get('Item');
         //按楼统计的报表
         this.chartdata = this.calleritem[0].issues;
+        this.config.data.datasets[0].data = this.chartdata;
+        this.config.data.labels = this.statuses;
+        new Chart(this.chartPie.nativeElement.getContext("2d"), this.config);
         this.valuesum = 0;
         if (this.chartdata != null) this.chartdata.forEach(e => this.valuesum += e);
         this.reportTitle = this.projname + '/' + this.navParams.get('BatchName') + '/' + this.calleritem[0].dataname;
         this.batchid = this.navParams.get('BatchId');
         this.buildingid = this.calleritem[0].id;
+        //new Chart(this.chartPie.nativeElement.getContext("2d"), this.config);
         break;
       default:
         alert('ReportLevel必须是数字0~2');
-        return;
+        break;
       //break;
     }
     
@@ -127,11 +142,10 @@ export class ReportRoomPage {
   }
 
   ionViewDidLoad() {
-    this.config.data.datasets[0].data = this.chartdata;
-    this.config.data.labels = this.statuses;
+    
     this.fetchdata();
     
-    new Chart(this.chartPie.nativeElement.getContext("2d"), this.config);
+    //new Chart(this.chartPie.nativeElement.getContext("2d"), this.config);
   }
 
   changetab() {
@@ -140,13 +154,16 @@ export class ReportRoomPage {
   }
 
   DetailReport(item, batchName) {
+    console.log(item); console.log(batchName);
+    let items=[];items.push(item);
     this.navCtrl.push(ReportRoomPage, {
-      ReportLevel: this.reportlevel + 1, ProjectName: this.projname, ProjId: this.projid,
-      ReportType: this.reportType, Item: item, BatchName: batchName, BatchId: this.batchid
+      "ReportLevel": this.reportlevel + 1, "ProjName": this.projname, "ProjId": this.projid,
+      "ReportType": this.reportType, "Item": items, "BatchName": batchName, "BatchId": this.batchid
     })
   }
 
   ShowReportDetail(status) {
-    this.navCtrl.push(ReportDetailsPage, { Status: status, Type: Number.parseInt(this.reportType), ProjId: this.projid, BatchId:this.batchid, BuildingId:this.buildingid });
+    this.navCtrl.push(ReportDetailsPage, { "Status": status, "Type": Number.parseInt(this.reportType), "ProjId": this.projid, "BatchId":this.batchid,
+     "BuildingId":this.buildingid });
   }
 }

@@ -59,7 +59,7 @@ export class initBaseDB {
           }).then((v7) => {
             return this.initBaseTable("positioncheckitemlink", "Projid,Positionid,Checkitemid");
           }).then((v8) => {
-            return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid");//增加责任单位
+            return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,Responsible");//增加责任单位
           }).then((v9) => {
             return this.initBaseTable("CustSatisfaction", "Id,Type integer,Name,Sortcode integer");
           }).then((vv) => {
@@ -486,7 +486,7 @@ export class initBaseDB {
               items = res[0];
               console.log(items);
               resolve(promise.then((v1) => {
-                return this.initBaseTable("buildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer");
+                return this.initBaseTable("buildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer,BatchType");
               }).then((v2) => {
                 return this.initBaseData("buildingversion", items[2]);//items[2]);
               }).then((v3) => {
@@ -1201,7 +1201,7 @@ export class initBaseDB {
   getBuilding(projid, batchid, type): Promise<Array<any>> {
     return new Promise((resolve) => {
       let sql: string;
-      sql = "SELECT buildingid,buildingname,needupd,needdownload,needupload FROM buildingversion where projid = '#projid#' and type = #type# and batchid = '#batchid#' order by buildingid";
+      sql = "SELECT buildingid,buildingname,needupd,needdownload,needupload FROM buildingversion where projid = '#projid#' and type = #type# and batchid = '#batchid#' order by buildingname";
       sql = sql.replace("#projid#", projid);
       sql = sql.replace("#type#", type);
       sql = sql.replace("#batchid#", batchid);
@@ -2774,6 +2774,24 @@ export class initBaseDB {
     })
   }
 
+  getResponsibility(vendid): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("getResponsibility");
+      resolve(promise.then((v1) => {  
+        let sql = "select vend.Responsible,v2.NameAlias from vend where vend.id = '"+vendid+"' inner join vend v2 on v2.Id = vend.responsible";
+        return this.db.executeSql(sql,[]);
+      }).catch(err => {
+        //this.nativeservice.hideLoading();
+        this.warn('默认责任单位导出失败:' + err);
+        throw '默认责任单位导出失败';
+      }))
+    })
+  }
+
+
   exportIssue(token, JsonStr): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
@@ -3450,22 +3468,23 @@ export class initBaseDB {
         resolve(100);
       });  //FormalRoomDetails", "RoomId,TransDate DateTime,RoomStatus,C
       resolve(promise.then((v1) => {
-        let sql = "select Batchid,BatchName from buildingversion where Projid = '#projid#' group by batchid,BatchName";
-        sql = sql.replace('#projid#', projid);
+        let sql = "select Batchid,BatchName from buildingversion where Projid = '#projid#' and type = #type# group by batchid,BatchName";
+        sql = sql.replace('#projid#', projid).replace('#type#',type);
+        console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
         let tn = ''; tn = this.getissuetablename(type);
         let sql = "select * from rooms ";
         if (type == 1) {
-          sql = sql + "left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id"
+          sql = sql + " left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 2) {
-          sql = sql + "left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 3) {
-          sql = sql + "left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
         }
-        sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
-          + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
-          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
+        sql = sql + " left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
+          + " left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
+          + " left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
         //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
         //+ "order by rooms.sortcode, rooms.unit";
         sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
@@ -3474,7 +3493,9 @@ export class initBaseDB {
         console.log(sql);
         let res: Array<any>; res = [];
         let tmppromise = Promise.resolve([]);
+        console.log('aaa333');
         for (var i = 0; i < v2.rows.length; i++) {
+          console.log('aaa444');
           console.log(JSON.stringify(v2.rows.item(i)));
           let batchid = v2.rows.item(i).Batchid;
           let batchname = v2.rows.item(i).BatchName;
@@ -3533,27 +3554,27 @@ export class initBaseDB {
       });  //FormalRoomDetails", "RoomId,TransDate DateTime,RoomStatus,C
       resolve(promise.then((v1) => {
         let sql = "select Buildingid,BuildingName from buildingversion where Projid = '#projid#' and batchid = '#batchid#' group by Buildingid,BuildingName";
-        sql = sql.replace('#projid#', projid);
+        sql = sql.replace('#projid#', projid).replace('#batchid#',batchid);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
         let tn = ''; tn = this.getissuetablename(type);
         let sql = "select * from rooms ";
         if (type == 1) {
-          sql = sql + "left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id"
+          sql = sql + " left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 2) {
-          sql = sql + "left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 3) {
-          sql = sql + "left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         }
-        sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and fci2.buildingid = '#buildingid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
-          + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.buildingid = '#buildingid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
-          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.buildingid = '#buildingid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
+        sql = sql + " left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and fci2.buildingid = '#buildingid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
+          + " left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.buildingid = '#buildingid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
+          + " left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.buildingid = '#buildingid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
         //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
         //+ "order by rooms.sortcode, rooms.unit";
         sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
         sql = sql.replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid);
         //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
-        console.log(sql);
+        console.log("fd:"+sql);
         let res: Array<any>; res = [];
         let tmppromise = Promise.resolve([]);
         for (var i = 0; i < v2.rows.length; i++) {
@@ -3619,7 +3640,7 @@ export class initBaseDB {
       if (status == '已整改') {
         plusranges = " fci.issuestatus = '已整改' ";
       } else {
-        plusranges = " fci.issuestatus = '待派单' or fci.issuestatus = '待整改' "
+        plusranges = " (fci.issuestatus = '待派单' or fci.issuestatus = '待整改') "
       }
       if (batchid) {
         if (buildingid) {
@@ -3634,9 +3655,10 @@ export class initBaseDB {
           sql = "select EngineerName, count(*) as counts from #issuename# fci where fci.projid = '#projid#' and #plusranges# group by EngineerName ";
           sql = sql.replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges);
         } else {
-          sql = "select vend.NameAlias, fci.VendId, count(*) as counts from #issuename# fci inner join vend on vend.id = fci.vendid where fci.projid = '#projid#' and #plusranges# group by fci.VendId, vend.NameAlias ";
-          sql += " left outer join (select fci1.VendId, count(*) as dpd from #issuename# fci1 where fci1.projid = '#projid#' and fci1.issuestatus = '待派单') fcidpd on fcidpd.vendid = fci.vendid ";
-          sql += " left outer join (select fci2.VendId, count(*) as dzg from #issuename# fci2 where fci2.projid = '#projid#' and fci2.issuestatus = '待整改') fcidzg on fcidzg.vendid = fci.vendid ";
+          sql = "select vend.NameAlias, fci.VendId, count(*) as counts,fcidpd.dpd,fcidzg.dzg from #issuename# fci inner join vend on vend.id = fci.vendid ";
+          sql += " left outer join (select fci1.VendId, count(*) as dpd from #issuename# fci1 where fci1.projid = '#projid#' and fci1.issuestatus = '待派单' group by fci1.vendid) fcidpd on fcidpd.vendid = fci.vendid ";
+          sql += " left outer join (select fci2.VendId, count(*) as dzg from #issuename# fci2 where fci2.projid = '#projid#' and fci2.issuestatus = '待整改' group by fci2.vendid) fcidzg on fcidzg.vendid = fci.vendid ";
+          sql += " where fci.projid = '#projid#' and #plusranges# group by fci.VendId, vend.NameAlias, fcidpd.dpd, fcidzg.dzg ";
           sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace('#issuename#', tn).replace('#issuename#', tn).replace('#issuename#', tn).replace('#plusranges#', plusranges);
         }
         console.log(sql);
@@ -3651,11 +3673,13 @@ export class initBaseDB {
             let counts = v2.rows.item(i).counts;
             tmppromise = tmppromise.then(() => {
               let tmpsql = " select count(*) as rooms from rooms where projid = '#projid#' and id in (select roomid from #issuename# fci where fci.projid = '#projid#' and EngineerName = '#EngineerName#' and #plusranges#)";
-              tmpsql = tmpsql.replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges).replace('#EngineerName#', EngineerName);
+              tmpsql = tmpsql.replace('#projid#', projid).replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges).replace('#EngineerName#', EngineerName);
+              console.log(tmpsql);
               return this.db.executeSql(tmpsql, []);
             }).then((v3: any) => {
               console.log(JSON.stringify(v3.rows.item(0)));
               res.push({ name: EngineerName, toReview: counts, roomCount: v3.rows.item(0).rooms });
+              console.log('res:'+res);
               return res;
             })
           }
@@ -3663,16 +3687,23 @@ export class initBaseDB {
           for (var i = 0; i < v2.rows.length; i++) {
             console.log(JSON.stringify(v2.rows.item(i)));
             let NameAlias = v2.rows.item(i).NameAlias;
-            let VendId = v2.rows.item(i).VendId;
-            let dpd = 0; dpd = v2.rows.item(i).dpd;
-            let dzg = 0; dpd = v2.rows.item(i).dzg;
+            let vendid = v2.rows.item(i).VendId;
+            let dpd = 0; 
+            if (v2.rows.item(i).dpd > 0)
+                dpd = v2.rows.item(i).dpd;
+            let dzg = 0; 
+            if (v2.rows.item(i).dzg > 0)   
+                dzg = v2.rows.item(i).dzg;
             tmppromise = tmppromise.then(() => {
               let tmpsql = " select count(*) as rooms from rooms where projid = '#projid#' and id in (select roomid from #issuename# fci where fci.projid = '#projid#' and vendid = '#vendid#' and #plusranges#)";
-              tmpsql = tmpsql.replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges).replace('#vendid#', VendId);
+              tmpsql = tmpsql.replace('#projid#', projid).replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges).replace('#vendid#', vendid);
+              console.log(tmpsql);
+              console.log("vendid:"+vendid);
               return this.db.executeSql(tmpsql, []);
             }).then((v3: any) => {
               console.log(JSON.stringify(v3.rows.item(0)));
               res.push({ name: NameAlias, toDistribute: dpd, toReform: dzg, roomCount: v3.rows.item(0).rooms });
+              console.log('res:'+res);
               return res;
             })
           }

@@ -2,7 +2,7 @@
   <ion-navbar>
     <ion-title>移动报表</ion-title>
   </ion-navbar>
-  <ion-segment [(ngModel)]="reportType" *ngIf="!reportTitle">
+  <ion-segment [(ngModel)]="reportType" *ngIf="!reportTitle" (click)="changetab()">
     <ion-segment-button value="1" style="font-size:large;">
       内部验房
     </ion-segment-button>
