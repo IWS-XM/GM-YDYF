@@ -184,7 +184,7 @@ export class IssuePage {
 						this.initBaseDB.getResponsibility(this.vendid).then((v:any)=>{
 							if (v && v.rows && v.rows.length > 0){
 								this.resunit = v.rows.item(0).NameAlias;
-								this.resunitid = v.rows.item(0).Responsible;
+								this.resunitid = v.rows.item(0).ResponsibleId;
 							} else {
 								this.resunit = this.responsibilityunits[0];
 								this.resunitid = this.responsibilityunitids[0];
@@ -206,7 +206,7 @@ export class IssuePage {
 				this.initBaseDB.getResponsibility(this.vendid).then((v:any)=>{
 					if (v && v.rows && v.rows.length > 0){
 						this.resunit = v.rows.item(0).NameAlias;
-						this.resunitid = v.rows.item(0).Responsible;
+						this.resunitid = v.rows.item(0).ResponsibleId;
 					} else {
 						this.resunit = this.responsibilityunits[0];
 						this.resunitid = this.responsibilityunitids[0];

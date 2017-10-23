@@ -59,7 +59,7 @@ export class initBaseDB {
           }).then((v7) => {
             return this.initBaseTable("positioncheckitemlink", "Projid,Positionid,Checkitemid");
           }).then((v8) => {
-            return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,Responsible");//增加责任单位
+            return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");//增加责任单位
           }).then((v9) => {
             return this.initBaseTable("CustSatisfaction", "Id,Type integer,Name,Sortcode integer");
           }).then((vv) => {
@@ -2781,7 +2781,8 @@ export class initBaseDB {
       });
       console.log("getResponsibility");
       resolve(promise.then((v1) => {  
-        let sql = "select vend.Responsible,v2.NameAlias from vend where vend.id = '"+vendid+"' inner join vend v2 on v2.Id = vend.responsible";
+        let sql = "select v1.ResponsibleId,v2.NameAlias from vend v1 inner join vend v2 on v2.Id = v1.responsibleId where v1.id = '"+vendid+"'";
+        console.log(sql);
         return this.db.executeSql(sql,[]);
       }).catch(err => {
         //this.nativeservice.hideLoading();
