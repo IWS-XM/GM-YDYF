@@ -181,18 +181,22 @@ export class IssuePage {
 					if (i > 0) {
 						this.vend = this.vendors[0];
 						this.vendid = this.vendids[0];
-						this.initBaseDB.getResponsibility(this.vendid).then((v:any)=>{
+						this.manager = this.vendmanagers[0];
+						this.managername = this.vendmanagernames[0];
+						this.managerphone = this.vendmanagerphone[0];
+						this.initBaseDB.getResponsibility(this.vendid).then((v)=>{							
 							if (v && v.rows && v.rows.length > 0){
 								this.resunit = v.rows.item(0).NameAlias;
 								this.resunitid = v.rows.item(0).ResponsibleId;
+								if (this.responsibilityunitids.indexOf(this.resunitid) < 0){
+									this.responsibilityunitids.push(this.resunitid);
+									this.responsibilityunits.push(this.resunit);
+								}
 							} else {
 								this.resunit = this.responsibilityunits[0];
 								this.resunitid = this.responsibilityunitids[0];
 							}
-						})
-						this.manager = this.vendmanagers[0];
-						this.managername = this.vendmanagernames[0];
-						this.managerphone = this.vendmanagerphone[0];
+						})						
 					}
 					console.log(this.issuedescDiv);
 					let x: any; x = this.issuedescDiv;
@@ -203,18 +207,22 @@ export class IssuePage {
 			} else {
 				this.vend = this.vendors[0];
 				this.vendid = this.vendids[0];
-				this.initBaseDB.getResponsibility(this.vendid).then((v:any)=>{
+				this.manager = this.vendmanagers[0];
+				this.managername = this.vendmanagernames[0];
+				this.managerphone = this.vendmanagerphone[0];
+				this.initBaseDB.getResponsibility(this.vendid).then((v)=>{
 					if (v && v.rows && v.rows.length > 0){
 						this.resunit = v.rows.item(0).NameAlias;
 						this.resunitid = v.rows.item(0).ResponsibleId;
+						if (this.responsibilityunitids.indexOf(this.resunitid) < 0){
+							this.responsibilityunitids.push(this.resunitid);
+							this.responsibilityunits.push(this.resunit);
+						}
 					} else {
 						this.resunit = this.responsibilityunits[0];
 						this.resunitid = this.responsibilityunitids[0];
 					}
-				})
-				this.manager = this.vendmanagers[0];
-				this.managername = this.vendmanagernames[0];
-				this.managerphone = this.vendmanagerphone[0];
+				})				
 				console.log(this.issuedescDiv);
 				let x: any; x = this.issuedescDiv;
 				setTimeout(() => {
@@ -240,6 +248,16 @@ export class IssuePage {
 		this.manager = this.vendmanagers[i];
 		this.managername = this.vendmanagernames[i];
 		this.managerphone = this.vendmanagerphone[i];
+		this.initBaseDB.getResponsibility(this.vendid).then((v)=>{
+			if (v && v.rows && v.rows.length > 0){
+				this.resunit = v.rows.item(0).NameAlias;
+				this.resunitid = v.rows.item(0).ResponsibleId;
+				if (this.responsibilityunitids.indexOf(this.resunitid) < 0){
+					this.responsibilityunitids.push(this.resunitid);
+					this.responsibilityunits.push(this.resunit);
+				}
+			} 
+		})			
 	}
 
 	responsibilityunitchange() {
