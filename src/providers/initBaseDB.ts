@@ -498,7 +498,7 @@ export class initBaseDB {
               }))
             } else {
               resolve(promise.then((v1) => {
-                return this.initBaseTable("buildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer");
+                return this.initBaseTable("buildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer,BatchType");
               }).then((v4) => {
                 return this.initBaseTable("uplimagetable", "Projid,Buildingid,Batchid,fn");
               }).catch(err => {
@@ -514,7 +514,7 @@ export class initBaseDB {
               items = res[0];
               console.log(items);
               resolve(promise.then((v1) => {
-                return this.initBaseTable("tmpbuildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer");
+                return this.initBaseTable("tmpbuildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer,BatchType");
               }).then((v2) => {
                 return this.initBaseData("tmpbuildingversion", items[2]);//items[2]);
               }).then((v3) => {
@@ -532,12 +532,12 @@ export class initBaseDB {
                 return this.db.executeSql("update buildingversion set needdownload = 1 where exists (select projid from tmpbuildingversion where buildingversion.projid = tmpbuildingversion.projid and buildingversion.buildingid = tmpbuildingversion.buildingid and buildingversion.batchid = tmpbuildingversion.batchid and buildingversion.downloadversionId != tmpbuildingversion.downloadversionId)", []);
               }).then((v6) => {
                 console.log("v6");
-                return this.db.executeSql("insert into buildingversion (Projid,Buildingid,BuildingName,Batchid,BatchName,Type,VersionId,needupd,downloadversionId,needdownload) select Projid,Buildingid,BuildingName,Batchid,BatchName,Type,0,1,0,1 from tmpbuildingversion where not exists (select projid from buildingversion where buildingversion.projid=tmpbuildingversion.projid and buildingversion.buildingid = tmpbuildingversion.buildingid and buildingversion.batchid = tmpbuildingversion.batchid and buildingversion.projid = '" + projid + "')", []);
+                return this.db.executeSql("insert into buildingversion (Projid,Buildingid,BuildingName,Batchid,BatchName,Type,VersionId,needupd,downloadversionId,needdownload,BatchType) select Projid,Buildingid,BuildingName,Batchid,BatchName,Type,0,1,0,1,BatchType from tmpbuildingversion where not exists (select projid from buildingversion where buildingversion.projid=tmpbuildingversion.projid and buildingversion.buildingid = tmpbuildingversion.buildingid and buildingversion.batchid = tmpbuildingversion.batchid and buildingversion.projid = '" + projid + "')", []);
               }).catch(err => {
                 console.log(err);
               }))
             } else {
-              resolve(this.initBaseTable("tmpbuildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer"));
+              resolve(this.initBaseTable("tmpbuildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer,BatchType"));
             }
           }
         })
@@ -2781,7 +2781,7 @@ export class initBaseDB {
       });
       console.log("getResponsibility");
       resolve(promise.then((v1) => {  
-        let sql = "select v1.ResponsibleId,v2.NameAlias from vend v1 inner join vend v2 on v2.Id = v1.responsibleId where v1.id = '"+vendid+"'";
+        let sql = "select v1.ResponsibleId,v2.NameAlias from vend v1 inner join vend v2 on v2.Id = v1.ResponsibleId where v1.Id = '"+vendid+"'";
         console.log(sql);
         return this.db.executeSql(sql,[]);
       }).catch(err => {
