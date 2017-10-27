@@ -166,45 +166,46 @@ export class IssuePage {
 				this.vendmanagerphone.push(v.phone);
 				i++;
 			})
-			if (i == 0) {
-				this.initBaseDB.getprojvendor(this.projid).then(v2 => {
-					v2.forEach(v => {
-						this.responsibilityunits.push(v.name);
-						this.responsibilityunitids.push(v.id);
-						this.vendors.push(v.name);
-						this.vendids.push(v.id);
-						this.vendmanagers.push(v.manager);
-						this.vendmanagernames.push(v.managename);
-						this.vendmanagerphone.push(v.phone);
-						i++;
-					})
-					if (i > 0) {
-						this.vend = this.vendors[0];
-						this.vendid = this.vendids[0];
-						this.manager = this.vendmanagers[0];
-						this.managername = this.vendmanagernames[0];
-						this.managerphone = this.vendmanagerphone[0];
-						this.initBaseDB.getResponsibility(this.vendid).then((v)=>{							
-							if (v && v.rows && v.rows.length > 0){
-								this.resunit = v.rows.item(0).NameAlias;
-								this.resunitid = v.rows.item(0).ResponsibleId;
-								if (this.responsibilityunitids.indexOf(this.resunitid) < 0){
-									this.responsibilityunitids.push(this.resunitid);
-									this.responsibilityunits.push(this.resunit);
-								}
-							} else {
-								this.resunit = this.responsibilityunits[0];
-								this.resunitid = this.responsibilityunitids[0];
-							}
-						})						
-					}
-					console.log(this.issuedescDiv);
-					let x: any; x = this.issuedescDiv;
-					setTimeout(() => {
-						x.open();
-					}, 0);
-				})
-			} else {
+			// if (i == 0) {
+			// 	this.initBaseDB.getprojvendor(this.projid).then(v2 => {
+			// 		v2.forEach(v => {
+			// 			this.responsibilityunits.push(v.name);
+			// 			this.responsibilityunitids.push(v.id);
+			// 			this.vendors.push(v.name);
+			// 			this.vendids.push(v.id);
+			// 			this.vendmanagers.push(v.manager);
+			// 			this.vendmanagernames.push(v.managename);
+			// 			this.vendmanagerphone.push(v.phone);
+			// 			i++;
+			// 		})
+			// 		if (i > 0) {
+			// 			this.vend = this.vendors[0];
+			// 			this.vendid = this.vendids[0];
+			// 			this.manager = this.vendmanagers[0];
+			// 			this.managername = this.vendmanagernames[0];
+			// 			this.managerphone = this.vendmanagerphone[0];
+			// 			this.initBaseDB.getResponsibility(this.vendid).then((v)=>{							
+			// 				if (v && v.rows && v.rows.length > 0){
+			// 					this.resunit = v.rows.item(0).NameAlias;
+			// 					this.resunitid = v.rows.item(0).ResponsibleId;
+			// 					if (this.responsibilityunitids.indexOf(this.resunitid) < 0){
+			// 						this.responsibilityunitids.push(this.resunitid);
+			// 						this.responsibilityunits.push(this.resunit);
+			// 					}
+			// 				} else {
+			// 					this.resunit = this.responsibilityunits[0];
+			// 					this.resunitid = this.responsibilityunitids[0];
+			// 				}
+			// 			})						
+			// 		}
+			// 		console.log(this.issuedescDiv);
+			// 		let x: any; x = this.issuedescDiv;
+			// 		setTimeout(() => {
+			// 			x.open();
+			// 		}, 0);
+			// 	})
+			//} else {
+			if (i > 0) {  
 				this.vend = this.vendors[0];
 				this.vendid = this.vendids[0];
 				this.manager = this.vendmanagers[0];

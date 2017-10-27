@@ -43,6 +43,9 @@ export class IssueviewPage {
 	versionid: number;
 	ResponsibleId: string;
 	userrole: Array<string> = [];
+	closedreason: string = '';
+	imagesclosed: Array<string> = [];
+	closedtime: string = '';
 	constructor(public localStorage: LocalStorage, public initBaseDB: initBaseDB, public navCtrl: NavController, public alertCtrl: AlertController,
 		public params: NavParams, private modalCtrl: ModalController) {
 		this.issueid = this.params.get('issueid');
@@ -88,6 +91,12 @@ export class IssueviewPage {
 			this.status = issuelist.IssueStatus;
 			this.versionid = issuelist.VersionId;
 			this.ResponsibleId = issuelist.ResponsibleId;
+			this.closedreason = issuelist.CloseReason;
+			if (issuelist.CloseDate) {
+				dt = new Date(issuelist.CloseDate);
+				this.closedtime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
+			}
+			
 			if (this.status == '待派单' || this.status == '待整改' || this.status == '已整改') {
 				this.showbutton = true;
 			}
@@ -137,6 +146,32 @@ export class IssueviewPage {
 					console.log('图片1加载失败' + err);
 				})
 			}
+
+			if (this.status == '非正常关闭') {
+				if (issuelist.ImgClose1) {
+					this.initBaseDB.getimagedata(this.projid, issuelist.ImgClose1).then((v1: any) => {
+						this.imagesclosed.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
+						console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
+						if (issuelist.ImgClose2) {
+							this.initBaseDB.getimagedata(this.projid, issuelist.ImgClose3).then((v2: any) => {
+								this.imagesclosed.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
+								if (issuelist.ImgClose3) {
+									this.initBaseDB.getimagedata(this.projid, issuelist.ImgClose3).then((v3: any) => {
+										this.imagesclosed.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
+									}).catch(err => {
+										console.log('图片3加载失败' + err);
+									})
+								}
+							}).catch(err => {
+								console.log('图片2加载失败' + err);
+							})
+						}
+
+					}).catch(err => {
+						console.log('图片1加载失败' + err);
+					})
+				}
+			}
 		})
 		//var now = new Date();
 		//this.registertime=now.toLocaleDateString()+"  "+now.toLocaleTimeString();		
@@ -172,7 +207,7 @@ export class IssueviewPage {
 					this.navCtrl.pop();
 				})
 			}).catch(err => {
-				console.log('通过失败:' + err);				
+				console.log('通过失败:' + err);
 			})
 		} else {
 			let sql = "update #tablename# set IssueStatus = '已通过', ReviewDate = '" + curtime + "', EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '' where Id = '#issueid#' ";
@@ -255,7 +290,7 @@ export class IssueviewPage {
 					let promise = new Promise((resolve) => {
 						resolve(100);
 					});
-                    console.log(uplsql);
+					console.log(uplsql);
 					promise.then(v1 => {
 						return this.initBaseDB.currentdb().executeSql(uplsql, []);
 					}).then((val: any) => {
