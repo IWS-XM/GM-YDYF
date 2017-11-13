@@ -79,7 +79,12 @@ export class PreinspectionPage {
         }
         console.log("initbatch" + this.nodata);
         console.log(this.batchbuildings);
-        this.nativeservice.hideLoading();
+        this.localStorage.getItem('updatebasedata').then(v=>{
+          console.log(v);
+          if (v == false){
+            this.nativeservice.hideLoading();
+          }
+        })    
         refresher.complete();
       }).catch(e => {
         this.nativeservice.hideLoading();

@@ -59,14 +59,19 @@ export class FormalinspectionPage {
           this.nodata = true;
         }
         console.log("initbatch" + this.nodata);
-        console.log(this.batchbuildings);        
-        this.nativeservice.hideLoading();
+        console.log(this.batchbuildings);  
+        this.localStorage.getItem('updatebasedata').then(v=>{
+          console.log(v);
+          if (v == false){
+            this.nativeservice.hideLoading();
+          }
+        })              
         refresher.complete();
       }).catch(e => {
         this.nativeservice.hideLoading();
         refresher.complete();
       })
-    }, 2000);
+    }, 300);
   }
 
   ngOnInit() {

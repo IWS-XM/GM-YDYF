@@ -217,6 +217,17 @@ export class NativeService {
         this.loadingIsOpen && this.loading.dismiss();
         this.loadingIsOpen = false;
       }, timeout);
+    } else {
+      this.hideLoading();
+      this.loadingIsOpen = true;
+      this.loading = this.loadingCtrl.create({
+        content: content
+      });
+      this.loading.present();
+      setTimeout(() => {//最长显示10秒
+        this.loadingIsOpen && this.loading.dismiss();
+        this.loadingIsOpen = false;
+      }, timeout);
     }
   };
 

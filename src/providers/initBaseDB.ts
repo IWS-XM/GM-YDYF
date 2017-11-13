@@ -149,10 +149,13 @@ export class initBaseDB {
           resolve(1);//vres.rows.item(0).counts);
         }).catch(err => {
           this.warn(tablename + ":" + err);
+          console.log('error:' + err);
+          throw '';
         })
       }).catch(e => {
         console.log(tablename + 'error');
         console.log('Transaction error: ' + e.message);
+        throw '';
       })
     })
   }
@@ -349,38 +352,97 @@ export class initBaseDB {
     })
   }
 
+  updatebasepack(v, token): Promise<any> {
+    return new Promise((resolve) => {
+      console.log('updatebasepack');
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      let data: Array<any>;
+      resolve(promise.then((v1) => {
+        console.log('aaaabasepack');
+        return this.httpService.get(APP_SERVE_URL + "/basepack/", { Token: token, Projid: v.projid });
+      }).then((res) => {
+        console.log("aaainitdata:" );
+        data = res[0];
+        return this.initData(res[0], v.projid);
+      }).then((val) => {
+        console.log("aaatablename:");
+        let tmppromise = Promise.resolve(0);
+        for (let i = 2; i < data.length; i += 2) {
+          let items = data[i];
+          let itemsrecord = data[i + 1];
+          console.log("aaatablename:" + items[0]);
+          tmppromise = tmppromise.then(() => {
+            if (itemsrecord.length > 0) {
+              return this.initBaseData(items[0], itemsrecord);
+            } else {
+              return 1;
+            }            
+          }).then((v) => {
+            return v;
+          })
+        }
+        return tmppromise;
+      }).then(v3 => {
+        return this.db.executeSql("update ProjVersion set needupd = 0, versionid = " + data[1][0] + " where projid = '" + v.projid + "'", []);
+      }).then(v4 => {
+        return this.localStorage.setItem('curproj', { projid: v.projid, projname: v.projname, versionid: data[1][0], needupd: 0 });
+      }).catch(e => {
+        console.log('error:' + e);
+        throw '';
+      }))
+    })
+  }
+
   updatecurproj(token): Promise<any> {
     return new Promise((resolve) => {
       console.log('updatecurproj');
-      this.localStorage.getItem('curproj').then(v => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      resolve(promise.then((v1) => {
+        return this.localStorage.getItem('curproj');
+      }).then((v:any) => {
         console.log(v);
         if (v.needupd == 1) {
-          this.httpService.get(APP_SERVE_URL + "/basepack/", { Token: token, Projid: v.projid }).then(res => {
-            console.log(res[0]);
-            this.initData(res[0], v.projid).then(val => {
-              let data: Array<any>;
-              data = res[0];
-              for (var i = 2; i < data.length; i += 2) {
-                let items = data[i];
-                console.log("tablename:" + items[0]);
-                if (data[i + 1].length > 0) {
-                  this.initBaseData(items[0], data[i + 1]);
-                }
-              }
-              console.log(res[0][1][0]);
-              this.db.executeSql("update ProjVersion set needupd = 0, versionid = " + res[0][1][0] + " where projid = '" + v.projid + "'", []).then(v2 => {
-                resolve(this.localStorage.setItem('curproj', { projid: v.projid, projname: v.projname, versionid: res[0][1][0], needupd: 0 }));
-              })
-            })
-          }).catch(e => {
-            console.log(e);
-            this.nativeservice.hideLoading();
-          })
+          return this.updatebasepack(v, token);
+        } else {
+          return 1;
         }
-        else {
-          resolve(1);
-        }
-      })
+      }).catch(e => {
+        console.log('error:' + e);
+        throw '';
+      }))
+      // this.localStorage.getItem('curproj').then(v => {
+      //   console.log(v);
+      //   if (v.needupd == 1) {
+      //     this.httpService.get(APP_SERVE_URL + "/basepack/", { Token: token, Projid: v.projid }).then(res => {
+      //       console.log(res[0]);
+      //       this.initData(res[0], v.projid).then(val => {
+      //         let data: Array<any>;
+      //         data = res[0];
+      //         for (let i = 2; i < data.length; i += 2) {
+      //           let items = data[i];
+      //           console.log("tablename:" + items[0]);
+      //           if (data[i + 1].length > 0) {
+      //             this.initBaseData(items[0], data[i + 1]);
+      //           }
+      //         }
+      //         console.log(res[0][1][0]);
+      //         this.db.executeSql("update ProjVersion set needupd = 0, versionid = " + res[0][1][0] + " where projid = '" + v.projid + "'", []).then(v2 => {
+      //           resolve(this.localStorage.setItem('curproj', { projid: v.projid, projname: v.projname, versionid: res[0][1][0], needupd: 0 }));
+      //         })
+      //       })
+      //     }).catch(e => {
+      //       console.log('error:'+e);
+      //       this.nativeservice.hideLoading();
+      //     })
+      //   }
+      //   else {
+      //     resolve(1);
+      //   }
+      // })
     })
   }
 
@@ -424,7 +486,8 @@ export class initBaseDB {
               console.log(item); console.log(item[0].VersionId);
               if (item[0].VersionId != versionid) {
                 console.log("checkandupdprojversion");
-                this.nativeservice.showLoading("正在下载基础数据,请稍侯...");
+                //this.nativeservice.hideLoading();
+                //this.nativeservice.showLoading("正在下载基础数据,请稍侯...");
                 this.localStorage.getItem('curproj').then(v => {
                   let promise2 = new Promise((resolve) => {
                     resolve(100);
@@ -445,16 +508,19 @@ export class initBaseDB {
                     })
                     // this.localStorage.setItem('curproj', { projid: v.projid, projname: v.projname, versionid: v.versionid, needupd: 1 });
                   }).then((v3) => {
+                    return this.localStorage.setItem('updatebasedata',true);
+                  }).then((v3) => {
                     return this.updatecurproj(token);
                   }).then((v4) => {
+                    console.log('bbbupdatecurproj');
                     this.nativeservice.hideLoading();
                     return 1;
                   }).catch(err => {
                     this.nativeservice.hideLoading();
-                    console.log(err);
+                    console.log("error:" + err);
                   }))
                 }).catch(e => {
-                  console.log(e);
+                  console.log("error:" + e);
                   this.nativeservice.hideLoading();
                 })
               }
@@ -465,7 +531,7 @@ export class initBaseDB {
           }
         }
       }).catch(err => {
-        console.log(err);
+        console.log("error:" + err);
         this.nativeservice.hideLoading();
       }))
     })
@@ -486,7 +552,7 @@ export class initBaseDB {
               items = res[0];
               console.log(items);
               resolve(promise.then((v1) => {
-                return this.initBaseTable("buildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer,BatchType");
+                return this.initBaseTable("buildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer default 0,needdownload integer default 0,needupload integer default 0,BatchType default ''");
               }).then((v2) => {
                 return this.initBaseData("buildingversion", items[2]);//items[2]);
               }).then((v3) => {
@@ -498,7 +564,7 @@ export class initBaseDB {
               }))
             } else {
               resolve(promise.then((v1) => {
-                return this.initBaseTable("buildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer,needdownload integer,needupload integer,BatchType");
+                return this.initBaseTable("buildingversion", "Projid,Buildingid,BuildingName,Batchid,VersionId integer,Type integer,BatchName,downloadversionId integer,needupd integer default 0,needdownload integer default 0,needupload integer default 0,BatchType default ''");
               }).then((v4) => {
                 return this.initBaseTable("uplimagetable", "Projid,Buildingid,Batchid,fn");
               }).catch(err => {
@@ -542,7 +608,7 @@ export class initBaseDB {
           }
         })
       }).catch(e => {
-        console.log(e);
+        console.log("error:" + e);
         this.nativeservice.hideLoading();
       })
     })
@@ -748,7 +814,7 @@ export class initBaseDB {
       let jsonarr: Array<any>; jsonarr = [];
       let tmppromise = Promise.resolve([]);
       console.log(tablenames);
-      for (var i = 0; i < tablenames.length; i++) {
+      for (let i = 0; i < tablenames.length; i++) {
         let tablename = tablenames[i];
         console.log(tablename);
         tmppromise = tmppromise.then(() => {
@@ -791,7 +857,7 @@ export class initBaseDB {
     return new Promise((resolve) => {
       var jsonarr: Array<any>; jsonarr = [];
       let tmppromise = Promise.resolve([]);
-      for (var i = 0; i < tablenames.length; i++) {
+      for (let i = 0; i < tablenames.length; i++) {
         let tablename = tablenames[i];
         console.log('reset up' + tablename);
         tmppromise = tmppromise.then(() => {
@@ -833,13 +899,17 @@ export class initBaseDB {
         return this.db.executeSql(sql, []);
       }).then((val: any) => {
         let tmppromise = Promise.resolve(10);
-        for (var i = 0; i < val.rows.length; i++) {
+        for (let i = 0; i < val.rows.length; i++) {
           console.log(JSON.stringify(val.rows.item(i)))
           let filename = val.rows.item(i).fn;
           let src = val.rows.item(i).src;
           tmppromise = tmppromise.then(() => {
             return this.uploadimg(src, filename);
           }).then((v) => {
+            if (v == null || v == 0) {
+              this.nativeservice.hideLoading();
+              throw "图片上传失败";
+            }
             return 1;
           })
         }
@@ -1097,6 +1167,7 @@ export class initBaseDB {
   refreshbatch(projid, type, token, versionid): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
+        this.localStorage.setItem('updatebasedata',false);
         resolve(100);
       });
       resolve(promise.then((v1) => {
@@ -1112,7 +1183,8 @@ export class initBaseDB {
         if (val == false) {
           return 10;
         } else {
-          this.nativeservice.showLoading("刷新中,请稍侯...");
+          console.log('aaainitbuilding');
+          //this.nativeservice.showLoading("刷新中,请稍侯...");
           return this.initbuildingversion(token, projid);
         }
       }).then((v1) => {
@@ -1126,7 +1198,7 @@ export class initBaseDB {
         console.log(JSON.stringify(batchlist.rows.item(0)));
         let batchbuildings: Array<any>; batchbuildings = [];
         let tmppromise = Promise.resolve([]);
-        for (var i = 0; i < batchlist.rows.length; i++) {
+        for (let i = 0; i < batchlist.rows.length; i++) {
           console.log(batchlist.rows.item(i).BatchName);
           let batchid = batchlist.rows.item(i).Batchid;
           let batchname = batchlist.rows.item(i).BatchName;
@@ -1141,7 +1213,7 @@ export class initBaseDB {
         }
         return tmppromise;
       }).then((buildinglist: Array<any>) => {
-        console.log(buildinglist);
+        console.log("aaabuildinglist:" + buildinglist);
         return buildinglist;
       }).catch(err => {
         this.warn('批次加载错误:' + err);
@@ -1175,7 +1247,7 @@ export class initBaseDB {
         console.log(JSON.stringify(batchlist.rows.item(0)));
         let batchbuildings: Array<any>; batchbuildings = [];
         let tmppromise = Promise.resolve([]);
-        for (var i = 0; i < batchlist.rows.length; i++) {
+        for (let i = 0; i < batchlist.rows.length; i++) {
           console.log(batchlist.rows.item(i).BatchName);
           let batchid = batchlist.rows.item(i).Batchid;
           let batchname = batchlist.rows.item(i).BatchName;
@@ -1198,7 +1270,7 @@ export class initBaseDB {
     })
   }
 
-  getBuilding(projid, batchid, type): Promise<Array<any>> {
+  getBuilding(projid, batchid, type): Promise<any> {
     return new Promise((resolve) => {
       let sql: string;
       sql = "SELECT buildingid,buildingname,needupd,needdownload,needupload FROM buildingversion where projid = '#projid#' and type = #type# and batchid = '#batchid#' order by buildingname";
@@ -1208,34 +1280,68 @@ export class initBaseDB {
       //var buildinglist: Array<any>;
       //buildinglist = [];     
       console.log(sql);
-      this.db.executeSql(sql, []).then(list => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      let buildings: Array<any>;
+      buildings = [];
+      resolve(promise.then((v1) => {
+        return this.db.executeSql(sql, []);
+      }).then((list: any) => {
         console.log(JSON.stringify(list.rows.item(0)));
-        //for (var i = 0; i < vres.rows.length; i++) {
-        //buildinglist.push({ projid: vres.rows.item(i).Projid, projname: vres.rows.item(i).ProjName, version: vres.rows.item(i).VersionId, needupd: vres.rows.item(i).needupd });
-        //}
-        //resolve(buildinglist);
-        let buildings: Array<any>;
-        buildings = [];
         let needtype: number;
+        let tmppromise = Promise.resolve(10);
         for (let i = 0; i < list.rows.length; i++) {  //Buildingid,BuildingName,needupd,needdownload 
-          console.log('for');
-          if (list.rows.item(i).needdownload == 1)
-            needtype = 1;
-          else if (list.rows.item(i).needupload == 1)                    /////////////////上传标记判断
-            needtype = 2;
-          else if (list.rows.item(i).needupd == 1)
-            needtype = 3;
-          else
-            needtype = 0;
-          console.log("needtype:" + needtype);
-          buildings.push({ buildingid: list.rows.item(i).Buildingid, buildingname: list.rows.item(i).BuildingName, needtype: needtype });
+          //console.log('for');
+          tmppromise = tmppromise.then((v) => {
+            if (list.rows.item(i).needdownload == 1)
+              needtype = 1;
+            else if (list.rows.item(i).needupload == 1)                    /////////////////上传标记判断
+              needtype = 2;
+            else if (list.rows.item(i).needupd == 1)
+              needtype = 3;
+            else
+              needtype = 0;
+            //console.log("needtype:" + needtype);
+            return buildings.push({ buildingid: list.rows.item(i).Buildingid, buildingname: list.rows.item(i).BuildingName, needtype: needtype });
+          }).then(val => {
+            return val;
+          })
         }
-        console.log(buildings);
-        resolve(buildings);
-
+        return tmppromise;
+      }).then(v => {
+        return buildings;
       }).catch(err => {
         this.warn('楼栋加载错误:' + err);
-      })
+      }))
+      // this.db.executeSql(sql, []).then(list => {
+      //   console.log(JSON.stringify(list.rows.item(0)));
+      //   //for (var i = 0; i < vres.rows.length; i++) {
+      //   //buildinglist.push({ projid: vres.rows.item(i).Projid, projname: vres.rows.item(i).ProjName, version: vres.rows.item(i).VersionId, needupd: vres.rows.item(i).needupd });
+      //   //}
+      //   //resolve(buildinglist);
+      //   let buildings: Array<any>;
+      //   buildings = [];
+      //   let needtype: number;
+      //   for (let i = 0; i < list.rows.length; i++) {  //Buildingid,BuildingName,needupd,needdownload 
+      //     //console.log('for');
+      //     if (list.rows.item(i).needdownload == 1)
+      //       needtype = 1;
+      //     else if (list.rows.item(i).needupload == 1)                    /////////////////上传标记判断
+      //       needtype = 2;
+      //     else if (list.rows.item(i).needupd == 1)
+      //       needtype = 3;
+      //     else
+      //       needtype = 0;
+      //     //console.log("needtype:" + needtype);
+      //     buildings.push({ buildingid: list.rows.item(i).Buildingid, buildingname: list.rows.item(i).BuildingName, needtype: needtype });
+      //   }
+      //   console.log(buildings);
+      //   resolve(buildings);
+
+      // }).catch(err => {
+      //   this.warn('楼栋加载错误:' + err);
+      // })
     })
   }
 
@@ -1556,14 +1662,15 @@ export class initBaseDB {
         return sql;
       }).then((vsql: string) => {
         console.log(vsql);
-        return this.db.executeSql(vsql, []).then((v3: any) => {
-          console.log("v3:" + v3); console.log(JSON.stringify(v3.rows.item(0)));
-          for (var l = 0; l < v3.rows.length; l++) {
-            console.log(JSON.stringify(v3.rows.item(l)));
-            vendlist.push({ id: v3.rows.item(l).Id, name: v3.rows.item(l).NameAlias, manager: v3.rows.item(l).Manager, phone: v3.rows.item(l).Phone, managename: v3.rows.item(l).ManageName });
-          }
-        })
+        return this.db.executeSql(vsql, []);
       }).then((v3: any) => {
+        console.log("v3:" + v3);
+        for (let l = 0; l < v3.rows.length; l++) {
+          console.log(JSON.stringify(v3.rows.item(l)));
+          vendlist.push({ id: v3.rows.item(l).Id, name: v3.rows.item(l).NameAlias, manager: v3.rows.item(l).Manager, phone: v3.rows.item(l).Phone, managename: v3.rows.item(l).ManageName });
+        }
+        return vendlist;
+      }).then((v4: any) => {
 
         let tmpvend: Array<any>; tmpvend = [];
         console.log(itemdesc);
@@ -1601,7 +1708,7 @@ export class initBaseDB {
       let sql = "select max(Timelimit) as Timelimit from projcheckitemdetails where projid = '#projid#' and Checkitemid = '#Checkitemid#' and (#issuedesc#)";
       sql = sql.replace('#projid#', projid).replace("#Checkitemid#", checitemid);
       let descrange: string;
-      for (var i = 0; i < issuedesc.length; i++) {
+      for (let i = 0; i < issuedesc.length; i++) {
         if (i == 0) {
           descrange = "Name = '" + issuedesc[i] + "'";
         } else {
@@ -2080,6 +2187,10 @@ export class initBaseDB {
           tmppromise = tmppromise.then(() => {
             return this.uploadimg(src, filename);
           }).then((v) => {
+            if (v == null || v == 0) {
+              this.nativeservice.hideLoading();
+              throw "图片上传失败";
+            }
             return 1;
           })
         }
@@ -2780,10 +2891,10 @@ export class initBaseDB {
         resolve(100);
       });
       console.log("getResponsibility");
-      resolve(promise.then((v1) => {  
-        let sql = "select v1.ResponsibleId,v2.NameAlias from vend v1 inner join vend v2 on v2.Id = v1.ResponsibleId where v1.Id = '"+vendid+"'";
+      resolve(promise.then((v1) => {
+        let sql = "select v1.ResponsibleId,v2.NameAlias from vend v1 inner join vend v2 on v2.Id = v1.ResponsibleId where v1.Id = '" + vendid + "'";
         console.log(sql);
-        return this.db.executeSql(sql,[]);
+        return this.db.executeSql(sql, []);
       }).catch(err => {
         //this.nativeservice.hideLoading();
         this.warn('默认责任单位导出失败:' + err);
@@ -3470,7 +3581,7 @@ export class initBaseDB {
       });  //FormalRoomDetails", "RoomId,TransDate DateTime,RoomStatus,C
       resolve(promise.then((v1) => {
         let sql = "select Batchid,BatchName from buildingversion where Projid = '#projid#' and type = #type# group by batchid,BatchName";
-        sql = sql.replace('#projid#', projid).replace('#type#',type);
+        sql = sql.replace('#projid#', projid).replace('#type#', type);
         console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
@@ -3555,7 +3666,7 @@ export class initBaseDB {
       });  //FormalRoomDetails", "RoomId,TransDate DateTime,RoomStatus,C
       resolve(promise.then((v1) => {
         let sql = "select Buildingid,BuildingName from buildingversion where Projid = '#projid#' and batchid = '#batchid#' group by Buildingid,BuildingName";
-        sql = sql.replace('#projid#', projid).replace('#batchid#',batchid);
+        sql = sql.replace('#projid#', projid).replace('#batchid#', batchid);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
         let tn = ''; tn = this.getissuetablename(type);
@@ -3575,7 +3686,7 @@ export class initBaseDB {
         sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
         sql = sql.replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid);
         //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
-        console.log("fd:"+sql);
+        console.log("fd:" + sql);
         let res: Array<any>; res = [];
         let tmppromise = Promise.resolve([]);
         for (var i = 0; i < v2.rows.length; i++) {
@@ -3680,7 +3791,7 @@ export class initBaseDB {
             }).then((v3: any) => {
               console.log(JSON.stringify(v3.rows.item(0)));
               res.push({ name: EngineerName, toReview: counts, roomCount: v3.rows.item(0).rooms });
-              console.log('res:'+res);
+              console.log('res:' + res);
               return res;
             })
           }
@@ -3689,22 +3800,22 @@ export class initBaseDB {
             console.log(JSON.stringify(v2.rows.item(i)));
             let NameAlias = v2.rows.item(i).NameAlias;
             let vendid = v2.rows.item(i).VendId;
-            let dpd = 0; 
+            let dpd = 0;
             if (v2.rows.item(i).dpd > 0)
-                dpd = v2.rows.item(i).dpd;
-            let dzg = 0; 
-            if (v2.rows.item(i).dzg > 0)   
-                dzg = v2.rows.item(i).dzg;
+              dpd = v2.rows.item(i).dpd;
+            let dzg = 0;
+            if (v2.rows.item(i).dzg > 0)
+              dzg = v2.rows.item(i).dzg;
             tmppromise = tmppromise.then(() => {
               let tmpsql = " select count(*) as rooms from rooms where projid = '#projid#' and id in (select roomid from #issuename# fci where fci.projid = '#projid#' and vendid = '#vendid#' and #plusranges#)";
               tmpsql = tmpsql.replace('#projid#', projid).replace('#projid#', projid).replace('#issuename#', tn).replace('#plusranges#', plusranges).replace('#vendid#', vendid);
               console.log(tmpsql);
-              console.log("vendid:"+vendid);
+              console.log("vendid:" + vendid);
               return this.db.executeSql(tmpsql, []);
             }).then((v3: any) => {
               console.log(JSON.stringify(v3.rows.item(0)));
               res.push({ name: NameAlias, toDistribute: dpd, toReform: dzg, roomCount: v3.rows.item(0).rooms });
-              console.log('res:'+res);
+              console.log('res:' + res);
               return res;
             })
           }

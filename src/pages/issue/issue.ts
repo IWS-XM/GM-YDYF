@@ -224,7 +224,7 @@ export class IssuePage {
 						this.resunitid = this.responsibilityunitids[0];
 					}
 				})				
-				console.log(this.issuedescDiv);
+				//console.log(this.issuedescDiv);
 				let x: any; x = this.issuedescDiv;
 				setTimeout(() => {
 					x.open();
@@ -235,7 +235,7 @@ export class IssuePage {
 
 	issuedescchange(event) {
 		this.timelimit = 0;
-		this.initBaseDB.getduetime(this.projid, this.checkitemid, event).then(val => {
+		this.initBaseDB.getduetime(this.projid, this.checkitemid, event).then(val => {			
 			console.log(JSON.stringify(val.rows.item(0)));
 			this.timelimit = val.rows.item(0).Timelimit;
 			console.log(this.timelimit);
