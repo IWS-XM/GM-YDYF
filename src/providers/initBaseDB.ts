@@ -908,6 +908,7 @@ export class initBaseDB {
           }).then((v) => {
             if (v == null || v == 0) {
               this.nativeservice.hideLoading();
+              this.nativeservice.showToast("图片上传失败");
               throw "图片上传失败";
             }
             return 1;
@@ -1166,12 +1167,13 @@ export class initBaseDB {
 
   refreshbatch(projid, type, token, versionid): Promise<any> {
     return new Promise((resolve) => {
-      let promise = new Promise((resolve) => {
-        this.localStorage.setItem('updatebasedata',false);
+      let promise = new Promise((resolve) => {        
         resolve(100);
       });
       resolve(promise.then((v1) => {
         return this.nativeservice.isConnecting();
+      }).then(v=>{
+        return this.localStorage.setItem('updatebasedata',false);
       }).then((vv: boolean) => {
         if (vv == false) {
           return vv;
@@ -2189,6 +2191,7 @@ export class initBaseDB {
           }).then((v) => {
             if (v == null || v == 0) {
               this.nativeservice.hideLoading();
+              this.nativeservice.showToast("图片上传失败");
               throw "图片上传失败";
             }
             return 1;

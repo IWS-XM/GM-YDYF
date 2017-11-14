@@ -169,11 +169,12 @@ export class FormalinspectionPage {
         if (val == false) {
           throw '';//resolve(10);
         } else {
-          this.nativeservice.showLoading("下载中...", 200000);
+          this.nativeservice.showLoading("下载中...");
           return this.initBaseDB.downloadbuildinginfo(this.token, this.projid, batchid, building.buildingid, this.type);
         }
       }).then((v) => {
         building.needtype = 0;
+        console.log("aaa下载完成");
         this.nativeservice.hideLoading();
         this.nativeservice.showToast('下载完成.');
         return 100;

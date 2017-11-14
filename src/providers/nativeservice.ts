@@ -206,7 +206,7 @@ export class NativeService {
    * 统一调用此方法显示loading
    * @param content 显示的内容
    */
-  showLoading(content: string = '', timeout: number = 300000): void {
+  showLoading(content: string = '', timeout: number = 3000000): void {
     if (!this.loadingIsOpen) {
       this.loadingIsOpen = true;
       this.loading = this.loadingCtrl.create({
@@ -218,6 +218,7 @@ export class NativeService {
         this.loadingIsOpen = false;
       }, timeout);
     } else {
+      console.log('aaashowLoading');
       this.hideLoading();
       this.loadingIsOpen = true;
       this.loading = this.loadingCtrl.create({

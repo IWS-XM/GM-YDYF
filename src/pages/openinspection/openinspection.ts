@@ -168,7 +168,7 @@ export class OpeninspectionPage {
         if (val == false) {
           throw '';//resolve(10);
         } else {
-          this.nativeservice.showLoading("下载中...", 200000);
+          this.nativeservice.showLoading("下载中...");
           return this.initBaseDB.downloadbuildinginfo(this.token, this.projid, batchid, building.buildingid, this.type);
         }
       }).then((v) => {
