@@ -48,13 +48,13 @@
     </ion-item>
     <ion-grid style="font-size:small; ">
       <ion-row align-items-center *ngIf="detailTitle!=''" style="border-bottom:1px solid #c8c7cc; background-color:#f8f7fc; font-weight:bold; height:40px;">
-        <ion-col col-4>{{(reportLevel==0?'批次':'楼栋')}}</ion-col>
+        <ion-col col-4>{{(reportlevel==0?'批次':'楼栋')}}</ion-col>
         <ion-col *ngFor="let status of statuses">{{status}}</ion-col>
       </ion-row>
 
       <ion-row align-items-center *ngFor="let item of datasource;let i=index" style="border-bottom:1px solid #c8c7cc; height:48px;">
         <ion-col col-4>
-          <a (click)="DetailReport(item, reportLevel==0? item.dataname:navParams.get('BatchName'))"
+          <a (click)="DetailReport(item, reportlevel==0? item.dataname:navParams.get('BatchName'))"
             id={{item.id}}>{{item.dataname}}</a>
         </ion-col>
         <ion-col *ngFor="let issuecnt of item.issues">{{issuecnt}}</ion-col>

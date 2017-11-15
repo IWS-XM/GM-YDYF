@@ -3513,18 +3513,19 @@ export class initBaseDB {
         let tn = ''; tn = this.getissuetablename(type);
         let sql = "select * from rooms ";
         if (type == 1) {
-          sql = sql + "left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + "inner join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 2) {
-          sql = sql + "left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + "inner join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 3) {
-          sql = sql + "left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + "inner join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
         }
         sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单' group by roomid) fdzg on fdzg.roomid = rooms.id "
           + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
-          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
+          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id "
+          + " where rooms.projid = '#projid#' ";
         //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
         //+ "order by rooms.sortcode, rooms.unit";
-        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
+        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
 
         //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
         console.log(sql);
@@ -3591,18 +3592,19 @@ export class initBaseDB {
         let tn = ''; tn = this.getissuetablename(type);
         let sql = "select * from rooms ";
         if (type == 1) {
-          sql = sql + " left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " inner join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 2) {
-          sql = sql + " left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " inner join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 3) {
-          sql = sql + " left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " inner join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
         }
         sql = sql + " left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
           + " left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
-          + " left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
-        //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
+          + " left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id "
+          + " where rooms.projid = '#projid#' ";         
+          //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
         //+ "order by rooms.sortcode, rooms.unit";
-        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
+        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
 
         //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
         console.log(sql);
@@ -3675,18 +3677,19 @@ export class initBaseDB {
         let tn = ''; tn = this.getissuetablename(type);
         let sql = "select * from rooms ";
         if (type == 1) {
-          sql = sql + " left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " inner join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 2) {
-          sql = sql + " left outer join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " inner join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 3) {
-          sql = sql + " left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " inner join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         }
         sql = sql + " left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and fci2.buildingid = '#buildingid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
           + " left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.buildingid = '#buildingid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
-          + " left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.buildingid = '#buildingid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id ";
+          + " left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.buildingid = '#buildingid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id "
+          + " where rooms.projid = '#projid#' ";
         //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
         //+ "order by rooms.sortcode, rooms.unit";
-        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
+        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
         sql = sql.replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid);
         //sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
         console.log("fd:" + sql);
