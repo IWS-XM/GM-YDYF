@@ -3513,7 +3513,7 @@ export class initBaseDB {
         let tn = ''; tn = this.getissuetablename(type);
         let sql = "select * from rooms ";
         if (type == 1) {
-          sql = sql + "inner join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + "left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 2) {
           sql = sql + "inner join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 3) {
@@ -3592,7 +3592,7 @@ export class initBaseDB {
         let tn = ''; tn = this.getissuetablename(type);
         let sql = "select * from rooms ";
         if (type == 1) {
-          sql = sql + " inner join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 2) {
           sql = sql + " inner join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 3) {
@@ -3677,7 +3677,7 @@ export class initBaseDB {
         let tn = ''; tn = this.getissuetablename(type);
         let sql = "select * from rooms ";
         if (type == 1) {
-          sql = sql + " inner join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
+          sql = sql + " left outer join (select roomid, RoomStatus from PreRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 2) {
           sql = sql + " inner join (select roomid, RoomStatus from OpenRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         } else if (type == 3) {

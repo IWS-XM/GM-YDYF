@@ -23,7 +23,7 @@ export class ReceiptPage {
     username: string;
     type: number;
     readonly: boolean;
-    titlestr:string = '';
+    titlestr: string = '';
     @ViewChild(SignaturePad) signaturePad: SignaturePad;
     @ViewChild('contentEl') contentEl: ElementRef;
     isEmpty = true;
@@ -50,7 +50,7 @@ export class ReceiptPage {
         this.receiptInfo.roomId = navParams.get('roomid');
         this.receiptInfo.roomName = navParams.get('roomname');
         this.type = navParams.get('type');
-        if (this.type == 2){
+        if (this.type == 2) {
             this.titlestr = '接待';
         } else {
             this.titlestr = '交付';
@@ -71,7 +71,7 @@ export class ReceiptPage {
 
     initdata() {
         this.initBaseDB.getroomdetails(this.receiptInfo.roomId, this.receiptInfo.batchid, this.type).then(val => {
-            console.log("roomdetails:" + JSON.stringify(val.rows.item(0)));
+            console.log("aaaroomdetails:" + JSON.stringify(val.rows.item(0)));
             if (val.rows.length > 0) {
                 if (val.rows.item(0).CustId != 'undefined')
                     this.receiptInfo.ownerName = val.rows.item(0).CustId;
@@ -104,7 +104,7 @@ export class ReceiptPage {
                 }
 
                 this.receiptInfo.dlvrDate = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
-                console.log(this.receiptInfo.dlvrDate);
+                console.log('dlvdate:'+this.receiptInfo.dlvrDate);
                 this.receiptInfo.additionNote = val.rows.item(0).Remark;
                 this.initBaseDB.getimagedata(this.receiptInfo.projId, val.rows.item(0).ImgSign).then(v => {
                     if (v && v.rows.length > 0) {
@@ -159,13 +159,13 @@ export class ReceiptPage {
 
     cansubmit(): boolean {
         let ret: boolean; ret = true;
-        let err:string = "";
+        let err: string = "";
         if (this.type == 3) {
             if (!this.receiptInfo.electricMeter && this.receiptInfo.electricMeter != 0) {
                 err = "电表读数必填. "; ret = false;
             }
             if (!this.receiptInfo.waterMeter && this.receiptInfo.waterMeter != 0) {
-                err += "水表读数必填. ";  ret = false;
+                err += "水表读数必填. "; ret = false;
             }
             if (!this.receiptInfo.gasMeter && this.receiptInfo.gasMeter != 0) {
                 err += "气表读数必填. "; ret = false;
@@ -185,18 +185,18 @@ export class ReceiptPage {
             if (this.receiptInfo.keyReserve.toString() == '') {
                 err += "钥匙留用只能填写数字. "; ret = false;
             }
-            if (ret == false){
-                this.nativeservice.alert(err).then(v=>{
+            if (ret == false) {
+                this.nativeservice.alert(err).then(v => {
                     return false;
-                }).catch(v=>{
+                }).catch(v => {
                     return false;
                 })
             } else {
                 return true;
             }
         } else {
-           return ret;
-        }        
+            return ret;
+        }
     }
 
     doSubmit() {
@@ -293,7 +293,7 @@ export class ReceiptPage {
             }).then(v3 => {
                 this.initBaseDB.updateuploadflag(this.receiptInfo.projId, this.receiptInfo.batchid, this.receiptInfo.buildingId, this.type);
             }).catch(err => {
-                console.log(this.titlestr+'信息提交失败:' + err);                
+                console.log(this.titlestr + '信息提交失败:' + err);
             }).then(v4 => {
                 this.navCtrl.pop();
             })
