@@ -141,22 +141,72 @@ export class initBaseDB {
       console.log(tablename); console.log(records);
       this.sqlitePorter.importJsonToDb(this.db, json).then(val => {
         console.log(val);
-        this.db.executeSql("SELECT * FROM " + tablename, []).then(vres => {   //SELECT count(*) as counts FROM
-          for (var i = 0; i < vres.rows.length; i++) {
-            console.log(JSON.stringify(vres.rows.item(i)));
-          }
-          //alert('Transaction finished, check record count: ' + tablename + "   " + JSON.stringify(vres.rows.item(0)));
-          resolve(1);//vres.rows.item(0).counts);
-        }).catch(err => {
-          this.warn(tablename + ":" + err);
-          console.log('error:' + err);
-          throw '';
-        })
+        // this.db.executeSql("SELECT * FROM " + tablename, []).then(vres => {   //SELECT count(*) as counts FROM
+        //   for (var i = 0; i < vres.rows.length; i++) {
+        //     console.log(JSON.stringify(vres.rows.item(i)));
+        //   }
+        //   //alert('Transaction finished, check record count: ' + tablename + "   " + JSON.stringify(vres.rows.item(0)));
+        resolve(1);//vres.rows.item(0).counts);
+        // }).catch(err => {
+        //   this.warn(tablename + ":" + err);
+        //   console.log('error:' + err);
+        //   throw '';
+        // })
       }).catch(e => {
         console.log(tablename + 'error');
         console.log('Transaction error: ' + e.message);
         throw '';
       })
+    })
+  }
+
+  initIssuesData(tablename, records): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("initIssuesData");    
+      let tmprecords = []; 
+      resolve(promise.then((v1) => {
+        let jsonstr = JSON.stringify(records);
+        console.log(jsonstr.substr(3,1));
+        if (jsonstr.substr(3,1) == 'X')
+            return 1;
+        else
+            return 0;
+      }).then((v) => {
+        console.log(v);
+        if (v == 1) {
+          let tmppromise = Promise.resolve([]);
+          for (var i = 0; i < records.length; i++){
+            let values:any; values = records[i];
+            tmppromise = tmppromise.then(() => {
+              return tmprecords.push({BatchId:values.BatchId,IssueId:values.IssueId,RoomId:values.RoomId,PositionId:values.PositionId,CheckItemId:values.CheckItemId,PlusDesc:values.PlusDesc,
+                IssueDesc:values.IssueDesc,UrgencyId:values.UrgencyId,ImgBefore1:values.ImgBefore1,ImgBefore2:values.ImgBefore2,ImgBefore3:values.ImgBefore3,ImgAfter1:values.ImgAfter1,
+                ImgAfter2:values.ImgAfter2,ImgAfter3:values.ImgAfter3,ID:values.ID,IssueStatus:values.IssueStatus,VendId:values.VendId,ResponVendId:values.ResponVendId,ProjId:values.ProjId,
+                Manager:values.Manager,ResponsibleId:values.ResponsibleId,IssueType:values.IssueType,RegisterDate:values.RegisterDate,AppointDate:values.AppointDate,LimitDate:values.LimitDate,
+                ReFormDate:values.ReFormDate,CloseDate:values.CloseDate,CloseReason:values.CloseReason,CancelDate:values.CancelDate,CancelReason:values.CancelReason,
+                VersionId:values.VersionId,ImgClose1:values.ImgClose1,ImgClose2:values.ImgClose2,ImgClose3:values.ImgClose3,ReturnDate:values.ReturnDate,ReturnReason:values.ReturnReason,
+                ReturnNum:values.ReturnNum,BuildingId:values.BuildingId,EngineerId:values.EngineerId,ReviewDate:values.ReviewDate,X:values.X,Y:values.Y,ResponsibleName:values.ResponsibleName,
+                ResponsiblePhone:values.ResponsiblePhone,EngineerName:values.EngineerName,EngineerPhone:values.EngineerPhone,ManagerName:values.ManagerName,ManagerPhone:values.ManagerPhone,
+                ReassignDate:values.ReassignDate,ReassignDesc:values.ReassignDesc,ReasonbyOver:values.ReasonbyOver,FixedDesc:values.FixedDesc});  
+              }).then((v) => {
+              return tmprecords;
+            })
+            }
+          return tmppromise;
+        } else {
+          return records;
+        }
+      }).then((vs:any) => {
+        var json = {};
+        json = { "data": { "inserts": { [tablename]: vs } } };
+        console.log(tablename); console.log(records);
+        return this.sqlitePorter.importJsonToDb(this.db, json);
+      }).catch(e => {
+        console.log('error:' + e);
+        throw '';
+      }))
     })
   }
 
@@ -1014,7 +1064,10 @@ export class initBaseDB {
             tmppromise = tmppromise.then(() => {
               return this.resetdata(tmptbname);
             }).then(v => {
-              return this.initBaseData(tmptbname, tmpdata);
+              if (tmptbname.endsWith('CheckIssues'))
+                 return this.initIssuesData(tmptbname, tmpdata);
+              else
+                 return this.initBaseData(tmptbname, tmpdata);
             })
           }
         }
@@ -1496,17 +1549,20 @@ export class initBaseDB {
           console.log(JSON.stringify(v2.rows.item(i)));
           let now = new Date();
           let dt = new Date(v2.rows.item(i).LimitDate);
-          let days = 0;
-          if (now > dt) {
-            days = Math.round((now.getTime() - dt.getTime()) / 1000 / 3600 / 24);
-          }
+          let days = 0;          
           status = v2.rows.item(i).IssueStatus;
           console.log(status)
           if (status == "待派单") {
             console.log("1" + status);
+            if (now > dt) {
+              days = Math.round((now.getTime() - dt.getTime()) / 1000 / 3600 / 24);
+            }
             dpd++;
           } else if (status == "待整改") {
             console.log("2" + status);
+            if (now > dt) {
+              days = Math.round((now.getTime() - dt.getTime()) / 1000 / 3600 / 24);
+            }
             dzg++;
           } else if (status == "已整改") {
             console.log("3" + status);

@@ -101,13 +101,16 @@ export class MyTeamPage {
               console.log(phones[0].value);
               let phonenum: string = phones[0].value;
               if (phonenum.substr(0, 1) == "1") {
-                phonenum = phonenum.replace('-', '').replace('-', '').replace('+86', '');
-                if (this.userids.indexOf(phones[0].value) == -1)
-                  contacts.push({ name: name, phone: phones[0].value, added: false, btnname: "添加" });
-                else
-                  contacts.push({ name: name, phone: phones[0].value, added: true, btnname: "已添加" });
+                phonenum = phonenum.replace('-', '').replace('-', '').replace('+86', '').replace(' ','').replace(' ','');
+                let pn = 0; pn = parseInt(phonenum);
+                let pnstr = ''; pnstr = pn.toString();
+                if (pnstr == phonenum && pnstr.length == 11){
+                  if (this.userids.indexOf(phones[0].value) == -1)
+                     contacts.push({ name: name, phone: pnstr, added: false, btnname: "添加" });
+                  else
+                     contacts.push({ name: name, phone: pnstr, added: true, btnname: "已添加" });
+                }      
               }
-
             }
           }
         }

@@ -206,17 +206,17 @@ export class NativeService {
    * 统一调用此方法显示loading
    * @param content 显示的内容
    */
-  showLoading(content: string = '', timeout: number = 3000000): void {
+  showLoading(content: string = '', timeout: number = 60000000): void {
     if (!this.loadingIsOpen) {
       this.loadingIsOpen = true;
       this.loading = this.loadingCtrl.create({
         content: content
       });
       this.loading.present();
-      setTimeout(() => {//最长显示10秒
-        this.loadingIsOpen && this.loading.dismiss();
-        this.loadingIsOpen = false;
-      }, timeout);
+      // setTimeout(() => {//最长显示10秒
+      //   this.loadingIsOpen && this.loading.dismiss();
+      //   this.loadingIsOpen = false;
+      // }, timeout);
     } else {
       console.log('aaashowLoading');
       this.hideLoading();
@@ -225,10 +225,10 @@ export class NativeService {
         content: content
       });
       this.loading.present();
-      setTimeout(() => {//最长显示10秒
-        this.loadingIsOpen && this.loading.dismiss();
-        this.loadingIsOpen = false;
-      }, timeout);
+      // setTimeout(() => {//最长显示10秒
+      //   this.loadingIsOpen && this.loading.dismiss();
+      //   this.loadingIsOpen = false;
+      // }, timeout);
     }
   };
 
@@ -236,6 +236,7 @@ export class NativeService {
    * 关闭loading
    */
   hideLoading(): void {
+    console.log('hideloadi2');
     this.loadingIsOpen && this.loading.dismiss();
     this.loadingIsOpen = false;
   };

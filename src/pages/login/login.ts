@@ -112,26 +112,28 @@ export class LoginPage {
     // let x = [];
     // x.push("(#row#)".replace("#row#", d.join(',')));
     // console.log(x);
-    // console.log(x.join(','));
-    // let s1 = 'test1', s2 = 'test2',s3 = 'test3',s4 = 'test4';
-    // d = [];
-    // d.push(s1);d.push(s2),d.push(s3),d.push(s4);
-    // console.log(d.join(','));
-    // x = [];
-    // x.push("(#row#)".replace("#row#", d.join(',')));
-    // console.log(x);
-    // console.log(x.join(','));
-    //this.initBaseDB.testhttp();
-    //this.navCtrl.push(BuilderTabsPage);
-    // let d = new Date();
-    // let t = new Date(d.getTime()+3*24*3600*1000);
-    // let w = new Date(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate(),15,59,59));
-    // console.log(t.toLocaleDateString());
-    // console.log(t.toLocaleTimeString());
-    // console.log(w.toLocaleString());
-    // console.log(t.toLocaleString());
-    // console.log(t.toTimeString());
 
+    // let records = [{"BatchId":"8cc9d555-5c96-4791-8d22-31750ec2314a","IssueId":"20171115030031","RoomId":"1f295a7d-0cee-4dcc-b355-ae2c3069d579","PositionId":"524d516f-49d6-4ea8-b252-59b44645e8f3","CheckItemId":"f9ddc52c-81d7-4e65-9e00-b143aa736010_d0ff7","PlusDesc":"","IssueDesc":"表面划伤、破损","UrgencyId":"一般","ImgBefore1":"c8ba308147f4e23f918ef29de87c0600.jpeg","ImgBefore2":"","ImgBefore3":"","ImgAfter1":"","ImgAfter2":"","ImgAfter3":"","ID":"00347920-f65f-4914-9e3d-9c1ab71402e7","IssueStatus":"已整改","VendId":"5d2b2f04-8e24-4a3c-85ba-180abd64638c","ResponVendId":"c3617701-5ee2-4627-86de-29e24f725e19","ProjId":"d0ff76c0-0d9d-45f6-b16a-f9515ab7056c","Manager":"ca24386a-fb50-42be-8bdb-6cb745cdfbf6","ResponsibleId":"e0e6df26-1745-41b9-9df7-50fe63cacc99","IssueType":"","RegisterDate":"2017-11-15T10:33:42+08:00","AppointDate":"2017-11-16T10:52:32+08:00","LimitDate":"2017-11-20T23:59:59+08:00","ReFormDate":"2017-12-20T13:44:52+08:00","CloseDate":null,"CloseReason":"","CancelDate":null,"CancelReason":"","VersionId":161,"ImgClose1":"","ImgClose2":"","ImgClose3":"","ReturnDate":null,"ReturnReason":"","ReturnNum":0,"BuildingId":"2d7eaa62-2416-47bb-8bf0-ca303b4c5e4c","EngineerId":"750cb44e-efd7-4d62-8861-3379d03c09f4","ReviewDate":null,"X":280,"Y":637,"ResponsibleName":"李鑫荣","ResponsiblePhone":"13052275608","EngineerName":"孔玮刚","EngineerPhone":"13816751323","ManagerName":"杨福泉","ManagerPhone":"15959370046","ReassignDate":null,"ReassignDesc":"","ReasonbyOver":"#overreason#","FixedDesc":"undefined"},{"BatchId":"8cc9d555-5c96-4791-8d22-31750ec2314a","IssueId":"20171115030014","RoomId":"2536bd8e-fef4-4d85-9e2c-6212d6e7c0ec","PositionId":"41856665-caee-49df-a611-bf8d0c761e13","CheckItemId":"650d1329-ef1f-45c8-95f6-402259c0ad79_d0ff7","PlusDesc":"","IssueDesc":"不平整,有色差","UrgencyId":"一般","ImgBefore1":"e1cf6a6470126612f1e9867e62a9cc12.jpeg","ImgBefore2":"57ca2e69ab75728a30bbaf2b383f49d2.jpeg","ImgBefore3":"07845c5430e0b121c272bd97a9237a80.jpeg","ImgAfter1":"","ImgAfter2":"","ImgAfter3":"","ID":"00df0713-c784-4419-bdb2-deb982d67516","IssueStatus":"已整改","VendId":"5d2b2f04-8e24-4a3c-85ba-180abd64638c","ResponVendId":"c3617701-5ee2-4627-86de-29e24f725e19","ProjId":"d0ff76c0-0d9d-45f6-b16a-f9515ab7056c","Manager":"ca24386a-fb50-42be-8bdb-6cb745cdfbf6","ResponsibleId":"e0e6df26-1745-41b9-9df7-50fe63cacc99","IssueType":"","RegisterDate":"2017-11-15T10:03:44+08:00","AppointDate":"2017-11-16T10:52:32+08:00","LimitDate":"2017-11-18T23:59:59+08:00","ReFormDate":"2017-12-20T14:42:28+08:00","CloseDate":null,"CloseReason":"","CancelDate":null,"CancelReason":"","VersionId":161,"ImgClose1":"","ImgClose2":"","ImgClose3":"","ReturnDate":null,"ReturnReason":"","ReturnNum":0,"BuildingId":"2d7eaa62-2416-47bb-8bf0-ca303b4c5e4c","EngineerId":"316f887b-fdd7-45b7-97a6-83e5b7f5c7dd","ReviewDate":null,"X":653,"Y":595,"ResponsibleName":"李鑫荣","ResponsiblePhone":"13052275608","EngineerName":"陆小鹏","EngineerPhone":"13773866727","ManagerName":"杨福泉","ManagerPhone":"15959370046","ReassignDate":null,"ReassignDesc":"","ReasonbyOver":"#overreason#","FixedDesc":"undefined"}];
+    // console.log(records);
+    // console.log(records.length);
+    // let sj = JSON.stringify(records);
+    // console.log(sj.substr(3,1));
+    // //console.log(JSON.stringify(records));
+    // let tmpjs = [];
+    // for (var i = 0; i < records.length; i++) {
+    //    //console.log(records[i]);
+    //    tmpjs.push({BatchId:records[i].BatchId,IssueId:records[i].IssueId,RoomId:records[i].RoomId,PositionId:records[i].PositionId,CheckItemId:records[i].CheckItemId,PlusDesc:records[i].PlusDesc,
+    //   IssueDesc:records[i].IssueDesc,UrgencyId:records[i].UrgencyId,ImgBefore1:records[i].ImgBefore1,ImgBefore2:records[i].ImgBefore2,ImgBefore3:records[i].ImgBefore3,ImgAfter1:records[i].ImgAfter1,
+    //   ImgAfter2:records[i].ImgAfter2,ImgAfter3:records[i].ImgAfter3,ID:records[i].ID,IssueStatus:records[i].IssueStatus,VendId:records[i].VendId,ResponVendId:records[i].ResponVendId,ProjId:records[i].ProjId,
+    //   Manager:records[i].Manager,ResponsibleId:records[i].ResponsibleId,IssueType:records[i].IssueType,RegisterDate:records[i].RegisterDate,AppointDate:records[i].AppointDate,LimitDate:records[i].LimitDate,
+    //   ReFormDate:records[i].ReFormDate,CloseDate:records[i].CloseDate,CloseReason:records[i].CloseReason,CancelDate:records[i].CancelDate,CancelReason:records[i].CancelReason,
+    //   VersionId:records[i].VersionId,ImgClose1:records[i].ImgClose1,ImgClose2:records[i].ImgClose2,ImgClose3:records[i].ImgClose3,ReturnDate:records[i].ReturnDate,ReturnReason:records[i].ReturnReason,
+    //   ReturnNum:records[i].ReturnNum,BuildingId:records[i].BuildingId,EngineerId:records[i].EngineerId,ReviewDate:records[i].ReviewDate,X:records[i].X,Y:records[i].Y,ResponsibleName:records[i].ResponsibleName,
+    //   ResponsiblePhone:records[i].ResponsiblePhone,EngineerName:records[i].EngineerName,EngineerPhone:records[i].EngineerPhone,ManagerName:records[i].ManagerName,ManagerPhone:records[i].ManagerPhone,
+    //   ReassignDate:records[i].ReassignDate,ReassignDesc:records[i].ReassignDesc,ReasonbyOver:records[i].ReasonbyOver,FixedDesc:records[i].FixedDesc});
+    // }
+    // console.log(tmpjs);
+    // console.log(JSON.stringify(tmpjs));
     this.nativeservice.isConnecting().then((val: boolean) => {
       if (val == false) {
         throw '无网络登陆失败';

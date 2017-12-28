@@ -109,9 +109,9 @@ export class RoomPage implements OnInit {
 	drawIssue(issueid: string, issue: any) {
 		let div = document.createElement('div'); console.log(this.dwgFactor);
 		div.style.backgroundColor = this.initBaseDB.getstatuscolor(issue.status);
-		div.style.width = '16px';
-		div.style.height = '16px';
-		div.style.borderRadius = '8px';
+		div.style.width = '12px';
+		div.style.height = '12px';
+		div.style.borderRadius = '6px';
 		div.style.position = 'absolute';
 		div.style.left = (issue.x / this.dwgFactor - 8) + 'px';
 		div.style.top = (issue.y / this.dwgFactor - 8) + 'px';
