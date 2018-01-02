@@ -48,6 +48,9 @@ export class BuilderCloseIssue {
 		} else if (this.reasonovertime == "其他" && this.reasonovertimeother == '') {
 			ret = false;
 			this.nativeService.alert("超时原因选择其他，需填写其他说明.");
+		} else if (this.imagesfixed[0] == null){
+			ret = false;
+			this.nativeService.alert("必须拍照上传至少一张图片.");
 		}
 		return ret;
 	}

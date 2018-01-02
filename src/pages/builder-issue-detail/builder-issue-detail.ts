@@ -59,6 +59,7 @@ export class BuilderIssueDetail {
   imagesfixed: Array<any>;
   teammembers: Array<any>;
   userrole: Array<string> = [];
+  vendid: string = '';
   constructor(public navCtrl: NavController, public navParams: NavParams, public initBaseDB: initBaseDB, private modalCtrl: ModalController, public nativeservice: NativeService, public actionSheetCtrl: ActionSheetController) {
     this.issueid = navParams.get('Id');
     this.projid = navParams.get('projid');
@@ -78,6 +79,10 @@ export class BuilderIssueDetail {
       let val: any; val = v[0];
       issuelist = val.rows.item(0);
       console.log(JSON.stringify(val.rows.item(0)));
+      this.vendid = issuelist.VendId;
+      if (this.vendid == 'undefined'){
+        this.vendid = '';
+      }
       this.fixeddesc = issuelist.fixedDesc;
       if (this.fixeddesc == 'undefined'){
         this.fixeddesc = '';
@@ -166,6 +171,7 @@ export class BuilderIssueDetail {
       console.log(result);
       if (result) {
         console.log('if');
+        if (result[0].img != null && result[0].img[0] != '')
         this.initBaseDB.updateFixedCompleteSingle(this.projid, this.issueid, result[0].img, result[0].fixeddesc, result[0].reason, this.username, this.userid).then(v => {
           this.nativeservice.showToast('完成整改成功.');
           this.navCtrl.pop();
@@ -177,7 +183,10 @@ export class BuilderIssueDetail {
 
   assignchange() {
     console.log('assignchange');
-    this.presentActionSheet();
+    this.initBaseDB.getProjTeam(this.projid,[this.vendid]).then(v=>{
+      this.teammembers = v;
+      this.presentActionSheet();
+    })    
   }
 
   presentActionSheet() {

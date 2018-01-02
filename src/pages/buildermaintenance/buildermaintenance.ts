@@ -60,6 +60,7 @@ export class BuildermaintenancePage {
   fixdatearrow: string = "∨";
   checkitemarrow: string = "∨";
   sortingarrow: string = "∨";
+  vendids: Array<string> = [];
   constructor(public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController, public dialogs: Dialogs,
     public initBaseDB: initBaseDB, public nativeservice: NativeService, public localStorage: LocalStorage, private clipboard: Clipboard) {
     this.localStorage.getItem('curuser').then(val => {
@@ -211,9 +212,24 @@ export class BuildermaintenancePage {
 
   changeAssignto() {
     if (this.existsSeletedIssues()) {
-      this.presentActionSheet();
+      this.addVendIds();
+      this.initBaseDB.getProjTeam(this.projid, this.vendids).then(v => {
+        this.teammembers = v;
+        this.presentActionSheet();
+      })
     } else {
       this.nativeservice.alert("请先选择要处理的问题项.");
+    }
+  }
+
+  addVendIds() {
+    this.vendids = [];
+    for (let issue of this.getIssues(this.selectedTab)) {
+      if (issue['selected']) {
+        if (this.vendids.indexOf(issue['vendid']) == -1) {
+          this.vendids.push(issue['vendid']);
+        }
+      }
     }
   }
 
@@ -365,9 +381,9 @@ export class BuildermaintenancePage {
           this.fixedcounts = val[6];
           this.returncounts = val[7];
         }
-        return this.initBaseDB.getProjTeam(this.projid);
+        return 10;//this.initBaseDB.getProjTeam(this.projid);
       }).then((v: any) => {
-        this.teammembers = v;
+        //this.teammembers = v;
         this.nativeservice.hideLoading();
         return 1;
       }).catch(err => {

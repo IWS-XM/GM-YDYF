@@ -46,7 +46,7 @@ export class HttpService {
   }
 
   public postimg(url: string, paramObj: any) {
-    let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
+    let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });console.log(url);console.log(paramObj);
     return this.http.post(url, this.toBodyString(paramObj), new RequestOptions({ headers: headers }))
       .toPromise()
       .then(res => this.handleSuccessImg(res))
@@ -65,7 +65,7 @@ export class HttpService {
     return url + this.toQueryString(paramObj);
   }
 
-  private handleSuccessImg(result) {
+  private handleSuccessImg(result) {console.log(result);
     let body = result._body;
     let data = JSON.parse(body);
     if (data.errcode == 0) {
@@ -120,7 +120,7 @@ export class HttpService {
       return result;
   }
 
-  private handleError(error: Response | any) {
+  private handleError(error: Response | any) {console.log(error);
     let msg = '请求失败';
 
     if (error.status == 0) {

@@ -2465,13 +2465,13 @@ export class initBaseDB {
       }
     }
     if (type == 1) {
-      sql = "select Id,1 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId from PreCheckIssues where projid = '#projid#' #filterstr# ";
-      sql += " union select Id,2 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId from OpenCheckIssues where projid = '#projid#' #filterstr# ";
-      sql += " union select Id,3 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId from FormalCheckIssues where projid = '#projid#' #filterstr# order by #orderstr# issueid desc";
+      sql = "select Id,1 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId,VendId from PreCheckIssues where projid = '#projid#' #filterstr# ";
+      sql += " union select Id,2 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId,VendId from OpenCheckIssues where projid = '#projid#' #filterstr# ";
+      sql += " union select Id,3 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId,VendId from FormalCheckIssues where projid = '#projid#' #filterstr# order by #orderstr# issueid desc";
       sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace('#filterstr#', filterstr).replace('#filterstr#', filterstr).replace('#filterstr#', filterstr);
 
     } else {
-      sql = "select Id,4 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId from ServiceCheckIssues where projid = '#projid#' #filterstr# order by #orderstr# issueid desc";
+      sql = "select Id,4 as type,IssueId,batchname,BuildingName,FloorName,RoomName,IssueStatus,PositionName,CheckItemName,IssueDesc,ResponsibleName,ReturnNum,LimitDate,ReFormDate,ReturnDate,UrgencyId,VendId from ServiceCheckIssues where projid = '#projid#' #filterstr# order by #orderstr# issueid desc";
       sql = sql.replace('#projid#', projid).replace('#filterstr#', filterstr);
     }
 
@@ -2523,22 +2523,22 @@ export class initBaseDB {
             if ((issuestatus == "全部" || issuestatus == "待派单") && status == "待派单") {
               console.log("1" + status);
               dpd++;
-              forass.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
+              forass.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
             } else if ((issuestatus == "全部" || issuestatus == "待整改") && status == "待整改") {
               console.log("2" + status);
               dzg++;
-              forfix.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
+              forfix.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
             } else if ((issuestatus == "全部" || issuestatus == "已整改") && status == "已整改") {
               console.log("3" + status);
               yzg++;
               dt = new Date(v2.rows.item(i).ReFormDate);
-              fixed.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已整改", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
+              fixed.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已整改", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
             }
             if ((issuestatus == "全部" || issuestatus == "被退回") && status != "已整改" && v2.rows.item(i).ReturnDate) {
               console.log("4" + status);
               bth++;
               dt = new Date(v2.rows.item(i).ReturnDate);
-              returned.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已退回", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum });
+              returned.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已退回", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
             }
 
             console.log(dpd + ";" + dzg + ";" + yzg + ";" + bth);
@@ -2562,7 +2562,7 @@ export class initBaseDB {
       });
       let ret = [];
       resolve(promise.then((v1) => {
-        let sql = "select iss.fixedDesc,iss.ReFormDate,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.AppointDate,iss.LimitDate,iss.RegisterDate from #tablename# iss where iss.Id = '#issueid#'";
+        let sql = "select iss.fixedDesc,iss.ReFormDate,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.AppointDate,iss.LimitDate,iss.RegisterDate,iss.VendId from #tablename# iss where iss.Id = '#issueid#'";
 
         sql = sql.replace('#tablename#', this.getissuetablename(type));
 
@@ -2611,14 +2611,28 @@ export class initBaseDB {
   }
 
   //"VendId,Name,Phone,ID,UserId,ProjId"
-  getProjTeam(projid): Promise<any> {
+  getProjTeam(projid,vendids:Array<string>): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
       });
       console.log("builderissuelist");
-      resolve(promise.then((v1) => {
-        let sql = "select UserId,Name,Phone from projteam where projid = '" + projid + "'";
+      resolve(promise.then((v) => {
+        let vendranges = '';
+        for (var j = 0; j < vendids.length; j++) {
+          if (j == 0){
+            vendranges = " vendid = '" + vendids[j] + "'";  
+          } else {
+            vendranges += " or vendid = '" + vendids[j] + "'";
+          }
+        }
+        return vendranges;
+      }).then((v1:string) => {
+        if (v1 == ''){
+           v1 = ' 1 = 1 ';
+        }
+        let sql = "select UserId,Name,Phone from projteam where projid = '" + projid + "' and ( #vendids# )";
+        sql = sql.replace('#vendids#',v1);
         console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
@@ -2633,6 +2647,30 @@ export class initBaseDB {
       }))
     })
   }
+
+  getProjTeamVendors(projid): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("builderissuelist");
+      resolve(promise.then((v1) => {
+        let sql = "select UserId,Name,Phone from projteam where projid = '" + projid + "'";        
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2: any) => {
+        let teammembers = [];
+        for (var i = 0; i < v2.rows.length; i++) {
+          teammembers.push({ userid: v2.rows.item(i).UserId, name: v2.rows.item(i).Name, phone: v2.rows.item(i).Phone });
+        }
+        return teammembers;
+      }).catch(err => {
+        this.warn('项目团队加载失败:' + err);
+        throw '项目团队加载失败';
+      }))
+    })
+  }
+
   //BatchId,IssueId,IssueStatus,LogDate,UserId,UserName,Origin,DueDate,ReasonbyOver,IsReturn,ReturnReason,ProjId,VersionId,ID
   updateResponsible(projid, idranges, staff, username, userid): Promise<any> {
     return new Promise((resolve) => {
@@ -2727,13 +2765,13 @@ export class initBaseDB {
         let now = new Date();
         let curtime: string = now.toLocaleDateString() + " " + now.getHours().toString() + ":" + now.getMinutes() + ":" + now.getSeconds();
         let sql = "update #tablename# set fixeddesc = '#fixeddesc#',ReasonbyOver = '#overreason#', ReFormDate = '" + curtime + "',issuestatus = '已整改' #img# where projid = '#projid#' and id = '#issueid#'";
-        let usql = sql.replace('#tablename#', 'PreCheckIssues').replace('#projid#', projid).replace('#issueid#', issueid).replace('#img#', setimg).replace('#fixeddesc#', fixeddesc).replace('#ReasonbyOver#', overreason);
+        let usql = sql.replace('#tablename#', 'PreCheckIssues').replace('#projid#', projid).replace('#issueid#', issueid).replace('#img#', setimg).replace('#fixeddesc#', fixeddesc).replace('#overreason#', overreason);
         sqls.push(usql);
-        usql = sql.replace('#tablename#', 'OpenCheckIssues').replace('#projid#', projid).replace('#issueid#', issueid).replace('#img#', setimg).replace('#fixeddesc#', fixeddesc).replace('#ReasonbyOver#', overreason);
+        usql = sql.replace('#tablename#', 'OpenCheckIssues').replace('#projid#', projid).replace('#issueid#', issueid).replace('#img#', setimg).replace('#fixeddesc#', fixeddesc).replace('#overreason#', overreason);
         sqls.push(usql);
-        usql = sql.replace('#tablename#', 'FormalCheckIssues').replace('#projid#', projid).replace('#issueid#', issueid).replace('#img#', setimg).replace('#fixeddesc#', fixeddesc).replace('#ReasonbyOver#', overreason);
+        usql = sql.replace('#tablename#', 'FormalCheckIssues').replace('#projid#', projid).replace('#issueid#', issueid).replace('#img#', setimg).replace('#fixeddesc#', fixeddesc).replace('#overreason#', overreason);
         sqls.push(usql);
-        usql = sql.replace('#tablename#', 'ServiceCheckIssues').replace('#projid#', projid).replace('#issueid#', issueid).replace('#img#', setimg).replace('#fixeddesc#', fixeddesc).replace('#ReasonbyOver#', overreason);
+        usql = sql.replace('#tablename#', 'ServiceCheckIssues').replace('#projid#', projid).replace('#issueid#', issueid).replace('#img#', setimg).replace('#fixeddesc#', fixeddesc).replace('#overreason#', overreason);
         sqls.push(usql);
 
         sql = "delete from upl#tablename# where projid = '#projid#' and id = '#issueid#'";
@@ -2970,7 +3008,7 @@ export class initBaseDB {
       });
       console.log("exportIssue");
       resolve(promise.then((v1) => {
-        return this.httpService.get(APP_SERVE_URL + "/IssueExportExcel", { Token: token, jsonStr: JsonStr });
+        return this.httpService.post(APP_SERVE_URL + "/IssueExportExcel", { Token: token, jsonStr: JsonStr });
       }).then((v2: any) => {
         console.log(v2);
         return APP_SERVE_URL.replace('/api', '') + v2[0][2][0];

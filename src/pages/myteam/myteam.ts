@@ -27,7 +27,7 @@ export class MyTeamPage {
     this.teams = []; this.userids = [];
     this.localStorage.getItem('curproj').then(val => {
       this.projid = val.projid;
-      this.initBaseDB.getProjTeam(this.projid).then(val => {
+      this.initBaseDB.getProjTeam(this.projid,[]).then(val => {
         if (val) {
           //{ userid: v2.rows.item(i).UserId, name: v2.rows.item(i).Name, phone: v2.rows.item(i).Phone }
           let items: Array<any>;

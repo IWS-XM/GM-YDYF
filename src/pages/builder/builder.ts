@@ -61,6 +61,7 @@ export class BuilderPage {
     checkitemarrow: string = "∨";
     sortingarrow: string = "∨";
     userrole: Array<string> = [];
+    vendids: Array<string> = [];
     constructor(public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController, public dialogs: Dialogs,
         public initBaseDB: initBaseDB, public nativeservice: NativeService, public localStorage: LocalStorage, private clipboard: Clipboard) {
         this.localStorage.getItem('curuser').then(val => {
@@ -100,6 +101,7 @@ export class BuilderPage {
         this.sortingcolor = "light";
         this.sortingarrow = "∨";
         this.lastselectedTab = this.selectedTab;
+        this.showflag = false;
         this.loadIssues();
     }
 
@@ -163,6 +165,7 @@ export class BuilderPage {
         this.sortingname = "default";
         this.sortingcolor = "light";
         this.sortingarrow = "∨";
+        this.showflag = false;
         this.refresh();
     }
 
@@ -236,14 +239,29 @@ export class BuilderPage {
 
     showDetail(issue) {
         //alert(issue['issueId']);
-        this.navCtrl.push(BuilderIssueDetail, { "Id": issue.id, "issue": issue, "projid": this.projid, "projname": this.projname, "userid": this.userid, "username": this.username, "teammembers": this.teammembers, "userrole": this.userrole});
+        this.navCtrl.push(BuilderIssueDetail, { "Id": issue.id, "issue": issue, "projid": this.projid, "projname": this.projname, "userid": this.userid, "username": this.username, "teammembers": this.teammembers, "userrole": this.userrole });
     }
 
     changeAssignto() {
         if (this.existsSeletedIssues()) {
-            this.presentActionSheet();
+            this.addVendIds();
+            this.initBaseDB.getProjTeam(this.projid, this.vendids).then(v => {
+                this.teammembers = v;
+                this.presentActionSheet();
+            })
         } else {
             this.nativeservice.alert("请先选择要处理的问题项.");
+        }
+    }
+
+    addVendIds() {
+        this.vendids = [];
+        for (let issue of this.getIssues(this.selectedTab)) {
+            if (issue['selected']) {
+                if (this.vendids.indexOf(issue['vendid']) == -1) {
+                    this.vendids.push(issue['vendid']);
+                }
+            }
         }
     }
 
@@ -397,9 +415,9 @@ export class BuilderPage {
                     this.fixedcounts = val[6];
                     this.returncounts = val[7];
                 }
-                return this.initBaseDB.getProjTeam(this.projid);
+                return 10;//this.initBaseDB.getProjTeam(this.projid);
             }).then((v: any) => {
-                this.teammembers = v;
+                //this.teammembers = v;
                 this.nativeservice.hideLoading();
                 return 1;
             }).catch(err => {
@@ -530,17 +548,17 @@ export class BuilderPage {
                 if (val) {
                     let list: Array<any>; list = [];
                     if (this.lastselectedTab == "待派单") {
-                        list.push(val[0]);list.push(this.issuelist[1]); list.push(this.issuelist[2]);list.push(this.issuelist[3]);
-                        this.asscounts = val[4];list.push(val[4]);list.push(this.issuelist[5]);list.push(this.issuelist[6]);list.push(this.issuelist[7]);
+                        list.push(val[0]); list.push(this.issuelist[1]); list.push(this.issuelist[2]); list.push(this.issuelist[3]);
+                        this.asscounts = val[4]; list.push(val[4]); list.push(this.issuelist[5]); list.push(this.issuelist[6]); list.push(this.issuelist[7]);
                     } else if (this.lastselectedTab == "待整改") {
-                        list.push(this.issuelist[0]); list.push(val[1]); list.push(this.issuelist[2]);list.push(this.issuelist[3]);
-                        list.push(this.issuelist[4]);this.forfixcounts = val[5];list.push(val[5]);list.push(this.issuelist[6]);list.push(this.issuelist[7]);
+                        list.push(this.issuelist[0]); list.push(val[1]); list.push(this.issuelist[2]); list.push(this.issuelist[3]);
+                        list.push(this.issuelist[4]); this.forfixcounts = val[5]; list.push(val[5]); list.push(this.issuelist[6]); list.push(this.issuelist[7]);
                     } else if (this.lastselectedTab == "已整改") {
-                        list.push(this.issuelist[0]); list.push(this.issuelist[1]);list.push(val[2]); list.push(this.issuelist[3]);
-                        list.push(this.issuelist[4]);list.push(this.issuelist[5]);this.fixedcounts = val[6];list.push(val[6]);list.push(this.issuelist[7]);
+                        list.push(this.issuelist[0]); list.push(this.issuelist[1]); list.push(val[2]); list.push(this.issuelist[3]);
+                        list.push(this.issuelist[4]); list.push(this.issuelist[5]); this.fixedcounts = val[6]; list.push(val[6]); list.push(this.issuelist[7]);
                     } else {
-                        list.push(this.issuelist[0]); list.push(this.issuelist[1]);list.push(this.issuelist[2]);list.push(val[3]); 
-                        list.push(this.issuelist[4]);list.push(this.issuelist[5]);list.push(this.issuelist[6]);this.fixedcounts = val[7];list.push(val[7]);
+                        list.push(this.issuelist[0]); list.push(this.issuelist[1]); list.push(this.issuelist[2]); list.push(val[3]);
+                        list.push(this.issuelist[4]); list.push(this.issuelist[5]); list.push(this.issuelist[6]); this.fixedcounts = val[7]; list.push(val[7]);
                     }
                     list.push(this.needupd);
                     this.issuelist = list;
