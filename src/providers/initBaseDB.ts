@@ -2562,7 +2562,7 @@ export class initBaseDB {
       });
       let ret = [];
       resolve(promise.then((v1) => {
-        let sql = "select iss.fixedDesc,iss.ReFormDate,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.AppointDate,iss.LimitDate,iss.RegisterDate,iss.VendId from #tablename# iss where iss.Id = '#issueid#'";
+        let sql = "select iss.fixedDesc,iss.ReFormDate,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.AppointDate,iss.LimitDate,iss.RegisterDate,iss.VendId,iss.PlusDesc from #tablename# iss where iss.Id = '#issueid#'";
 
         sql = sql.replace('#tablename#', this.getissuetablename(type));
 

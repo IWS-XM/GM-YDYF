@@ -16,29 +16,6 @@ export class BuilderIssueDetail {
   issueid: string;
   projid: string;
   projname: string;
-  // buildingid = '10930414234';
-  // buildingname = '18号楼';
-  // floorid = '10920419kdsjf023';
-  // floorname = '21楼';
-  // roomid = 'ieko098390293lkfs123df';
-  // roomname = '2001单元';
-  // area = '北阳台';
-  // catagory = '墙面';
-  // description = '掉漆严重';
-  // photos_before = [
-  //   { src: '../../assets/img/ydyf-001.jpg' },
-  //   { src: '../../assets/img/ydyf-002.jpg' }
-  // ];
-  // photos_after = [{ src: '../../assets/img/ydyf-004.jpg' }];
-  // reg_date = '2017-05-10 09:44';
-  // assign_date = '2017-06-17 17:57';
-  // due_date = '2017-06-03';
-  // over_days = 19;
-  // return_times = 3;
-  // ownerid = '10293810012323';
-  // ownername = '李小龙';
-  // assigntoid = '1290301390123';
-  // assigntoname = '黄飞鸿';
   status = 'pending';
   status_name = '待整改';
   return_log: Array<any>;
@@ -60,6 +37,7 @@ export class BuilderIssueDetail {
   teammembers: Array<any>;
   userrole: Array<string> = [];
   vendid: string = '';
+  descplus: string = '';
   constructor(public navCtrl: NavController, public navParams: NavParams, public initBaseDB: initBaseDB, private modalCtrl: ModalController, public nativeservice: NativeService, public actionSheetCtrl: ActionSheetController) {
     this.issueid = navParams.get('Id');
     this.projid = navParams.get('projid');
@@ -79,6 +57,10 @@ export class BuilderIssueDetail {
       let val: any; val = v[0];
       issuelist = val.rows.item(0);
       console.log(JSON.stringify(val.rows.item(0)));
+      this.descplus = issuelist.PlusDesc;
+      if (this.descplus == 'undefined'){
+        this.descplus = '';
+      }
       this.vendid = issuelist.VendId;
       if (this.vendid == 'undefined'){
         this.vendid = '';
