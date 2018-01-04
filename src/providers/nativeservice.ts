@@ -262,7 +262,7 @@ export class NativeService {
    * 判断是否有网络
    * @returns {boolean}
    */
-  isConnecting(): Promise<boolean> {
+  isConnecting(force:boolean = false): Promise<boolean> {
     return new Promise((resolve) => {
       //this.platform.ready().then((readySource) => {
       //  console.log('Platform ready from', readySource);
@@ -277,7 +277,7 @@ export class NativeService {
           this.showToast("您的当前网络不可用,请检查您的网络设置.");
           return false;
         }
-        if (networktype == 'wifi')
+        if (force || networktype == 'wifi')
           return true;
         else {
           console.log("checknetwork");

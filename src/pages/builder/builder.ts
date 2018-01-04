@@ -386,8 +386,8 @@ export class BuilderPage {
                 console.log(val);
                 if (val && val != null) {
                     this.projid = val.projid; this.projname = val.projname;
-                    if (val.needupd == 1) {
-                        return this.nativeservice.isConnecting().then(val => {
+                    //if (val.needupd == 1) {
+                        return this.nativeservice.isConnecting(true).then(val => {
                             console.log("is connecting" + val);
                             if (val == true) {
                                 console.log('downlo');
@@ -397,9 +397,9 @@ export class BuilderPage {
                                 return 1;
                             }
                         })
-                    } else {
-                        return 1;
-                    }
+                    // } else {
+                    //     return 1;
+                    // }
                 } else {
                     this.nativeservice.showToast("没有需要整改的项目问题")
                     throw '';

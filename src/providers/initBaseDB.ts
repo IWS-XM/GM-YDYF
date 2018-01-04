@@ -1224,7 +1224,7 @@ export class initBaseDB {
         resolve(100);
       });
       resolve(promise.then((v1) => {
-        return this.nativeservice.isConnecting();
+        return this.nativeservice.isConnecting(true);
       }).then(v=>{
         return this.localStorage.setItem('updatebasedata',false);
       }).then((vv: boolean) => {
@@ -1566,9 +1566,17 @@ export class initBaseDB {
             dzg++;
           } else if (status == "已整改") {
             console.log("3" + status);
+            let fixdate = new Date(v2.rows.item(i).ReFormDate);
+            if (fixdate > dt){
+              days = Math.round((fixdate.getTime() - dt.getTime()) / 1000 / 3600 / 24);
+            }
             yzg++;
           } else if (status == "已通过") {
             console.log("4" + status);
+            let fixdate = new Date(v2.rows.item(i).ReFormDate);
+            if (fixdate > dt){
+              days = Math.round((fixdate.getTime() - dt.getTime()) / 1000 / 3600 / 24);
+            }
             ytg++;
           }
           console.log(v2.rows.item(i).ReturnNum);
@@ -2514,11 +2522,14 @@ export class initBaseDB {
             console.log(JSON.stringify(v2.rows.item(i)));
             let now = new Date();
             let dt = new Date(v2.rows.item(i).LimitDate);
+            let fixdate = new Date(v2.rows.item(i).ReFormDate);
             let days = 0;
-            if (now > dt) {
-              days = Math.round((now.getTime() - dt.getTime()) / 1000 / 3600 / 24);
-            }
             status = v2.rows.item(i).IssueStatus;
+            if (now > dt && (status == "待派单" || status == "待整改")) {
+              days = Math.round((now.getTime() - dt.getTime()) / 1000 / 3600 / 24);
+            } else if (status == "已整改" && dt < fixdate){
+              days = Math.round((fixdate.getTime() - dt.getTime()) / 1000 / 3600 / 24);
+            }
             console.log(status)
             if ((issuestatus == "全部" || issuestatus == "待派单") && status == "待派单") {
               console.log("1" + status);

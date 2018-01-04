@@ -35,7 +35,26 @@ export class MaintenancePage {
         this.projid = val.projid;
         this.projname = val.projname;
         this.versionid = val.versionid;
-        this.initbatch();
+        //this.initbatch();
+        this.initBaseDB.refreshbatch(this.projid, this.type, this.token, this.versionid).then((batlist: Array<any>) => {
+          if (batlist && batlist.length > 0) {
+            this.batchbuildings = batlist;
+            this.nodata = false;
+            console.log(this.nodata);
+          } else {
+            this.nodata = true;
+          }
+          console.log("initbatch" + this.nodata);
+          console.log(this.batchbuildings);        
+          this.localStorage.getItem('updatebasedata').then(v=>{
+            console.log(v);
+            if (v == false){
+              this.nativeservice.hideLoading();
+            }
+          })    
+        }).catch(e => {
+          this.nativeservice.hideLoading();
+        })
       } else {
         this.nodata = true;
         this.nativeservice.alert("项目或App没授权，请联系系统管理员.");        
