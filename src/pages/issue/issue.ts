@@ -131,8 +131,8 @@ export class IssuePage {
 			this.nativeService.alert('承建商不能为空'); return false;
 		} else if (this.resunit == "") {
 			this.nativeService.alert('责任单位不能为空'); return false;
-		} else if (this.images[0] == null){
-            this.nativeService.alert('必须拍照上传至少一张图片'); return false;
+		// } else if (this.images[0] == null){
+        //     this.nativeService.alert('必须拍照上传至少一张图片'); return false;
 		} else {
 			return true;
 		}

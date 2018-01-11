@@ -13,7 +13,7 @@
   </ion-item>
   <p></p>
   <p></p>
-  <ion-item>
+  <ion-item *ngIf="ismanager">
 	<button ion-button full (click)="addclick()" style="height:2.8em" color="primary">+ 添加成员</button>
 	</ion-item>
   </ion-list>

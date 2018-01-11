@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, NavParams } from 'ionic-angular';
 import { LocalStorage } from '../../providers/local-storage';
 import { NativeService } from '../../providers/nativeservice';
 import { AddteammemberPage } from '../addteammember/addteammember';
@@ -18,16 +18,20 @@ export class MyTeamPage {
   userids: Array<string>;
   projid: string;
   iosdevice: boolean = false;
+  ismanager: boolean = false;
+  vendid : string = '';
   constructor(public navCtrl: NavController, public localStorage: LocalStorage, public nativeservice: NativeService, public actionSheetCtrl: ActionSheetController,
-    public initBaseDB: initBaseDB, private contacts: Contacts) {
+    public initBaseDB: initBaseDB, public params: NavParams, private contacts: Contacts) {
     this.iosdevice = this.nativeservice.isIos();
+    this.vendid = this.params.get('vendid');
+    this.ismanager = this.params.get('ismanager');
   }
 
   ionViewDidEnter() {
     this.teams = []; this.userids = [];
     this.localStorage.getItem('curproj').then(val => {
       this.projid = val.projid;
-      this.initBaseDB.getProjTeam(this.projid,[]).then(val => {
+      this.initBaseDB.getProjTeam(this.projid,[this.vendid]).then(val => {
         if (val) {
           //{ userid: v2.rows.item(i).UserId, name: v2.rows.item(i).Name, phone: v2.rows.item(i).Phone }
           let items: Array<any>;
@@ -58,7 +62,7 @@ export class MyTeamPage {
         {
           text: '添加新成员',
           handler: () => {
-            this.navCtrl.push(AddmembermanualPage, { projid: this.projid });
+            this.navCtrl.push(AddmembermanualPage, { "projid": this.projid, "vendid": this.vendid });
           }
         },
         {
@@ -116,7 +120,7 @@ export class MyTeamPage {
         }
       });
       this.nativeservice.hideLoading();
-      this.navCtrl.push(AddphonecontactsPage, { projid: this.projid, items: contacts });
+      this.navCtrl.push(AddphonecontactsPage, { "projid": this.projid, "items": contacts, "vendid":this.vendid });
     }).catch(e => {
       console.log(e);
       this.nativeservice.hideLoading();

@@ -6,6 +6,7 @@ import { initBaseDB } from '../../providers/initBaseDB';
 import { ShowimgPage } from '../../pages/imageeditor/showimg';
 import { AssignreturnPage } from '../../pages/assignreturn/assignreturn';
 import { NativeService } from '../../providers/nativeservice';
+import { LocalStorage } from '../../providers/local-storage';
 
 @Component({
   selector: 'page-builder-issue-detail',
@@ -38,7 +39,7 @@ export class BuilderIssueDetail {
   userrole: Array<string> = [];
   vendid: string = '';
   descplus: string = '';
-  constructor(public navCtrl: NavController, public navParams: NavParams, public initBaseDB: initBaseDB, private modalCtrl: ModalController, public nativeservice: NativeService, public actionSheetCtrl: ActionSheetController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public initBaseDB: initBaseDB, public localStorage: LocalStorage, private modalCtrl: ModalController, public nativeservice: NativeService, public actionSheetCtrl: ActionSheetController) {
     this.issueid = navParams.get('Id');
     this.projid = navParams.get('projid');
     this.projname = navParams.get('projname');
@@ -53,20 +54,20 @@ export class BuilderIssueDetail {
     this.images = []; this.imagesfixed = [];
     this.return_log = [];
     this.initBaseDB.getbuilderissueinfo(this.issueid, this.issue.type).then((v: any) => {
-      let issuelist: any;  console.log(v);console.log(v[1]);
+      let issuelist: any; console.log(v); console.log(v[1]);
       let val: any; val = v[0];
       issuelist = val.rows.item(0);
       console.log(JSON.stringify(val.rows.item(0)));
       this.descplus = issuelist.PlusDesc;
-      if (this.descplus == 'undefined'){
+      if (this.descplus == 'undefined') {
         this.descplus = '';
       }
       this.vendid = issuelist.VendId;
-      if (this.vendid == 'undefined'){
+      if (this.vendid == 'undefined') {
         this.vendid = '';
       }
       this.fixeddesc = issuelist.fixedDesc;
-      if (this.fixeddesc == 'undefined'){
+      if (this.fixeddesc == 'undefined') {
         this.fixeddesc = '';
       }
       let dt = new Date(issuelist.RegisterDate);
@@ -154,10 +155,19 @@ export class BuilderIssueDetail {
       if (result) {
         console.log('if');
         if (result[0].img != null && result[0].img[0] != '')
-        this.initBaseDB.updateFixedCompleteSingle(this.projid, this.issueid, result[0].img, result[0].fixeddesc, result[0].reason, this.username, this.userid).then(v => {
-          this.nativeservice.showToast('完成整改成功.');
-          this.navCtrl.pop();
-        })
+          this.initBaseDB.updateFixedCompleteSingle(this.projid, this.issueid, result[0].img, result[0].fixeddesc, result[0].reason, this.username, this.userid).then(v => {
+            if (this.issue.status == "待派单") {
+              this.localStorage.setItem('builderissue', { issue: this.issue, status: '直接整改' }).then(v1 => {
+                this.nativeservice.showToast('完成整改成功.');
+                this.navCtrl.pop();
+              })
+            } else {
+              this.localStorage.setItem('builderissue', { issue: this.issue, status: '整改' }).then(v1 => {
+                this.nativeservice.showToast('完成整改成功.');
+                this.navCtrl.pop();
+              })
+            }
+          })
       }
     });
     modal.present();
@@ -165,10 +175,10 @@ export class BuilderIssueDetail {
 
   assignchange() {
     console.log('assignchange');
-    this.initBaseDB.getProjTeam(this.projid,[this.vendid]).then(v=>{
+    this.initBaseDB.getProjTeam(this.projid, [this.vendid]).then(v => {
       this.teammembers = v;
       this.presentActionSheet();
-    })    
+    })
   }
 
   presentActionSheet() {
@@ -187,8 +197,18 @@ export class BuilderIssueDetail {
 
   assignto(staff: any) {
     this.initBaseDB.updateResponsible(this.projid, "'" + this.issueid + "'", staff, this.username, this.userid).then(v => {
-      this.nativeservice.showToast('变更负责人成功.');
-      this.navCtrl.pop();
+      if (this.issue.status == "待派单") {
+        this.localStorage.setItem('builderissue', { issue: this.issue, status: '指派' }).then(v1 => {
+          this.nativeservice.showToast('指派负责人成功.');
+          this.navCtrl.pop();
+        })
+      } else {
+        this.issue.ResponsibleName = staff.name;
+        this.localStorage.setItem('builderissue', { issue: this.issue, status: '重派' }).then(v1 => {
+          this.nativeservice.showToast('变更负责人成功.');
+          this.navCtrl.pop();
+        })
+      }
     })
   }
 
@@ -209,8 +229,10 @@ export class BuilderIssueDetail {
           })
         } else {
           this.initBaseDB.returnassign(this.projid, this.issueid, this.username, this.userid, result, this.issue.type).then(val => {
-            this.nativeservice.showToast('退回成功.');
-            this.navCtrl.pop();
+            this.localStorage.setItem('builderissue', { issue: this.issue, status: '退回' }).then(v1 => {
+              this.nativeservice.showToast('退回成功.');
+              this.navCtrl.pop();
+            })
           })
         }
       }

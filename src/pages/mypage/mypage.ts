@@ -4,7 +4,7 @@ import { AboutPage } from '../about/about'
 import { MyinfoPage } from '../myinfo/myinfo'
 import { MysettingsPage } from '../mysettings/mysettings'
 import { LocalStorage } from '../../providers/local-storage';
-import { MyTeamPage } from '../myteam/myteam';
+import { MyTeamVendorPage } from '../myteam/myteamvendor';
 
 @Component({
   selector: 'page-mypage',
@@ -38,6 +38,6 @@ export class MyPage {
   }
    
   myteamclick() {
-    this.navCtrl.push(MyTeamPage);
+    this.navCtrl.push(MyTeamVendorPage);
   }
 }

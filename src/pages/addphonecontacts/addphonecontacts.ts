@@ -14,11 +14,13 @@ export class AddphonecontactsPage {
   items: Array<any>;
   projid: string;
   token: string;
+  vendid: string;
   constructor(public navCtrl: NavController, public params: NavParams, public localStorage: LocalStorage, public nativeservice: NativeService,
     private httpService: HttpService, public initBaseDB: initBaseDB) {
     this.items = [];
     this.items = this.params.get('items');
     this.projid = this.params.get('projid');
+    this.vendid = this.params.get('vendid');
     this.localStorage.getItem("curuser").then(val => {
       this.token = val.token;
     })
@@ -33,8 +35,8 @@ export class AddphonecontactsPage {
             let now = new Date();
             let id = "builder" + now.getTime().toString();
             let userid = res[0][0][2];
-            let values = ["'" + id + "'", "'" + this.projid + "'", "'" + userid + "'", item.phone, "'" + item.name + "'"];
-            this.initBaseDB.addProjTeamMembers(this.projid, item.phone, values.join(",")).then(val => {
+            let values = ["'" + id + "'", "'" + this.projid + "'", "'" + userid + "'", item.phone, "'" + item.name + "'", "'" + this.vendid + "'"];
+            this.initBaseDB.addProjTeamMembers(this.projid, this.vendid, item.phone, values.join(",")).then(val => {
               let i = this.items.indexOf(item);
               this.items[i].added = true;
               this.items[i].btnname = "已添加";

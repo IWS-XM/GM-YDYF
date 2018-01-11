@@ -27,6 +27,7 @@ import { ShowimgPage } from '../pages/imageeditor/showimg';
 import {ChangePWPage} from '../pages/changepw/changepw';
 import { MyPage } from '../pages/mypage/mypage';
 import { MyTeamPage } from '../pages/myteam/myteam';
+import { MyTeamVendorPage } from '../pages/myteam/myteamvendor';
 import { ImageEditorModal } from '../pages/imageeditor/imageeditormodal';
 import { AddphonecontactsPage } from '../pages/addphonecontacts/addphonecontacts';
 import { AddmembermanualPage } from '../pages/addmembermanual/addmembermanual';  //
@@ -46,6 +47,7 @@ import { PreroomspassPage } from '../pages/preroomspass/preroomspass';
 import { ReportPage } from '../pages/report/report';
 import { ReportRoomPage } from '../pages/report-room/report-room';
 import { ReportDetailsPage } from '../pages/report-details/report-details';
+import { BuilderFilterPage } from '../pages/builder/builderfilter';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -89,6 +91,7 @@ import { FileOpener } from '@ionic-native/file-opener';
     MysettingsPage,
     ChangePWPage,
     MyTeamPage,
+    MyTeamVendorPage,
     AddphonecontactsPage,
     AddmembermanualPage,
     ReceiptPage,
@@ -108,7 +111,8 @@ import { FileOpener } from '@ionic-native/file-opener';
     PreroomspassPage,
     ReportPage,
     ReportRoomPage,
-    ReportDetailsPage
+    ReportDetailsPage,
+    BuilderFilterPage
   ],
   imports: [
     BrowserModule,
@@ -143,6 +147,7 @@ import { FileOpener } from '@ionic-native/file-opener';
     MysettingsPage,
     ChangePWPage,
     MyTeamPage,
+    MyTeamVendorPage,
     AddphonecontactsPage,
     AddmembermanualPage,
       ReceiptPage,
@@ -162,7 +167,8 @@ import { FileOpener } from '@ionic-native/file-opener';
     PreroomspassPage,
     ReportPage,
     ReportRoomPage,
-    ReportDetailsPage
+    ReportDetailsPage,
+    BuilderFilterPage
   ],
   providers: [
     StatusBar,

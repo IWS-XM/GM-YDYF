@@ -1961,6 +1961,8 @@ export class initBaseDB {
         tablefield.push("FormalCheckIssues"); tablefield.push("VersionId,BatchId,IssueId,RoomId,PositionName,CheckItemName,PlusDesc,IssueDesc,UrgencyId,ImgBefore1,ImgBefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,Id,IssueStatus,VendId,ResponVendId,ProjId,Manager,ResponsibleId,IssueType,RegisterDate,AppointDate,LimitDate,ReFormDate,ReturnDate,ReturnReason,ReturnNum,BuildingId,EngineerId,ReviewDate,x,y,ResponsibleName,ResponsiblePhone,EngineerName,EngineerPhone,APImg,FloorName,BuildingName,RoomName,ManagerName,ManagerPhone,BatchName,ReassignDate,ReassignDesc,ReasonbyOver,fixedDesc,ImgWidth");
         tablefield.push("ProjTeam"); tablefield.push("VendId,Name,Phone,ID,UserId,ProjId");
         tablefield.push("FormalCheckLogs"); tablefield.push("BatchId,IssueId,IssueStatus,LogDate,UserId,UserName,Origin,DueDate,ReasonbyOver,IsReturn,ReturnReason,ProjId,VersionId,ID");
+        tablefield.push("Vend"); tablefield.push("Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
+        
         let tmppromise = Promise.resolve([]);
         for (let k = 0; k < tablename.length; k++) {
           console.log(tablename[k]);
@@ -1968,7 +1970,9 @@ export class initBaseDB {
           tmppromise = tmppromise.then(() => {
             let sql: string;
             if (tn == "ProjTeam") {
-              sql = "delete from ProjTeam where id like 'builder%' and projid = '" + projid + "'";
+              sql = "delete from ProjTeam where projid = '" + projid + "'";//id like 'builder%' and 
+            } else if (tn == "Vend") {
+              sql = "delete from Vend where projid = '" + projid + "'";//id like 'builder%' and 
             } else {
               sql = "delete from #tablename# where exists (select ID from #tmptablename# where #tmptablename#.Id = #tablename#.Id)";
               sql = sql.replace('#tablename#', tn);
@@ -2047,7 +2051,7 @@ export class initBaseDB {
         return tmppromise;
       }).then(v5 => {
         console.log(data[1][0]);
-        let sql = "update projversion set lastdate = '#lastdate#',needupd = 0 where projid = '#projid#'";
+        let sql = "update projversion set lastdate = '#lastdate#' where projid = '#projid#'";
         sql = sql.replace('#projid#', projid);
         sql = sql.replace('#lastdate#', data[1][0]);
         console.log('updbdata:' + sql);
@@ -2081,6 +2085,8 @@ export class initBaseDB {
           });
           resolve(promise.then((v1) => {
             return this.initBaseTable("ProjTeam", "VendId,Name,Phone,ID,UserId,ProjId");
+          }).then((v0) => {
+            return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");//增加责任单位
           }).then((v2) => {
             return this.initBaseTable("PreCheckIssues", "VersionId integer,BatchId,IssueId,RoomId,PositionName,CheckItemName,PlusDesc,IssueDesc,UrgencyId,ImgBefore1,ImgBefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,Id primary key,IssueStatus,VendId,ResponVendId,ProjId,Manager,ResponsibleId,IssueType,RegisterDate datetime,AppointDate datetime,LimitDate datetime,ReFormDate datetime,ReturnDate datetime,ReturnReason,ReturnNum integer default 0 ,BuildingId,EngineerId,ReviewDate datetime,x integer,y integer,ResponsibleName,ResponsiblePhone,EngineerName,EngineerPhone,APImg,FloorName,BuildingName,RoomName,ManagerName,ManagerPhone,BatchName,ReassignDate datetime,ReassignDesc,ReasonbyOver,fixedDesc,ImgWidth integer");
           }).then((v3) => {
@@ -2123,6 +2129,8 @@ export class initBaseDB {
             return this.initBaseTable("uplServiceCheckIssues", "BatchId,IssueId,RoomId,PositionId,CheckItemId,PlusDesc,IssueDesc,UrgencyId,ImgBefore1,ImgBefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,Id primary key,IssueStatus,VendId,ResponVendId,ProjId,Manager,ResponsibleId,IssueType,RegisterDate datetime,AppointDate datetime,LimitDate datetime,ReFormDate datetime,CloseDate datetime,CloseReason,CancelDate datetime,CancelReason,VersionId integer,ImgClose1,ImgClose2,ImgClose3,ReturnDate datetime,ReturnReason,ReturnNum integer,BuildingId,EngineerId,ReviewDate datetime,x integer,y integer,ResponsibleName,ResponsiblePhone,EngineerName,EngineerPhone,ManagerName,ManagerPhone,ReassignDate datetime,ReassignDesc,ReasonbyOver,fixedDesc");
           }).then((v7) => {
             return this.initBaseTable("tmpProjTeam", "VendId,Name,Phone,ID,UserId,ProjId");
+          }).then((v0) => {
+            return this.initBaseTable("tmpVend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
           }).then((v7) => {
             return this.initBaseTable("uplimagetable", "Projid,fn");
           }).then((v7) => {
@@ -2174,6 +2182,22 @@ export class initBaseDB {
             return this.resetprojdata("tmpServiceCheckLogs", projid);
           }).then((v3) => {
             return this.resetprojdata("tmpProjTeam", projid);
+          }).then((vv) => {
+            return this.existstable("Vend");
+          }).then(counts => {
+              if (counts == 0) {
+                return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
+              } else {
+                return 10;
+              }
+          }).then((vv) => {
+            return this.existstable("tmpVend");
+          }).then(counts => {
+              if (counts == 0) {
+                return this.initBaseTable("tmpVend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
+              } else {
+                return this.resetprojdata("tmpVend", projid);
+              }
           }).then((v4) => {
             return this.db.executeSql("select LastDate from projversion where projid = '" + projid + "'", []);
           }).then((v5: any) => {
@@ -2294,6 +2318,11 @@ export class initBaseDB {
       }).then((v) => {
         console.log('v')
         return this.localStorage.setItem('needupload' + projid, false);
+      }).then(vv5 => {
+        let sql = "update projversion set needupd = 0 where projid = '#projid#'";
+        sql = sql.replace('#projid#', projid);
+        console.log('updbdataupd:' + sql);
+        return this.db.executeSql(sql, []);
       }).then((v5) => {
         console.log('v5')
         return this.downloadbuilderdata(token, projid);
@@ -2503,6 +2532,7 @@ export class initBaseDB {
         let sql = "select needupd from projversion where projid = '#projid#'".replace('#projid#', projid);
         return this.db.executeSql(sql, []);
       }).then((v1: any) => {
+        console.log(v1);
         if (v1 && v1.rows.length > 0) {
           needupd = v1.rows.item(0).Needupd;
         }
@@ -2516,6 +2546,10 @@ export class initBaseDB {
           let forfix: Array<any>; forfix = [];
           let fixed: Array<any>; fixed = [];
           let returned: Array<any>; returned = [];
+          let issforass: Array<string>; issforass = [];
+          let issforfix: Array<string>; issforfix = [];
+          let issfixed: Array<string>; issfixed = [];
+          let issreturned: Array<string>; issreturned = [];
           let dpd = 0, dzg = 0, yzg = 0, bth = 0;
           let status: string;
           for (var i = 0; i < v2.rows.length; i++) {
@@ -2534,20 +2568,24 @@ export class initBaseDB {
             if ((issuestatus == "全部" || issuestatus == "待派单") && status == "待派单") {
               console.log("1" + status);
               dpd++;
+              issforass.push(v2.rows.item(i).Id);
               forass.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
             } else if ((issuestatus == "全部" || issuestatus == "待整改") && status == "待整改") {
               console.log("2" + status);
               dzg++;
+              issforfix.push(v2.rows.item(i).Id);
               forfix.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
             } else if ((issuestatus == "全部" || issuestatus == "已整改") && status == "已整改") {
               console.log("3" + status);
               yzg++;
+              issfixed.push(v2.rows.item(i).Id);
               dt = new Date(v2.rows.item(i).ReFormDate);
               fixed.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已整改", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
             }
             if ((issuestatus == "全部" || issuestatus == "被退回") && status != "已整改" && v2.rows.item(i).ReturnDate) {
               console.log("4" + status);
               bth++;
+              issreturned.push(v2.rows.item(i).Id);
               dt = new Date(v2.rows.item(i).ReturnDate);
               returned.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已退回", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
             }
@@ -2555,9 +2593,9 @@ export class initBaseDB {
             console.log(dpd + ";" + dzg + ";" + yzg + ";" + bth);
           }
           console.log(forass); console.log(dpd + ";" + dzg + ";" + yzg + ";" + bth);
-          return [forass, forfix, fixed, returned, dpd, dzg, yzg, bth, needupd];
+          return [forass, forfix, fixed, returned, dpd, dzg, yzg, bth, needupd,issforass, issforfix, issfixed, issreturned];
         } else {
-          return [[], [], [], [], 0, 0, 0, 0, needupd];
+          return [[], [], [], [], 0, 0, 0, 0, needupd, [], [], [], []];
         }
       }).catch(err => {
         this.warn('问题加载失败:' + err);
@@ -2658,7 +2696,7 @@ export class initBaseDB {
       }))
     })
   }
-
+  //Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId  
   getProjTeamVendors(projid): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
@@ -2666,18 +2704,19 @@ export class initBaseDB {
       });
       console.log("builderissuelist");
       resolve(promise.then((v1) => {
-        let sql = "select UserId,Name,Phone from projteam where projid = '" + projid + "'";        
+        let sql = "select Id,NameAlias,Phone,ManagerName from vend where exists (select VendId from projteam where projteam.vendid = vend.Id and projid = '" + projid + "') ";        
         console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
-        let teammembers = [];
+        let teamvendors = [];
         for (var i = 0; i < v2.rows.length; i++) {
-          teammembers.push({ userid: v2.rows.item(i).UserId, name: v2.rows.item(i).Name, phone: v2.rows.item(i).Phone });
+          console.log(JSON.stringify(v2.rows.item(i)));
+          teamvendors.push({ vendid: v2.rows.item(i).Id, name: v2.rows.item(i).NameAlias, managerphone: v2.rows.item(i).Phone, managername: v2.rows.item(i).ManagerName });
         }
-        return teammembers;
+        return teamvendors;
       }).catch(err => {
-        this.warn('项目团队加载失败:' + err);
-        throw '项目团队加载失败';
+        this.warn('项目团队承建商加载失败:' + err);
+        throw '项目团队承建商加载失败';
       }))
     })
   }
@@ -3031,21 +3070,21 @@ export class initBaseDB {
     })
   }
 
-  addProjTeamMembers(projid, phone, values): Promise<any> {
+  addProjTeamMembers(projid, vendid, phone, values): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
       });
       console.log("addProjTeamMembers");
       resolve(promise.then((v1) => {
-        let sql = "select Phone from projteam where projid = '" + projid + "' and phone = " + phone.toString();
+        let sql = "select Phone from projteam where projid = '" + projid + "' and vendid = '" + vendid + "' and phone = " + phone.toString();
         console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
         if (v2 && v2.rows.length > 0) {
           return 10;
         } else {
-          let sql = "insert into ProjTeam(Id,projid,userid,phone,name) values (#values#)";
+          let sql = "insert into ProjTeam(Id,projid,userid,phone,name,vendId) values (#values#)";
           sql = sql.replace("#values#", values);
           console.log(sql);
           return this.db.executeSql(sql, []);

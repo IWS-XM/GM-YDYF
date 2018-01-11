@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ActionSheetController } from 'ionic-angular';
+import { NavController, NavParams, ModalController, ActionSheetController } from 'ionic-angular';
 import { BuilderIssueDetail } from "../builder-issue-detail/builder-issue-detail";
 import { initBaseDB } from '../../providers/initBaseDB';
 import { NativeService } from '../../providers/nativeservice';
 import { LocalStorage } from '../../providers/local-storage';
 import { Dialogs } from '@ionic-native/dialogs';
 import { Clipboard } from '@ionic-native/clipboard';
+import { BuilderFilterPage } from '../builder/builderfilter';
 
 @Component({
     selector: 'page-builder',
@@ -27,7 +28,7 @@ export class BuilderPage {
     userid: string;
     username: string;
     token: string;
-    needupd: boolean;
+    needupd: boolean = false;
     asscounts: number = 0;
     forfixcounts: number = 0;
     fixedcounts: number = 0;
@@ -62,7 +63,7 @@ export class BuilderPage {
     sortingarrow: string = "∨";
     userrole: Array<string> = [];
     vendids: Array<string> = [];
-    constructor(public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController, public dialogs: Dialogs,
+    constructor(public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController, public dialogs: Dialogs, private modalCtrl: ModalController,
         public initBaseDB: initBaseDB, public nativeservice: NativeService, public localStorage: LocalStorage, private clipboard: Clipboard) {
         this.localStorage.getItem('curuser').then(val => {
             this.userid = val.userid;
@@ -71,10 +72,21 @@ export class BuilderPage {
             this.userrole = val.userrole;
         })
         this.sortings = [{ fieldstr: "默认排序", fieldname: "default" }, { fieldstr: "工序批次", fieldname: "BatchName" }, { fieldstr: "紧急程度", fieldname: "UrgencyId" }, { fieldstr: "整改时限", fieldname: "LimitDate" }, { fieldstr: "退回次数", fieldname: "ReturnNum" }];
+        this.lastselectedTab = this.selectedTab;
+        this.initdata();
+        this.loadIssues();
     }
 
-    ionViewDidEnter() {
+    initdata() {
         console.log("builderload");
+        let refreshlast = false;
+        if (this.lastselectedTab != this.selectedTab) {
+            if (this.assignfilterstr != "负责人" || this.buildingfilterstr != "楼栋" || this.floorfilterstr != "楼层" ||
+                this.duedatefilterstr != "整改时限" || this.checkitemfilterstr != "问题分类" || this.fixdatefilterstr != "整改时间" ||
+                this.returntimesfilterstr != "退回次数") {
+                refreshlast = true;
+            }
+        }
         this.assignfilterstr = "负责人";
         this.assigncolor = "light";
         this.assignarrow = "∨";
@@ -100,9 +112,84 @@ export class BuilderPage {
         this.sortingname = "default";
         this.sortingcolor = "light";
         this.sortingarrow = "∨";
-        this.lastselectedTab = this.selectedTab;
         this.showflag = false;
-        this.loadIssues();
+        this.localStorage.removeitem('builderissue');
+        if (refreshlast == true) {
+            this.refresh(this.lastselectedTab);
+        }
+        console.log('neeup:' + this.needupd);
+        if (this.projid) {
+            console.log('projidupd:' + this.projid);
+            this.localStorage.getItem('needupload' + this.projid).then(v => {
+                this.needupd = v;
+                console.log('needupd:' + v);
+            })
+        }
+    }
+
+    ionViewDidEnter() {
+        console.log('didenter');
+        this.localStorage.getItem('builderissue').then(val => {
+            if (val) {
+                console.log(val);
+                let idx: number;
+                if (val.status == '指派') {
+                    idx = this.issuelist[9].indexOf(val.issue.id); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[0].splice(idx, 1);
+                        this.issuelist[9].splice(idx, 1);
+                        this.forfixcounts += 1;
+                        this.asscounts -= 1;
+                    }
+                    this.needupd = true;
+                } else if (val.status == '重派') {
+                    idx = this.issuelist[10].indexOf(val.issue.id); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[1][idx].ResponsibleName = val.issue.ResponsibleName;
+                    }
+                    this.needupd = true;
+                } else if (val.status == '直接整改') {
+                    idx = this.issuelist[9].indexOf(val.issue.id); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[0].splice(idx, 1);
+                        this.issuelist[9].splice(idx, 1);
+                        this.fixedcounts += 1;
+                        this.asscounts -= 1;
+                    }
+                    idx = this.issuelist[12].indexOf(val.issue.id); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[3].splice(idx, 1);
+                        this.issuelist[12].splice(idx, 1);
+                        this.returncounts -= 1;
+                    }
+                    this.needupd = true;
+                } else if (val.status == '整改') {
+                    idx = this.issuelist[10].indexOf(val.issue.id); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[1].splice(idx, 1);
+                        this.issuelist[10].splice(idx, 1);
+                        this.fixedcounts += 1;
+                        this.forfixcounts -= 1;
+                    }
+                    idx = this.issuelist[12].indexOf(val.issue.id); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[3].splice(idx, 1);
+                        this.issuelist[12].splice(idx, 1);
+                        this.returncounts -= 1;
+                    }
+                    this.needupd = true;
+                } else if (val.status == '退回') {
+                    idx = this.issuelist[10].indexOf(val.issue.id); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[1].splice(idx, 1);
+                        this.issuelist[10].splice(idx, 1);
+                        this.asscounts += 1;
+                        this.forfixcounts -= 1;
+                    }
+                    this.needupd = true;
+                }
+            }
+        })
     }
 
     doRefresh(refresher) {
@@ -140,33 +227,35 @@ export class BuilderPage {
     clearSelection() {
         for (let issue of this.getIssues(this.selectedTab)) { issue['selected'] = false; }
 
-        this.assignfilterstr = "负责人";
-        this.assigncolor = "light";
-        this.assignarrow = "∨";
-        this.buildingfilterstr = "楼栋";
-        this.buildcolor = "light";
-        this.buildarrow = "∨";
-        this.floorfilterstr = "楼层";
-        this.floorcolor = "light";
-        this.floorarrow = "∨";
-        this.duedatefilterstr = "整改时限";
-        this.duedatecolor = "light";
-        this.duedatearrow = "∨";
-        this.checkitemfilterstr = "问题分类";
-        this.checkitemcolor = "light";
-        this.checkitemarrow = "∨";
-        this.fixdatefilterstr = "整改时间";
-        this.fixdatecolor = "light";
-        this.fixdatearrow = "∨";
-        this.returntimesfilterstr = "退回次数";
-        this.returncolor = "light";
-        this.returnarrow = "∨";
-        this.sortingstr = "默认排序";
-        this.sortingname = "default";
-        this.sortingcolor = "light";
-        this.sortingarrow = "∨";
-        this.showflag = false;
-        this.refresh();
+        // this.assignfilterstr = "负责人";
+        // this.assigncolor = "light";
+        // this.assignarrow = "∨";
+        // this.buildingfilterstr = "楼栋";
+        // this.buildcolor = "light";
+        // this.buildarrow = "∨";
+        // this.floorfilterstr = "楼层";
+        // this.floorcolor = "light";
+        // this.floorarrow = "∨";
+        // this.duedatefilterstr = "整改时限";
+        // this.duedatecolor = "light";
+        // this.duedatearrow = "∨";
+        // this.checkitemfilterstr = "问题分类";
+        // this.checkitemcolor = "light";
+        // this.checkitemarrow = "∨";
+        // this.fixdatefilterstr = "整改时间";
+        // this.fixdatecolor = "light";
+        // this.fixdatearrow = "∨";
+        // this.returntimesfilterstr = "退回次数";
+        // this.returncolor = "light";
+        // this.returnarrow = "∨";
+        // this.sortingstr = "默认排序";
+        // this.sortingname = "default";
+        // this.sortingcolor = "light";
+        // this.sortingarrow = "∨";
+        // this.showflag = false;
+        this.initdata();
+        this.refresh(this.selectedTab);
+        this.lastselectedTab = this.selectedTab;
     }
 
     itemHold() {
@@ -280,21 +369,46 @@ export class BuilderPage {
     }
 
     assignto(staff: any) {
-        let idrange = [];
+        let idrange = []; let ids = [];
         for (let issue of this.getIssues(this.selectedTab)) {
             if (issue['selected']) {
                 idrange.push("'" + issue['id'] + "'");
+                ids.push(issue['id']);
             }
         }
         console.log(idrange.join(','));
         this.nativeservice.showLoading("处理中,请稍后...");
         this.initBaseDB.updateResponsible(this.projid, idrange.join(','), staff, this.username, this.userid).then(v => {
-            this.loadIssues().then(v => {
-                this.nativeservice.hideLoading();
-                this.nativeservice.showToast("处理完成.");
-            }).catch(e => {
-                this.nativeservice.hideLoading();
-            })
+            let idx = 0; this.needupd = true;
+            if (this.selectedTab == '待派单') {
+                for (let itemid of ids) {
+                    idx = this.issuelist[9].indexOf(itemid); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[0].splice(idx, 1);
+                        this.issuelist[9].splice(idx, 1);
+                        this.forfixcounts += 1;
+                        this.asscounts -= 1;
+                    }
+                }
+            } else {
+                for (let itemid of ids) {
+                    idx = this.issuelist[10].indexOf(itemid); console.log('idx:' + idx);
+                    if (idx > -1) {
+                        this.issuelist[1][idx].ResponsibleName = staff.name;
+                        this.issuelist[1][idx].selected = false;
+                    }
+                }
+            }
+
+            this.nativeservice.hideLoading();
+            this.nativeservice.showToast("处理完成.");
+
+            // this.loadIssues().then(v => {
+            //     this.nativeservice.hideLoading();
+            //     this.nativeservice.showToast("处理完成.");
+            // }).catch(e => {
+            //     this.nativeservice.hideLoading();
+            // })
         }).catch(e => {
             this.nativeservice.hideLoading();
         })
@@ -310,22 +424,61 @@ export class BuilderPage {
             this.dialogs.confirm('确定当前选中的问题都已整改完毕？', '', ['取消', '确定']).then(val => {
                 console.log("valupd:" + val);
                 if (val == 2) {
-                    let idrange = [];
+                    let idrange = []; let ids = [];
                     console.log("true");
                     for (let issue of this.getIssues(this.selectedTab)) {
                         if (issue['selected']) {
                             idrange.push("'" + issue['id'] + "'");
+                            ids.push(issue['id']);
                         }
                     }
                     console.log(idrange.join(','));
                     this.nativeservice.showLoading("处理中,请稍后...");
                     this.initBaseDB.updateFixedCompleteMutil(this.projid, idrange.join(','), this.username, this.userid).then(v => {
-                        this.loadIssues().then(v => {
-                            this.nativeservice.hideLoading();
-                            this.nativeservice.showToast("处理完成.");
-                        }).catch(e => {
-                            this.nativeservice.hideLoading();
-                        })
+                        let idx = 0; this.needupd = true;
+                        if (this.selectedTab == '待派单') {
+                            for (let itemid of ids) {
+                                idx = this.issuelist[9].indexOf(itemid); console.log('idx:' + idx);
+                                if (idx > -1) {
+                                    this.issuelist[0].splice(idx, 1);
+                                    this.issuelist[9].splice(idx, 1);
+                                    this.fixedcounts += 1;
+                                    this.asscounts -= 1;
+                                }
+                                idx = this.issuelist[12].indexOf(itemid); console.log('idx:' + idx);
+                                if (idx > -1) {
+                                    this.issuelist[3].splice(idx, 1);
+                                    this.issuelist[12].splice(idx, 1);
+                                    this.returncounts -= 1;
+                                }
+                            }
+                        } else {
+                            for (let itemid of ids) {
+                                idx = this.issuelist[10].indexOf(itemid); console.log('idx:' + idx);
+                                if (idx > -1) {
+                                    this.issuelist[1].splice(idx, 1);
+                                    this.issuelist[10].splice(idx, 1);
+                                    this.fixedcounts += 1;
+                                    this.forfixcounts -= 1;
+                                }
+                                idx = this.issuelist[12].indexOf(itemid); console.log('idx:' + idx);
+                                if (idx > -1) {
+                                    this.issuelist[3].splice(idx, 1);
+                                    this.issuelist[12].splice(idx, 1);
+                                    this.returncounts -= 1;
+                                }
+                            }
+                        }
+
+                        this.nativeservice.hideLoading();
+                        this.nativeservice.showToast("处理完成.");
+
+                        // this.loadIssues().then(v => {
+                        //     this.nativeservice.hideLoading();
+                        //     this.nativeservice.showToast("处理完成.");
+                        // }).catch(e => {
+                        //     this.nativeservice.hideLoading();
+                        // })
                     }).catch(e => {
                         this.nativeservice.hideLoading();
                     })
@@ -386,23 +539,48 @@ export class BuilderPage {
                 console.log(val);
                 if (val && val != null) {
                     this.projid = val.projid; this.projname = val.projname;
-                    //if (val.needupd == 1) {
-                        return this.nativeservice.isConnecting(true).then(val => {
-                            console.log("is connecting" + val);
-                            if (val == true) {
-                                console.log('downlo');
-                                this.nativeservice.showLoading("正在下载基础数据,请稍侯...")
-                                return this.initBaseDB.downloadbuilderdata(this.token, this.projid);
-                            } else {
-                                return 1;
-                            }
-                        })
-                    // } else {
-                    //     return 1;
-                    // }
+                    return this.localStorage.getItem('needupload' + this.projid);
                 } else {
                     this.nativeservice.showToast("没有需要整改的项目问题")
                     throw '';
+                }
+            }).then((vv) => {
+                if (vv == true) {
+                    return this.dialogs.confirm('存在未上传数据，是否先上传数据？', '', ['暂不上传', '全部上传'])
+                        .then(val => {
+                            if (val == 2) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })
+                } else {
+                    return false;
+                }
+
+            }).then((vv2) => {
+                if (vv2 == true) {
+                    return this.nativeservice.isConnecting(true).then(val => {
+                        console.log("is connecting" + val);
+                        if (val == true) {
+                            console.log('updanddow');
+                            this.nativeservice.showLoading("正在下载基础数据,请稍侯...")
+                            return this.initBaseDB.uploadbuilderinfo(this.token, this.projid);
+                        } else {
+                            return 1;
+                        }
+                    })
+                } else {
+                    return this.nativeservice.isConnecting(true).then(val => {
+                        console.log("is connecting" + val);
+                        if (val == true) {
+                            console.log('downlo');
+                            this.nativeservice.showLoading("正在下载基础数据,请稍侯...")
+                            return this.initBaseDB.downloadbuilderdata(this.token, this.projid);
+                        } else {
+                            return 1;
+                        }
+                    })
                 }
             }).then((v2) => {
                 return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, "全部");
@@ -430,36 +608,50 @@ export class BuilderPage {
 
     presentfilter(groupbystr) {
         this.initBaseDB.getissuesuminfo(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, groupbystr, this.selectedTab).then(val => {
-            if (val && val.length > 0) {
-                let actionSheet = this.actionSheetCtrl.create({
-                    title: '选择过滤条件',
-                    buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelfilter(groupbystr); } }]
-                });
-                if (groupbystr == "LimitDate") {
-                    for (let s of val) {
-                        if (s.fieldstr == "全部") {
-                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                        } else {
-                            // let dt = new Date(s.fieldstr);
-                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                        }
-                    }
-                } else if (groupbystr == "ReFormDate") {
-                    for (let s of val) {
-                        if (s.fieldstr == "全部") {
-                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                        } else {
-                            // let dt = new Date(s.fieldstr);
-                            actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                        }
-                    }
+            const modal = this.modalCtrl.create(BuilderFilterPage, {
+                groupbystr: groupbystr, filters: val
+            });
+            modal.onDidDismiss((result: any) => {
+                console.log(result);
+                if (result) {
+                    console.log('selected');
+                    this.filter(groupbystr, result);
                 } else {
-                    for (let s of val) {
-                        actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
-                    }
+                    this.cancelfilter(groupbystr);
                 }
-                actionSheet.present();
-            }
+            });
+            modal.present();
+
+            // if (val && val.length > 0) {
+            //     let actionSheet = this.actionSheetCtrl.create({
+            //         title: '选择过滤条件',
+            //         buttons: [{ text: '取消', role: 'cancel', handler: () => { this.cancelfilter(groupbystr); } }]
+            //     });
+            //     if (groupbystr == "LimitDate") {
+            //         for (let s of val) {
+            //             if (s.fieldstr == "全部") {
+            //                 actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            //             } else {
+            //                 // let dt = new Date(s.fieldstr);
+            //                 actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            //             }
+            //         }
+            //     } else if (groupbystr == "ReFormDate") {
+            //         for (let s of val) {
+            //             if (s.fieldstr == "全部") {
+            //                 actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            //             } else {
+            //                 // let dt = new Date(s.fieldstr);
+            //                 actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            //             }
+            //         }
+            //     } else {
+            //         for (let s of val) {
+            //             actionSheet.addButton({ text: s.fieldstr + '  共 ' + s.counts + ' 条', handler: () => { this.filter(groupbystr, s); } });
+            //         }
+            //     }
+            //     actionSheet.present();
+            // }
         })
     }
 
@@ -528,10 +720,10 @@ export class BuilderPage {
             this.returncolor = "light";
             this.returnarrow = "∨";
         }
-        this.refresh();
+        this.refresh(this.selectedTab);
     }
 
-    refresh(): Promise<any> {
+    refresh(refreshTab): Promise<any> {
         return new Promise((resolve) => {
             // if (changetab == false){
             //   this.issuelist = []; 
@@ -540,30 +732,33 @@ export class BuilderPage {
                 resolve(100);
             });
             console.log("refreshIssues");
+            console.log(refreshTab);
             // this.nativeservice.showLoading("处理中，请稍侯...");
             resolve(promise.then((v1) => {
-                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, this.lastselectedTab);
+                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, refreshTab);
             }).then((val: any) => {
                 console.log("refresh end");
                 if (val) {
                     let list: Array<any>; list = [];
-                    if (this.lastselectedTab == "待派单") {
+                    if (refreshTab == "待派单") {
                         list.push(val[0]); list.push(this.issuelist[1]); list.push(this.issuelist[2]); list.push(this.issuelist[3]);
                         this.asscounts = val[4]; list.push(val[4]); list.push(this.issuelist[5]); list.push(this.issuelist[6]); list.push(this.issuelist[7]);
-                    } else if (this.lastselectedTab == "待整改") {
+                        list.push(this.needupd); list.push(val[9]); list.push(this.issuelist[10]); list.push(this.issuelist[11]); list.push(this.issuelist[12]);
+                    } else if (refreshTab == "待整改") {
                         list.push(this.issuelist[0]); list.push(val[1]); list.push(this.issuelist[2]); list.push(this.issuelist[3]);
                         list.push(this.issuelist[4]); this.forfixcounts = val[5]; list.push(val[5]); list.push(this.issuelist[6]); list.push(this.issuelist[7]);
-                    } else if (this.lastselectedTab == "已整改") {
+                        list.push(this.needupd); list.push(this.issuelist[9]); list.push(val[10]); list.push(this.issuelist[11]); list.push(this.issuelist[12]);
+                    } else if (refreshTab == "已整改") {
                         list.push(this.issuelist[0]); list.push(this.issuelist[1]); list.push(val[2]); list.push(this.issuelist[3]);
                         list.push(this.issuelist[4]); list.push(this.issuelist[5]); this.fixedcounts = val[6]; list.push(val[6]); list.push(this.issuelist[7]);
+                        list.push(this.needupd); list.push(this.issuelist[9]); list.push(this.issuelist[10]); list.push(val[11]); list.push(this.issuelist[12]);
                     } else {
                         list.push(this.issuelist[0]); list.push(this.issuelist[1]); list.push(this.issuelist[2]); list.push(val[3]);
-                        list.push(this.issuelist[4]); list.push(this.issuelist[5]); list.push(this.issuelist[6]); this.fixedcounts = val[7]; list.push(val[7]);
+                        list.push(this.issuelist[4]); list.push(this.issuelist[5]); list.push(this.issuelist[6]); this.returncounts = val[7]; list.push(val[7]);
+                        list.push(this.needupd); list.push(this.issuelist[9]); list.push(this.issuelist[10]); list.push(this.issuelist[11]); list.push(val[12]);
                     }
-                    list.push(this.needupd);
                     this.issuelist = list;
                 }
-                this.lastselectedTab = this.selectedTab;
                 return 1;
             }).then((v: any) => {
                 // this.nativeservice.hideLoading();
@@ -634,7 +829,7 @@ export class BuilderPage {
         this.sortingname = item.fieldname;
         this.sortingcolor = "light";
         this.sortingarrow = "∨";
-        this.refresh();
+        this.refresh(this.selectedTab);
     }
 
     sortingclick() {

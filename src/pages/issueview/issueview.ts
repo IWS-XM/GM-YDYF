@@ -259,7 +259,7 @@ export class IssueviewPage {
 		const modal = this.modalCtrl.create(IssuereturnPage, {
 		});
 		modal.onDidDismiss(result => {
-			if (result) {
+			if (result) {console.log('return result:'+result);
 				let now = new Date();
 				let curtime: string = now.toLocaleDateString() + " " + now.getHours().toString() + ":" + now.getMinutes() + ":" + now.getSeconds();
 

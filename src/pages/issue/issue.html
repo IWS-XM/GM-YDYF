@@ -48,13 +48,13 @@
       </ion-select>
     </ion-item>
     <ion-item>
-      <ion-label style=" white-space:normal">承建商(整改单位)</ion-label>
+      <ion-label fixed style=" white-space:normal">承建商(整改单位)</ion-label>
       <ion-select [(ngModel)]="vend" (ionChange)="vendorchange()" okText="确定" cancelText="取消" style=" white-space:normal;max-width:100%;padding:0">
         <ion-option *ngFor="let item of vendors">{{item}}</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
-      <ion-label>责任单位</ion-label>
+      <ion-label fixed>责任单位</ion-label>
       <ion-select [(ngModel)]="resunit" (ionChange)="responsibilityunitchange()" okText="确定" cancelText="取消" style=" white-space:normal;max-width:100%;padding:0">
         <ion-option *ngFor="let item of responsibilityunits">{{ item }}</ion-option>
       </ion-select>

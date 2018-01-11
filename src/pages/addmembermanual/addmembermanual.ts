@@ -15,9 +15,11 @@ export class AddmembermanualPage {
   name: string;
   phone: string;
   token: string;
+  vendid: string;
   constructor(public navCtrl: NavController, public params: NavParams, public localStorage: LocalStorage, public nativeservice: NativeService,
     private httpService: HttpService, public initBaseDB: initBaseDB) {
     this.projid = this.params.get('projid');
+    this.vendid = this.params.get('vendid');
     this.name = ""; this.phone = '';
     this.localStorage.getItem("curuser").then(val => {
       this.token = val.token;
@@ -28,14 +30,14 @@ export class AddmembermanualPage {
     console.log({ token: this.token, Projid: this.projid, Userid: this.phone, Name: this.name });
     this.nativeservice.isConnecting().then((val: boolean) => {
       if (val == true) {
-        this.httpService.post(APP_SERVE_URL + '/AppLogin/AddUser', { Token: this.token, ProjId: this.projid, UserId: this.phone, Name: this.name }).then(res => {
+        this.httpService.post(APP_SERVE_URL + '/AppLogin/AddUser', { Token: this.token, ProjId: this.projid, UserId: this.phone, Name: this.name, VendId:this.vendid }).then(res => {
           console.log(res);
           if (res[0][0][0] == "true") {
             let now = new Date();
             let id = "builder" + now.getTime().toString();
             let userid = res[0][0][2];
-            let values = ["'" + id + "'", "'" + this.projid + "'", "'" + userid + "'", this.phone, "'" + this.name + "'"];
-            this.initBaseDB.addProjTeamMembers(this.projid, this.phone, values.join(",")).then(val => {
+            let values = ["'" + id + "'", "'" + this.projid + "'", "'" + userid + "'", this.phone, "'" + this.name + "'", "'"+this.vendid+"'"];
+            this.initBaseDB.addProjTeamMembers(this.projid, this.vendid, this.phone, values.join(",")).then(val => {
               this.nativeservice.showToast("添加成功.");
               this.navCtrl.pop();
             })
