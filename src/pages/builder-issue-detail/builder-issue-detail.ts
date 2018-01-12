@@ -7,6 +7,7 @@ import { ShowimgPage } from '../../pages/imageeditor/showimg';
 import { AssignreturnPage } from '../../pages/assignreturn/assignreturn';
 import { NativeService } from '../../providers/nativeservice';
 import { LocalStorage } from '../../providers/local-storage';
+import { BuilderAssigning } from '../builder-assigning/builder-assigning';
 
 @Component({
   selector: 'page-builder-issue-detail',
@@ -177,23 +178,34 @@ export class BuilderIssueDetail {
     console.log('assignchange');
     this.initBaseDB.getProjTeam(this.projid, [this.vendid]).then(v => {
       this.teammembers = v;
-      this.presentActionSheet();
+      const modal = this.modalCtrl.create(BuilderAssigning, {
+        staff: this.teammembers
+      });
+      modal.onDidDismiss((result: any) => {
+        console.log(result);
+        if (result) {
+          console.log('selected');
+          this.assignto(result);
+        }
+      });
+      modal.present();
+      //this.presentActionSheet();
     })
   }
 
-  presentActionSheet() {
-    let actionSheet = this.actionSheetCtrl.create({
-      title: '选择负责人',
-      buttons: [{ text: '取消', role: 'cancel' }]
-    });
-    for (let s of this.teammembers) {
-      actionSheet.addButton({ text: s.phone + ' ' + s.name, handler: () => { this.assignto(s); } });
-    }
-    // for (let s of this.staffs) {
-    //   actionSheet.addButton({ text: s.id + ' ' + s.name, handler: () => { this.assignto(s); } });
-    // }
-    actionSheet.present();
-  }
+  // presentActionSheet() {
+  //   let actionSheet = this.actionSheetCtrl.create({
+  //     title: '选择负责人',
+  //     buttons: [{ text: '取消', role: 'cancel' }]
+  //   });
+  //   for (let s of this.teammembers) {
+  //     actionSheet.addButton({ text: s.phone + ' ' + s.name, handler: () => { this.assignto(s); } });
+  //   }
+  //   // for (let s of this.staffs) {
+  //   //   actionSheet.addButton({ text: s.id + ' ' + s.name, handler: () => { this.assignto(s); } });
+  //   // }
+  //   actionSheet.present();
+  // }
 
   assignto(staff: any) {
     this.initBaseDB.updateResponsible(this.projid, "'" + this.issueid + "'", staff, this.username, this.userid).then(v => {

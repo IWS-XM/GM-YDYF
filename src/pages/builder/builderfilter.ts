@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { NavController, ViewController, NavParams } from 'ionic-angular';
-import { LocalStorage } from '../../providers/local-storage';
-import { initBaseDB } from '../../providers/initBaseDB';
 
 @Component({
   selector: 'page-builderfilter',
@@ -9,12 +7,8 @@ import { initBaseDB } from '../../providers/initBaseDB';
 })
 export class BuilderFilterPage {
   filters: Array<any> = [];
-  userids: Array<string>;
-  projid: string;
-  userid: string = '';
   groupbystr:string = '';
-  constructor(public navCtrl: NavController, public localStorage: LocalStorage, public initBaseDB: initBaseDB, 
-    private viewCtrl: ViewController, public params: NavParams) {
+  constructor(public navCtrl: NavController, private viewCtrl: ViewController, public params: NavParams) {
   }
 
   ionViewDidEnter() {

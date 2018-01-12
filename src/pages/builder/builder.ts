@@ -7,6 +7,7 @@ import { LocalStorage } from '../../providers/local-storage';
 import { Dialogs } from '@ionic-native/dialogs';
 import { Clipboard } from '@ionic-native/clipboard';
 import { BuilderFilterPage } from '../builder/builderfilter';
+import { BuilderAssigning } from '../builder-assigning/builder-assigning';
 
 @Component({
     selector: 'page-builder',
@@ -336,7 +337,18 @@ export class BuilderPage {
             this.addVendIds();
             this.initBaseDB.getProjTeam(this.projid, this.vendids).then(v => {
                 this.teammembers = v;
-                this.presentActionSheet();
+                const modal = this.modalCtrl.create(BuilderAssigning, {
+                    staff: this.teammembers
+                });
+                modal.onDidDismiss((result: any) => {
+                    console.log(result);
+                    if (result) {
+                        console.log('selected');
+                        this.assignto(result);
+                    } 
+                });
+                modal.present();
+                //this.presentActionSheet();
             })
         } else {
             this.nativeservice.alert("请先选择要处理的问题项.");
@@ -354,19 +366,17 @@ export class BuilderPage {
         }
     }
 
-    presentActionSheet() {
-        let actionSheet = this.actionSheetCtrl.create({
-            title: '选择负责人',
-            buttons: [{ text: '取消', role: 'cancel' }]
-        });
-        for (let s of this.teammembers) {
-            actionSheet.addButton({ text: s.phone + ' ' + s.name, handler: () => { this.assignto(s); } });
-        }
-        // for (let s of this.staffs) {
-        //   actionSheet.addButton({ text: s.id + ' ' + s.name, handler: () => { this.assignto(s); } });
+    // presentActionSheet() {    
+        // let actionSheet = this.actionSheetCtrl.create({
+        //     title: '选择负责人',
+        //     buttons: [{ text: '取消', role: 'cancel' }]
+        // });
+        // for (let s of this.teammembers) {
+        //     actionSheet.addButton({ text: s.phone + ' ' + s.name, handler: () => { this.assignto(s); } });
         // }
-        actionSheet.present();
-    }
+        
+        // actionSheet.present();
+    // }
 
     assignto(staff: any) {
         let idrange = []; let ids = [];

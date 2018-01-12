@@ -29,7 +29,7 @@ export class AddphonecontactsPage {
   addclick(item) {
     this.nativeservice.isConnecting().then((val: boolean) => {
       if (val == true) {
-        this.httpService.post(APP_SERVE_URL + '/AppLogin/AddUser', { Token: this.token, ProjId: this.projid, UserId: item.phone, Name: item.name }).then(res => {
+        this.httpService.post(APP_SERVE_URL + '/AppLogin/AddUser', { Token: this.token, ProjId: this.projid, UserId: item.phone, Name: item.name, VendId:this.vendid }).then(res => {
           console.log(res);
           if (res[0][0][0] == "true") {
             let now = new Date();

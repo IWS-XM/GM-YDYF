@@ -1,17 +1,21 @@
 
 <ion-header>
+    <ion-navbar color="primary">
+      <ion-title>
+        选择负责人
+      </ion-title>
+    </ion-navbar>
+  </ion-header>
 
-  <ion-navbar color="primary">
-    <ion-title>选择负责人</ion-title>
-  </ion-navbar>
-
-</ion-header>
-<ion-list>
-  <button ion-item detail-none *ngFor="let p of persons" (click)="personclick(p.id)">
-    <ion-label fixed>{{p.name}}</ion-label>
-    <ion-label item-right>{{p.phone}}</ion-label>
-  </button>
-</ion-list>
-<ion-content padding>
-
-</ion-content>
+<ion-content>
+    <ion-list>
+      <ion-item *ngFor="let item of staff" detail-push (click)="submit(item)">
+       {{item.phone}} &nbsp; {{item.name}}
+    </ion-item>
+    </ion-list>
+  </ion-content>
+  <ion-footer id="actionbtn">
+      <table width="100%">
+          <button ion-button color="default" full (click)="cancel()" style="padding:0;margin:0">取消</button>
+        </table>
+</ion-footer>
