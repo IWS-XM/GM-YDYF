@@ -1226,7 +1226,11 @@ export class initBaseDB {
       resolve(promise.then((v1) => {
         return this.nativeservice.isConnecting(true);
       }).then(v=>{
-        return this.localStorage.setItem('updatebasedata',false);
+        if (v == false){
+          return v;
+        } else {
+          return this.localStorage.setItem('updatebasedata',false);
+        }       
       }).then((vv: boolean) => {
         if (vv == false) {
           return vv;
@@ -1417,13 +1421,14 @@ export class initBaseDB {
         } else if (type == 3) {
           sql = sql + "left outer join (select roomid, RoomStatus from FormalRoomDetails frd where frd.projid = '#projid#' and frd.batchid = '#batchid#' and frd.buildingid = '#buildingid#') frdts on frdts.roomid = rooms.id "
         }
-        sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单' group by roomid) fdzg on fdzg.roomid = rooms.id "
-          + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
-          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id "
+        sql = sql + "left outer join (select roomid, count(*) as dzg from #issuename# fci2 where (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') and fci2.projid = '#projid#' and fci2.batchid = '#batchid#' group by roomid) fdzg on fdzg.roomid = rooms.id "
+          + "left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.issuestatus = '已整改'  and fci3.projid = '#projid#' and fci3.batchid = '#batchid#' group by roomid) fyzg on fyzg.roomid = rooms.id "
+          + "left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.issuestatus = '已通过'  and fci4.projid = '#projid#' and fci4.batchid = '#batchid#' group by roomid) fytg on fytg.roomid = rooms.id "
           + "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
+          + " and rooms.projid = '#projid#' "
           + "order by rooms.sortcode, rooms.unit";
-        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
-        sql = sql.replace('#batchid#', batchid).replace('#batchid#', batchid);
+        sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
+        sql = sql.replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid).replace('#batchid#', batchid);
         sql = sql.replace('#buildingid#', buildingid).replace('#buildingid#', buildingid).replace('#checkbatchname#', batchtn);
         console.log(sql);
         return this.db.executeSql(sql, []);
