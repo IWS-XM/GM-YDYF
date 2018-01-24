@@ -165,40 +165,121 @@ export class initBaseDB {
       let promise = new Promise((resolve) => {
         resolve(100);
       });
-      console.log("initIssuesData");    
-      let tmprecords = []; 
+      console.log("initIssuesData");
+      let tmprecords = [];
       resolve(promise.then((v1) => {
         let jsonstr = JSON.stringify(records);
-        console.log(jsonstr.substr(3,1));
-        if (jsonstr.substr(3,1) == 'X')
-            return 1;
+        console.log(jsonstr.substr(3, 1));
+        if (jsonstr.substr(3, 1) == 'X')
+          return 1;
         else
-            return 0;
+          return 0;
       }).then((v) => {
         console.log(v);
         if (v == 1) {
           let tmppromise = Promise.resolve([]);
-          for (var i = 0; i < records.length; i++){
-            let values:any; values = records[i];
+          for (var i = 0; i < records.length; i++) {
+            let values: any; values = records[i];
             tmppromise = tmppromise.then(() => {
-              return tmprecords.push({BatchId:values.BatchId,IssueId:values.IssueId,RoomId:values.RoomId,PositionId:values.PositionId,CheckItemId:values.CheckItemId,PlusDesc:values.PlusDesc,
-                IssueDesc:values.IssueDesc,UrgencyId:values.UrgencyId,ImgBefore1:values.ImgBefore1,ImgBefore2:values.ImgBefore2,ImgBefore3:values.ImgBefore3,ImgAfter1:values.ImgAfter1,
-                ImgAfter2:values.ImgAfter2,ImgAfter3:values.ImgAfter3,ID:values.ID,IssueStatus:values.IssueStatus,VendId:values.VendId,ResponVendId:values.ResponVendId,ProjId:values.ProjId,
-                Manager:values.Manager,ResponsibleId:values.ResponsibleId,IssueType:values.IssueType,RegisterDate:values.RegisterDate,AppointDate:values.AppointDate,LimitDate:values.LimitDate,
-                ReFormDate:values.ReFormDate,CloseDate:values.CloseDate,CloseReason:values.CloseReason,CancelDate:values.CancelDate,CancelReason:values.CancelReason,
-                VersionId:values.VersionId,ImgClose1:values.ImgClose1,ImgClose2:values.ImgClose2,ImgClose3:values.ImgClose3,ReturnDate:values.ReturnDate,ReturnReason:values.ReturnReason,
-                ReturnNum:values.ReturnNum,BuildingId:values.BuildingId,EngineerId:values.EngineerId,ReviewDate:values.ReviewDate,X:values.X,Y:values.Y,ResponsibleName:values.ResponsibleName,
-                ResponsiblePhone:values.ResponsiblePhone,EngineerName:values.EngineerName,EngineerPhone:values.EngineerPhone,ManagerName:values.ManagerName,ManagerPhone:values.ManagerPhone,
-                ReassignDate:values.ReassignDate,ReassignDesc:values.ReassignDesc,ReasonbyOver:values.ReasonbyOver,FixedDesc:values.FixedDesc});  
-              }).then((v) => {
+              return tmprecords.push({
+                BatchId: values.BatchId, IssueId: values.IssueId, RoomId: values.RoomId, PositionId: values.PositionId, CheckItemId: values.CheckItemId, PlusDesc: values.PlusDesc,
+                IssueDesc: values.IssueDesc, UrgencyId: values.UrgencyId, ImgBefore1: values.ImgBefore1, ImgBefore2: values.ImgBefore2, ImgBefore3: values.ImgBefore3, ImgAfter1: values.ImgAfter1,
+                ImgAfter2: values.ImgAfter2, ImgAfter3: values.ImgAfter3, ID: values.ID, IssueStatus: values.IssueStatus, VendId: values.VendId, ResponVendId: values.ResponVendId, ProjId: values.ProjId,
+                Manager: values.Manager, ResponsibleId: values.ResponsibleId, IssueType: values.IssueType, RegisterDate: values.RegisterDate, AppointDate: values.AppointDate, LimitDate: values.LimitDate,
+                ReFormDate: values.ReFormDate, CloseDate: values.CloseDate, CloseReason: values.CloseReason, CancelDate: values.CancelDate, CancelReason: values.CancelReason,
+                VersionId: values.VersionId, ImgClose1: values.ImgClose1, ImgClose2: values.ImgClose2, ImgClose3: values.ImgClose3, ReturnDate: values.ReturnDate, ReturnReason: values.ReturnReason,
+                ReturnNum: values.ReturnNum, BuildingId: values.BuildingId, EngineerId: values.EngineerId, ReviewDate: values.ReviewDate, X: values.X, Y: values.Y, ResponsibleName: values.ResponsibleName,
+                ResponsiblePhone: values.ResponsiblePhone, EngineerName: values.EngineerName, EngineerPhone: values.EngineerPhone, ManagerName: values.ManagerName, ManagerPhone: values.ManagerPhone,
+                ReassignDate: values.ReassignDate, ReassignDesc: values.ReassignDesc, ReasonbyOver: values.ReasonbyOver, FixedDesc: values.FixedDesc
+              });
+            }).then((v) => {
               return tmprecords;
             })
-            }
+          }
           return tmppromise;
         } else {
           return records;
         }
-      }).then((vs:any) => {
+      }).then((vs: any) => {
+        var json = {};
+        json = { "data": { "inserts": { [tablename]: vs } } };
+        console.log(tablename); console.log(records);
+        return this.sqlitePorter.importJsonToDb(this.db, json);
+      }).catch(e => {
+        console.log('error:' + e);
+        throw '';
+      }))
+    })
+  }
+
+  initRoomsDetailsData(tablename, records): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      console.log("initRoomsDetailsData");
+      let tmprecords = [];
+      resolve(promise.then((v1) => {
+        let jsonstr = JSON.stringify(records);
+        console.log(jsonstr.substr(3, 1));
+        if (jsonstr.substr(3, 1) == 'E')
+          return 1;
+        else
+          return 0;
+      }).then((v) => {
+        console.log(v);
+        if (v == 1) {//"RoomId,TransDate,RoomStatus,Remark,EngineerId,EngineerPhone,ProjId,VersionId,ID,BatchId,BuildingId,EngineerName");
+          if (tablename == 'PreRoomsDetails') {
+            let tmppromise = Promise.resolve([]);
+            for (var i = 0; i < records.length; i++) {
+              let values: any; values = records[i];
+              tmppromise = tmppromise.then(() => { //,,,,,,,,,,
+                return tmprecords.push({
+                  RoomId: values.RoomId, TransDate: values.TransDate, RoomStatus: values.RoomStatus, Remark: values.Remark,  EngineerId: values.EngineerId,
+                  EngineerPhone: values.EngineerPhone,ProjId: values.ProjId, VersionId: values.VersionId, ID: values.ID, BatchId: values.BatchId, BuildingId: values.BuildingId, EngineerName: values.EngineerName
+                });
+              }).then((v) => {
+                return tmprecords;
+              })
+            }
+            return tmppromise;
+          } else if (tablename == 'OpenRoomsDetails') {
+            let tmppromise = Promise.resolve([]);
+            for (var i = 0; i < records.length; i++) {
+              let values: any; values = records[i];
+              console.log(records[i]);
+              tmppromise = tmppromise.then(() => { //,,,,,,,,,,
+                return tmprecords.push({
+                  RoomId: values.RoomId, TransDate: values.TransDate, RoomStatus: values.RoomStatus, CustId: values.CustId, CustPhone: values.CustPhone, Remark: values.Remark, EngineerId: values.EngineerId,
+                  EngineerPhone: values.EngineerPhone, ImgSign: values.ImgSign, ProjId: values.ProjId, VersionId: values.VersionId, ID: values.ID, BatchId: values.BatchId, BuildingId: values.BuildingId, EngineerName: values.EngineerName
+                });
+              }).then((v) => {
+                return tmprecords;
+              })
+            }
+            return tmppromise;
+          } else {//"RoomId,,,,,,,BuildingId,EngineerName"
+            let tmppromise = Promise.resolve([]);
+            for (var i = 0; i < records.length; i++) {
+              let values: any; values = records[i];
+              tmppromise = tmppromise.then(() => { //,,,,,,,,,,
+                return tmprecords.push({
+                  RoomId: values.RoomId, TransDate: values.TransDate, RoomStatus: values.RoomStatus, CustId: values.CustId, CustPhone: values.CustPhone, Remark: values.Remark, EngineerId: values.EngineerId,
+                  EngineerPhone: values.EngineerPhone, ImgSign: values.ImgSign, ProjId: values.ProjId, VersionId: values.VersionId, ID: values.ID,
+                  AmmeterNumber: values.AmmeterNumber, AmmeterReading: values.AmmeterReading, WaterMeterNumber: values.WaterMeterNumber, GasMeterNumber: values.GasMeterNumber, WaterMeterReading: values.WaterMeterReading,
+                  GasMeterReading: values.GasMeterReading, KeyRetentionStatus: values.KeyRetentionStatus, 
+                  BatchId: values.BatchId, BuildingId: values.BuildingId, EngineerName: values.EngineerName
+                });
+              }).then((v) => {
+                return tmprecords;
+              })
+            }
+            return tmppromise;
+          }
+        } else {
+          return records;
+        }
+      }).then((vs: any) => {
         var json = {};
         json = { "data": { "inserts": { [tablename]: vs } } };
         console.log(tablename); console.log(records);
@@ -413,7 +494,7 @@ export class initBaseDB {
         console.log('aaaabasepack');
         return this.httpService.get(APP_SERVE_URL + "/basepack/", { Token: token, Projid: v.projid });
       }).then((res) => {
-        console.log("aaainitdata:" );
+        console.log("aaainitdata:");
         data = res[0];
         return this.initData(res[0], v.projid);
       }).then((val) => {
@@ -428,7 +509,7 @@ export class initBaseDB {
               return this.initBaseData(items[0], itemsrecord);
             } else {
               return 1;
-            }            
+            }
           }).then((v) => {
             return v;
           })
@@ -453,7 +534,7 @@ export class initBaseDB {
       });
       resolve(promise.then((v1) => {
         return this.localStorage.getItem('curproj');
-      }).then((v:any) => {
+      }).then((v: any) => {
         console.log(v);
         if (v.needupd == 1) {
           return this.updatebasepack(v, token);
@@ -558,7 +639,7 @@ export class initBaseDB {
                     })
                     // this.localStorage.setItem('curproj', { projid: v.projid, projname: v.projname, versionid: v.versionid, needupd: 1 });
                   }).then((v3) => {
-                    return this.localStorage.setItem('updatebasedata',true);
+                    return this.localStorage.setItem('updatebasedata', true);
                   }).then((v3) => {
                     return this.updatecurproj(token);
                   }).then((v4) => {
@@ -1064,10 +1145,15 @@ export class initBaseDB {
             tmppromise = tmppromise.then(() => {
               return this.resetdata(tmptbname);
             }).then(v => {
-              if (tmptbname.endsWith('CheckIssues'))
-                 return this.initIssuesData(tmptbname, tmpdata);
-              else
-                 return this.initBaseData(tmptbname, tmpdata);
+              if (tmptbname.endsWith('CheckIssues')) {
+                return this.initIssuesData(tmptbname, tmpdata);
+              }
+              else if (tmptbname.endsWith('RoomDetails')) {
+                return this.initRoomsDetailsData(tmptbname, tmpdata);
+              }
+              else {
+                return this.initBaseData(tmptbname, tmpdata);
+              }
             })
           }
         }
@@ -1115,6 +1201,8 @@ export class initBaseDB {
           /////图片处理  "CustRoomSatisfactions", "RoomId,SatisfiedDim,Type,Score integer,ProjId,VersionId integer,Id,BatchId"          
         }
         return tmppromise;
+        // }).then(vv3=>{
+        // return this.test(projid,type);
       }).then(v3 => {
         //ImgBefore1,Imgbefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,ImgClose1,ImgClose2,ImgClose3
         let tmptn = '';
@@ -1137,9 +1225,9 @@ export class initBaseDB {
         sql += " union select ImgClose2 as fn from #tmptablename# where ImgClose2 != '' and ImgClose2 != 'NUll' and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename#.ImgClose2) ".replace('#tmptablename#', tmptn).replace('#tmptablename#', tmptn).replace('#projid#', projid);
         sql += " union select ImgClose3 as fn from #tmptablename# where ImgClose3 != '' and ImgClose3 != 'NUll' and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename#.ImgClose3) ".replace('#tmptablename#', tmptn).replace('#tmptablename#', tmptn).replace('#projid#', projid);
         if (type == 2) {
-          sql += " union select ImgSign as fn from #tmptablename2# where ImgSign != '' and ImgSign != 'NUll' and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename2#.ImgSign) ".replace('#tmptablename2#', 'tmpOpenRoomDetails').replace('#tmptablename2#', 'tmpOpenRoomDetails').replace('#projid#', projid);
+          sql += " union select ImgSign as fn from #tmptablename2# where ImgSign != '' and ImgSign != 'NUll' and projid = '#projid#' and batchid = '#batchid#' and buildingid = '#buildingid#' and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename2#.ImgSign) ".replace('#tmptablename2#', 'OpenRoomDetails').replace('#tmptablename2#', 'tmpOpenRoomDetails').replace('#projid#', projid);
         } else if (type == 3) {
-          sql += " union select ImgSign as fn from #tmptablename2# where ImgSign != '' and ImgSign != 'NUll' and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename2#.ImgSign) ".replace('#tmptablename2#', 'tmpFormalRoomDetails').replace('#tmptablename2#', 'tmpFormalRoomDetails').replace('#projid#', projid);
+          sql += " union select ImgSign as fn from #tmptablename2# where ImgSign != '' and ImgSign != 'NUll' and projid = '#projid#' and batchid = '#batchid#' and buildingid = '#buildingid#' and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename2#.ImgSign) ".replace('#tmptablename2#', 'FormalRoomDetails').replace('#tmptablename2#', 'tmpFormalRoomDetails').replace('#projid#', projid);
         }
         console.log(sql);
         return this.db.executeSql(sql, []);
@@ -1165,6 +1253,75 @@ export class initBaseDB {
         sql = sql.replace('#version#', data[1][0]);
         console.log('updbvdata:' + sql);
         return this.db.executeSql(sql, []);
+      }).catch(err => {
+        console.log(err);
+      }))
+    })
+  }
+
+  test(projid, type): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      let tablename: Array<string>;
+      tablename = [];
+      console.log('testtest111');
+      resolve(promise.then((v1) => {
+        //ImgBefore1,Imgbefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,ImgClose1,ImgClose2,ImgClose3
+        let tmptn = '';
+        if (type == 1) {
+          tmptn = 'tmpPreCheckIssues';
+        } else if (type == 2) {
+          tmptn = 'tmpOpenCheckIssues';
+        } else if (type == 3) {
+          tmptn = 'tmpFormalCheckIssues';
+        } else {
+          tmptn = 'tmpServiceCheckIssues';
+        }
+        let sql = "select * from #tmptablename2# where ImgSign != '' and ImgSign != 'NUll' and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename2#.ImgSign) ".replace('#tmptablename2#', 'tmpOpenRoomDetails').replace('#tmptablename2#', 'tmpOpenRoomDetails').replace('#projid#', projid);
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v4: any) => {
+        console.log("v4:" + v4);
+        let tmppromise = Promise.resolve([]);
+        for (var j = 0; j < v4.rows.length; j++) {
+          console.log(JSON.stringify(v4.rows.item(j)));
+          tmppromise = tmppromise.then(() => {
+            return [3];
+          }).then(val => {
+            return [4];
+          })
+        }
+        return tmppromise;
+      }).then((v1) => {
+        //ImgBefore1,Imgbefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,ImgClose1,ImgClose2,ImgClose3
+        let tmptn = '';
+        if (type == 1) {
+          tmptn = 'tmpPreCheckIssues';
+        } else if (type == 2) {
+          tmptn = 'tmpOpenCheckIssues';
+        } else if (type == 3) {
+          tmptn = 'tmpFormalCheckIssues';
+        } else {
+          tmptn = 'tmpServiceCheckIssues';
+        }
+        let sql = "select ImgSign as fn from #tmptablename2# where projid = '#projid#'  ".replace('#tmptablename2#', 'OpenRoomDetails').replace('#projid#', projid);
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v4: any) => {
+        console.log("v4:" + v4);
+        let tmppromise = Promise.resolve([]);
+        for (var j = 0; j < v4.rows.length; j++) {
+          console.log(JSON.stringify(v4.rows.item(j)));
+          let fn = v4.rows.item(j).fn;
+          tmppromise = tmppromise.then(() => {
+            return [3];
+          }).then(val => {
+            return [4];
+          })
+        }
+        return tmppromise;
       }).catch(err => {
         console.log(err);
       }))
@@ -1220,17 +1377,17 @@ export class initBaseDB {
 
   refreshbatch(projid, type, token, versionid): Promise<any> {
     return new Promise((resolve) => {
-      let promise = new Promise((resolve) => {        
+      let promise = new Promise((resolve) => {
         resolve(100);
       });
       resolve(promise.then((v1) => {
         return this.nativeservice.isConnecting(true);
-      }).then(v=>{
-        if (v == false){
+      }).then(v => {
+        if (v == false) {
           return v;
         } else {
-          return this.localStorage.setItem('updatebasedata',false);
-        }       
+          return this.localStorage.setItem('updatebasedata', false);
+        }
       }).then((vv: boolean) => {
         if (vv == false) {
           return vv;
@@ -1554,7 +1711,7 @@ export class initBaseDB {
           console.log(JSON.stringify(v2.rows.item(i)));
           let now = new Date();
           let dt = new Date(v2.rows.item(i).LimitDate);
-          let days = 0;          
+          let days = 0;
           status = v2.rows.item(i).IssueStatus;
           console.log(status)
           if (status == "待派单") {
@@ -1572,14 +1729,14 @@ export class initBaseDB {
           } else if (status == "已整改") {
             console.log("3" + status);
             let fixdate = new Date(v2.rows.item(i).ReFormDate);
-            if (fixdate > dt){
+            if (fixdate > dt) {
               days = Math.round((fixdate.getTime() - dt.getTime()) / 1000 / 3600 / 24);
             }
             yzg++;
           } else if (status == "已通过") {
             console.log("4" + status);
             let fixdate = new Date(v2.rows.item(i).ReFormDate);
-            if (fixdate > dt){
+            if (fixdate > dt) {
               days = Math.round((fixdate.getTime() - dt.getTime()) / 1000 / 3600 / 24);
             }
             ytg++;
@@ -1827,7 +1984,7 @@ export class initBaseDB {
         resolve(100);
       });
       resolve(promise.then((v1) => {
-        let sql = "select crs.SatisfiedDim as Dim, crs.Score from CustRoomSatisfactions crs inner join custsatisfaction csf on crs.SatisfiedDim = csf.name where crs.roomid = '#roomid#' and crs.type = #type# order by csf.sortcode";
+        let sql = "select crs.SatisfiedDim as Dim, crs.Score from CustRoomSatisfactions crs inner join custsatisfaction csf on crs.SatisfiedDim = csf.name and crs.type = csf.type where crs.roomid = '#roomid#' and crs.type = #type# order by csf.sortcode";
         sql = sql.replace('#roomid#', roomid).replace('#type#', type.toString());
         console.log(sql);
         return this.db.executeSql(sql, []);
@@ -1967,7 +2124,7 @@ export class initBaseDB {
         tablefield.push("ProjTeam"); tablefield.push("VendId,Name,Phone,ID,UserId,ProjId");
         tablefield.push("FormalCheckLogs"); tablefield.push("BatchId,IssueId,IssueStatus,LogDate,UserId,UserName,Origin,DueDate,ReasonbyOver,IsReturn,ReturnReason,ProjId,VersionId,ID");
         tablefield.push("Vend"); tablefield.push("Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
-        
+
         let tmppromise = Promise.resolve([]);
         for (let k = 0; k < tablename.length; k++) {
           console.log(tablename[k]);
@@ -2190,19 +2347,19 @@ export class initBaseDB {
           }).then((vv) => {
             return this.existstable("Vend");
           }).then(counts => {
-              if (counts == 0) {
-                return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
-              } else {
-                return 10;
-              }
+            if (counts == 0) {
+              return this.initBaseTable("Vend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
+            } else {
+              return 10;
+            }
           }).then((vv) => {
             return this.existstable("tmpVend");
           }).then(counts => {
-              if (counts == 0) {
-                return this.initBaseTable("tmpVend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
-              } else {
-                return this.resetprojdata("tmpVend", projid);
-              }
+            if (counts == 0) {
+              return this.initBaseTable("tmpVend", "Id,NameAlias,Manager,ManagerName,Phone,Projid,ResponsibleId");
+            } else {
+              return this.resetprojdata("tmpVend", projid);
+            }
           }).then((v4) => {
             return this.db.executeSql("select LastDate from projversion where projid = '" + projid + "'", []);
           }).then((v5: any) => {
@@ -2566,7 +2723,7 @@ export class initBaseDB {
             status = v2.rows.item(i).IssueStatus;
             if (now > dt && (status == "待派单" || status == "待整改")) {
               days = Math.round((now.getTime() - dt.getTime()) / 1000 / 3600 / 24);
-            } else if (status == "已整改" && dt < fixdate){
+            } else if (status == "已整改" && dt < fixdate) {
               days = Math.round((fixdate.getTime() - dt.getTime()) / 1000 / 3600 / 24);
             }
             console.log(status)
@@ -2574,31 +2731,31 @@ export class initBaseDB {
               console.log("1" + status);
               dpd++;
               issforass.push(v2.rows.item(i).Id);
-              forass.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
+              forass.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid: v2.rows.item(i).VendId });
             } else if ((issuestatus == "全部" || issuestatus == "待整改") && status == "待整改") {
               console.log("2" + status);
               dzg++;
               issforfix.push(v2.rows.item(i).Id);
-              forfix.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
+              forfix.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "整改时限", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid: v2.rows.item(i).VendId });
             } else if ((issuestatus == "全部" || issuestatus == "已整改") && status == "已整改") {
               console.log("3" + status);
               yzg++;
               issfixed.push(v2.rows.item(i).Id);
               dt = new Date(v2.rows.item(i).ReFormDate);
-              fixed.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已整改", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
+              fixed.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已整改", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid: v2.rows.item(i).VendId });
             }
             if ((issuestatus == "全部" || issuestatus == "被退回") && status != "已整改" && v2.rows.item(i).ReturnDate) {
               console.log("4" + status);
               bth++;
               issreturned.push(v2.rows.item(i).Id);
               dt = new Date(v2.rows.item(i).ReturnDate);
-              returned.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已退回", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid:v2.rows.item(i).VendId });
+              returned.push({ selected: false, type: v2.rows.item(i).type, id: v2.rows.item(i).Id, batchname: v2.rows.item(i).BatchName, floorname: v2.rows.item(i).FloorName, roomname: v2.rows.item(i).RoomName, buildingname: v2.rows.item(i).BuildingName, status: status, position: v2.rows.item(i).PositionName, checkitem: v2.rows.item(i).CheckItemName, issueid: v2.rows.item(i).IssueId, IssueDesc: v2.rows.item(i).IssueDesc, ResponsibleName: v2.rows.item(i).ResponsibleName, datestr: "已退回", date: this.showdatetime(dt), overdays: days, returntimes: v2.rows.item(i).ReturnNum, vendid: v2.rows.item(i).VendId });
             }
 
             console.log(dpd + ";" + dzg + ";" + yzg + ";" + bth);
           }
           console.log(forass); console.log(dpd + ";" + dzg + ";" + yzg + ";" + bth);
-          return [forass, forfix, fixed, returned, dpd, dzg, yzg, bth, needupd,issforass, issforfix, issfixed, issreturned];
+          return [forass, forfix, fixed, returned, dpd, dzg, yzg, bth, needupd, issforass, issforfix, issfixed, issreturned];
         } else {
           return [[], [], [], [], 0, 0, 0, 0, needupd, [], [], [], []];
         }
@@ -2665,7 +2822,7 @@ export class initBaseDB {
   }
 
   //"VendId,Name,Phone,ID,UserId,ProjId"
-  getProjTeam(projid,vendids:Array<string>): Promise<any> {
+  getProjTeam(projid, vendids: Array<string>): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
@@ -2674,19 +2831,19 @@ export class initBaseDB {
       resolve(promise.then((v) => {
         let vendranges = '';
         for (var j = 0; j < vendids.length; j++) {
-          if (j == 0){
-            vendranges = " vendid = '" + vendids[j] + "'";  
+          if (j == 0) {
+            vendranges = " vendid = '" + vendids[j] + "'";
           } else {
             vendranges += " or vendid = '" + vendids[j] + "'";
           }
         }
         return vendranges;
-      }).then((v1:string) => {
-        if (v1 == ''){
-           v1 = ' 1 = 1 ';
+      }).then((v1: string) => {
+        if (v1 == '') {
+          v1 = ' 1 = 1 ';
         }
         let sql = "select UserId,Name,Phone from projteam where projid = '" + projid + "' and ( #vendids# )";
-        sql = sql.replace('#vendids#',v1);
+        sql = sql.replace('#vendids#', v1);
         console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
@@ -2709,7 +2866,7 @@ export class initBaseDB {
       });
       console.log("builderissuelist");
       resolve(promise.then((v1) => {
-        let sql = "select Id,NameAlias,Phone,ManagerName from vend where exists (select VendId from projteam where projteam.vendid = vend.Id and projid = '" + projid + "') ";        
+        let sql = "select Id,NameAlias,Phone,ManagerName from vend where exists (select VendId from projteam where projteam.vendid = vend.Id and projid = '" + projid + "') ";
         console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((v2: any) => {
@@ -3750,8 +3907,8 @@ export class initBaseDB {
         sql = sql + " left outer join (select roomid, count(*) as dzg from #issuename# fci2 where fci2.batchid = '#batchid#' and (fci2.issuestatus = '待整改' or fci2.issuestatus = '待派单') group by roomid) fdzg on fdzg.roomid = rooms.id "
           + " left outer join (select roomid, count(*) as yzg from #issuename# fci3 where fci3.batchid = '#batchid#' and fci3.issuestatus = '已整改' group by roomid) fyzg on fyzg.roomid = rooms.id "
           + " left outer join (select roomid, count(*) as ytg from #issuename# fci4 where fci4.batchid = '#batchid#' and fci4.issuestatus = '已通过' group by roomid) fytg on fytg.roomid = rooms.id "
-          + " where rooms.projid = '#projid#' ";         
-          //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
+          + " where rooms.projid = '#projid#' ";
+        //+ "where exists (select roomid from #checkbatchname# fcr where fcr.roomid = rooms.id and fcr.projid = '#projid#' and fcr.batchid = '#batchid#' and fcr.buildingid = '#buildingid#')"
         //+ "order by rooms.sortcode, rooms.unit";
         sql = sql.replace('#projid#', projid).replace('#projid#', projid).replace('#projid#', projid).replace("#issuename#", tn).replace("#issuename#", tn).replace("#issuename#", tn);
 
