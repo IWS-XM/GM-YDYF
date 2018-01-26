@@ -157,6 +157,7 @@ export class IssuePage {
 			console.log(val);
 			this.itemdescs = val[0];
 			this.responsibilityunits = []; this.responsibilityunitids = []; this.vendids = []; this.vendors = [];
+			this.vendmanagers = [];this.vendmanagernames = []; this.vendmanagerphone = [];
 			let i = 0;
 			val[1].forEach(v => {
 				this.responsibilityunits.push(v.name);
