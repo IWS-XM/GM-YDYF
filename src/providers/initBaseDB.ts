@@ -893,7 +893,7 @@ export class initBaseDB {
 
   initApartImage(projid, buildingid): Promise<any> {
     return new Promise((resolve) => {
-      let promise = new Promise((resolve) => {
+      let promise = new Promise((resolve) => {        
         resolve(100);
       });
       console.log('image');
@@ -902,7 +902,15 @@ export class initBaseDB {
         sql = sql.replace('#projid#', projid); sql = sql.replace('#projid#', projid); sql = sql.replace('#projid#', projid);
         sql = sql.replace('#buildingid#', buildingid);
         return this.db.executeSql(sql, []);
-      }).then((v2: any) => {
+      }).then((v:any)=>{
+        if (v.rows.length && v.rows.length > 0){
+          this.localStorage.setItem('imgcount',0).then(vv=>{
+            this.nativeservice.showLoadingimg('加载户型图',v.rows.length);
+          })
+        }
+        return v;
+      })
+      .then((v2: any) => {
         let tmppromise = Promise.resolve([]);
         for (var i = 0; i < v2.rows.length; i++) {
           console.log(JSON.stringify(v2.rows.item(i)));
@@ -916,6 +924,9 @@ export class initBaseDB {
           })
         }
         return tmppromise;
+      }).then(v=>{
+        this.localStorage.setItem('imgcount',-1);
+        return v;
       }).catch(err => {
         console.log(err);
       }))
@@ -1028,6 +1039,13 @@ export class initBaseDB {
         sql = sql.replace('#projid#', projid).replace('#batchid#', batchid).replace('#buildingid#', buildingid);
         console.log(sql);
         return this.db.executeSql(sql, []);
+      }).then((vv1:any)=>{
+        if (vv1.rows.length && vv1.rows.length > 0){
+          this.localStorage.setItem('imgcount',0).then(vv=>{
+            this.nativeservice.showLoadingimg('上传房间问题图片',vv1.rows.length);
+          })
+        }
+        return vv1;
       }).then((val: any) => {
         let tmppromise = Promise.resolve(10);
         for (let i = 0; i < val.rows.length; i++) {
@@ -1046,6 +1064,9 @@ export class initBaseDB {
           })
         }
         return tmppromise;
+      }).then(v=>{
+        this.localStorage.setItem('imgcount',-1);
+        return v;
       }).then((v1) => {
         if (type == 1) {
           return this.uploaddata(projid, batchid, buildingid, ["PreCheckIssues", "PreRoomDetails"]);
@@ -1231,6 +1252,13 @@ export class initBaseDB {
         }
         console.log(sql);
         return this.db.executeSql(sql, []);
+      }).then((vv1:any)=>{
+        if (vv1.rows.length && vv1.rows.length > 0){
+          this.localStorage.setItem('imgcount',0).then(vv=>{
+            this.nativeservice.showLoadingimg('加载房间问题图片',vv1.rows.length);
+          })
+        }
+        return vv1;
       }).then((v4: any) => {
         console.log("v4:" + v4);
         let tmppromise = Promise.resolve([]);
@@ -1253,6 +1281,9 @@ export class initBaseDB {
         sql = sql.replace('#version#', data[1][0]);
         console.log('updbvdata:' + sql);
         return this.db.executeSql(sql, []);
+      }).then(v=>{
+        this.localStorage.setItem('imgcount',-1);
+        return v;
       }).catch(err => {
         console.log(err);
       }))
@@ -2198,6 +2229,13 @@ export class initBaseDB {
 
         console.log(sql);
         return this.db.executeSql(sql, []);
+      }).then((vv1:any)=>{
+        if (vv1.rows.length && vv1.rows.length > 0){
+          this.localStorage.setItem('imgcount',0).then(vv=>{
+            this.nativeservice.showLoadingimg('加载房间问题图片',vv1.rows.length);
+          })
+        }
+        return vv1;
       }).then((v4: any) => {
         console.log("v4:" + v4);
         let tmppromise = Promise.resolve([]);
@@ -2232,6 +2270,9 @@ export class initBaseDB {
           })
         }
         return tmppromise;
+      }).then(v=>{
+        this.localStorage.setItem('imgcount',-1);
+        return v;
       }).catch(err => {
         console.log(err);
       }))
@@ -2430,6 +2471,13 @@ export class initBaseDB {
         sql = sql.replace('#projid#', projid);
         console.log(sql);
         return this.db.executeSql(sql, []);
+      }).then((vv1:any)=>{
+        if (vv1.rows.length && vv1.rows.length > 0){
+          this.localStorage.setItem('imgcount',0).then(vv=>{
+            this.nativeservice.showLoadingimg('上传房间问题图片',vv1.rows.length);
+          })
+        }
+        return vv1;
       }).then((val: any) => {
         let tmppromise = Promise.resolve(10);
         for (var i = 0; i < val.rows.length; i++) {
@@ -2448,6 +2496,9 @@ export class initBaseDB {
           })
         }
         return tmppromise;
+      }).then(v=>{
+        this.localStorage.setItem('imgcount',-1);
+        return v;
       }).then((v1) => {
         return this.uploadbuilderdata(projid, ["PreCheckIssues", "PreCheckLogs", "OpenCheckIssues", "OpenCheckLogs", "FormalCheckIssues", "FormalCheckLogs", "ServiceCheckIssues", "ServiceCheckLogs"]);
       }).then((v2) => {
@@ -3420,7 +3471,11 @@ export class initBaseDB {
       let promise = new Promise((resolve) => {
         resolve(100);
       });
-      resolve(promise.then((v1) => {
+      resolve(promise.then((v)=>{
+        return this.localStorage.getItem('imgcount').then(x=>{
+          this.localStorage.setItem('imgcount',x+1);
+        })
+      }).then((v1) => {
         return this.httpService.getimg(FILE_SERVE_URL + "/ydyf_DownLoadFileString", { token: FILE_TOKEN, MD5: filename });
       }).catch(err => {
         this.warn('图片下载失败:' + err);
@@ -3432,13 +3487,19 @@ export class initBaseDB {
     return new Promise((resolve) => {
       //let filename = Md5.hashStr(src).toString() + ext;//'11.jpg';//
       console.log(filename);
-      //ydyf_DownLoadFile
-      this.httpService.postimg(FILE_SERVE_URL + "/ydyf_UpLoadFileString", { token: FILE_TOKEN, FileName: src, MD5: filename }).then(v => {
-        resolve(1);
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      resolve(promise.then((v)=>{
+        return this.localStorage.getItem('imgcount').then(x=>{
+          this.localStorage.setItem('imgcount',x+1);
+        })
+      }).then((v1) => {
+        return this.httpService.postimg(FILE_SERVE_URL + "/ydyf_UpLoadFileString", { token: FILE_TOKEN, FileName: src, MD5: filename });
       }).catch(err => {
         this.warn('图片上传失败:' + err);
         resolve(0);
-      })
+      }))
     })
   }
 

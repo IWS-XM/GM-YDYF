@@ -25,6 +25,8 @@ declare var cordova: any;
 export class NativeService {
   private loading: Loading;
   private loadingIsOpen: boolean = false;
+  private loadingimg: Loading;
+  private loadingIsOpenimg: boolean = false;
   constructor(private platform: Platform,
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
@@ -241,6 +243,48 @@ export class NativeService {
     this.loadingIsOpen = false;
   };
 
+  /**
+   * 统一调用此方法显示loadingimg
+   * @param content 显示的内容
+   */
+  showLoadingimg(content: string = '', totalcount:number, timeout: number = 10): void {
+    this.localStorage.getItem('imgcount').then(v => {
+      if (v == -1) {
+        this.hideLoadingimg();
+      } else {
+
+        if (!this.loadingIsOpenimg) {
+          this.loadingIsOpenimg = true;
+          this.loadingimg = this.loadingCtrl.create({
+            content: content + v + '/' + totalcount
+          });
+          this.loadingimg.present();
+        } else {
+          // console.log('aaashowLoading');
+          // this.hideLoadingimg();
+          // this.loadingIsOpenimg = true;
+          // this.loadingimg = this.loadingCtrl.create({
+          //   content: content + v
+          // });
+          this.loadingimg.setContent(content + v + '/' + totalcount);
+          this.loadingimg.present();          
+        }
+        setTimeout(() => {//最长显示10秒
+            this.showLoadingimg(content,totalcount,timeout);
+          }, timeout);
+      }
+    })    
+  };
+
+  /**
+   * 关闭loadingimg
+   */
+  hideLoadingimg(): void {
+    console.log('hideloadi2');
+    this.loadingIsOpenimg && this.loadingimg.dismiss();
+    this.loadingIsOpenimg = false;
+  };
+
 
   /**
    * 获取网络类型 如`unknown`, `ethernet`, `wifi`, `2g`, `3g`, `4g`, `cellular`, `none`
@@ -262,7 +306,7 @@ export class NativeService {
    * 判断是否有网络
    * @returns {boolean}
    */
-  isConnecting(force:boolean = false): Promise<boolean> {
+  isConnecting(force: boolean = false): Promise<boolean> {
     return new Promise((resolve) => {
       //this.platform.ready().then((readySource) => {
       //  console.log('Platform ready from', readySource);
