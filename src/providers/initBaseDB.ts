@@ -11,13 +11,14 @@ import { HttpService } from '../providers/HttpService';
 import { LocalStorage } from '../providers/local-storage';
 import { Md5 } from "ts-md5/dist/md5";
 import { NativeService } from '../providers/nativeservice';
+import { Dialogs } from '@ionic-native/dialogs';
 
 @Injectable()
 export class initBaseDB {
   db: SQLiteObject;
   basedata: Array<any>;
   constructor(public http: Http, private sqlite: SQLite, public storage: Storage, private sqlitePorter: SQLitePorter, private httpService: HttpService,
-    public localStorage: LocalStorage, public nativeservice: NativeService) {
+    public localStorage: LocalStorage, public nativeservice: NativeService,private dialogs: Dialogs) {
 
   }
 
@@ -1119,9 +1120,15 @@ export class initBaseDB {
     return new Promise((resolve) => {
       console.log('update bu info:' + projid);
       let promise = new Promise((resolve) => {
-        resolve(100);
+        resolve(this.dialogs.confirm('是否下载房间问题图片', '', ['取消下载', '确定下载']));
       });
+      let loadissueimg:boolean;
       resolve(promise.then((v1) => {
+        if (v1 == 2){
+          loadissueimg = true;
+        } else {
+          loadissueimg = false;
+        }
         let sql = "select VersionId from buildingversion where projid = '#projid#' and batchid = '#batchid#' and buildingid = '#buildingid#' and type = #type#";
         sql = sql.replace('#projid#', projid);
         sql = sql.replace('#batchid#', batchid);
@@ -1138,7 +1145,7 @@ export class initBaseDB {
         return this.httpService.get(APP_SERVE_URL + "/DynamicsPack", { Token: token, projId: projid, Batchid: batchid, buildingid: buildingid, batchVersion: versionid, type: type });
       }).then((v3) => {
         console.log("v3");
-        return this.updateDynamicsPack(v3[0], projid, batchid, buildingid, type);
+        return this.updateDynamicsPack(v3[0], projid, batchid, buildingid, type, loadissueimg);
       }).catch(err => {
         this.nativeservice.hideLoading();
         return console.log("楼栋更新失败:" + err);
@@ -1146,7 +1153,7 @@ export class initBaseDB {
     })
   }
 
-  updateDynamicsPack(data, projid, batchid, buildingid, type): Promise<any> {
+  updateDynamicsPack(data, projid, batchid, buildingid, type, loadissueimg:boolean): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
@@ -1226,6 +1233,9 @@ export class initBaseDB {
         // return this.test(projid,type);
       }).then(v3 => {
         //ImgBefore1,Imgbefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,ImgClose1,ImgClose2,ImgClose3
+        if (loadissueimg == false){
+          return [10];
+        }
         let tmptn = '';
         if (type == 1) {
           tmptn = 'tmpPreCheckIssues';
@@ -1253,6 +1263,9 @@ export class initBaseDB {
         console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((vv1:any)=>{
+        if (loadissueimg == false){
+          return vv1;
+        }
         if (vv1.rows.length && vv1.rows.length > 0){
           this.localStorage.setItem('imgcount',0).then(vv=>{
             this.nativeservice.showLoadingimg('加载房间问题图片',vv1.rows.length);
@@ -1261,6 +1274,9 @@ export class initBaseDB {
         return vv1;
       }).then((v4: any) => {
         console.log("v4:" + v4);
+        if (loadissueimg == false){
+          return v4;
+        }
         let tmppromise = Promise.resolve([]);
         for (var j = 0; j < v4.rows.length; j++) {
           console.log(JSON.stringify(v4.rows.item(j)));
