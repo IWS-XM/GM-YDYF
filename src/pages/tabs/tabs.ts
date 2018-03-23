@@ -17,6 +17,6 @@ export class TabsPage {
   tab5Root = MyPage;
 
   constructor() {
-
+    
   }
 }
