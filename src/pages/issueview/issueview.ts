@@ -46,6 +46,7 @@ export class IssueviewPage {
 	closedreason: string = '';
 	imagesclosed: Array<string> = [];
 	closedtime: string = '';
+    issuelist: any;
 	constructor(public localStorage: LocalStorage, public initBaseDB: initBaseDB, public navCtrl: NavController, public alertCtrl: AlertController,
 		public params: NavParams, private modalCtrl: ModalController) {
 		this.issueid = this.params.get('issueid');
@@ -64,99 +65,54 @@ export class IssueviewPage {
 		this.mousestouch = [];
 		this.showbutton = false;
 		this.initBaseDB.getissueinfo(this.issueid, this.type).then((val: any) => {
-			let issuelist: any;
-			issuelist = val.rows.item(0);
+			
+			this.issuelist = val.rows.item(0);
 			console.log(JSON.stringify(val.rows.item(0)));
-			this.position = issuelist.Position;
-			this.checkitem = issuelist.Checkitem;
-			this.itdesc = issuelist.IssueDesc;
-			this.descplus = issuelist.PlusDesc;
-			this.uglevel = issuelist.UrgencyId;
-			this.vend = issuelist.Vendor;
-			this.resunit = issuelist.Resunit;
-			console.log(issuelist.RegisterDate);
-			let dt = new Date(issuelist.RegisterDate);
+			this.position = this.issuelist.Position;
+			this.checkitem = this.issuelist.Checkitem;
+			this.itdesc = this.issuelist.IssueDesc;
+			this.descplus = this.issuelist.PlusDesc;
+			this.uglevel = this.issuelist.UrgencyId;
+			this.vend = this.issuelist.Vendor;
+			this.resunit = this.issuelist.Resunit;
+			console.log(this.issuelist.RegisterDate);
+			let dt = new Date(this.issuelist.RegisterDate);
 			this.registertime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
 			console.log(this.registertime);
-			if (issuelist.LimitDate) {
-				dt = new Date(issuelist.LimitDate)
+			if (this.issuelist.LimitDate) {
+				dt = new Date(this.issuelist.LimitDate)
 				this.duetime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
 			}
 
-			if (issuelist.ReFormDate) {
-				dt = new Date(issuelist.ReFormDate);
+			if (this.issuelist.ReFormDate) {
+				dt = new Date(this.issuelist.ReFormDate);
 				this.fixtime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
 			}
 
-			this.status = issuelist.IssueStatus;
-			this.versionid = issuelist.VersionId;
-			this.ResponsibleId = issuelist.ResponsibleId;
-			this.closedreason = issuelist.CloseReason;
-			if (issuelist.CloseDate) {
-				dt = new Date(issuelist.CloseDate);
+			this.status = this.issuelist.IssueStatus;
+			this.versionid = this.issuelist.VersionId;
+			this.ResponsibleId = this.issuelist.ResponsibleId;
+			this.closedreason = this.issuelist.CloseReason;
+			if (this.issuelist.CloseDate) {
+				dt = new Date(this.issuelist.CloseDate);
 				this.closedtime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
 			}
 			
 			if (this.status == '待派单' || this.status == '待整改' || this.status == '已整改') {
 				this.showbutton = true;
-			}
-			if (issuelist.ImgBefore1) {
-				this.initBaseDB.getimagedata(this.projid, issuelist.ImgBefore1).then((v1: any) => {
-					this.images.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
-					if (issuelist.ImgBefore2) {
-						this.initBaseDB.getimagedata(this.projid, issuelist.ImgBefore2).then((v2: any) => {
-							this.images.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
-							if (issuelist.ImgBefore3) {
-								this.initBaseDB.getimagedata(this.projid, issuelist.ImgBefore3).then((v3: any) => {
-									this.images.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
-								}).catch(err => {
-									console.log('图片3加载失败' + err);
-								})
-							}
-						}).catch(err => {
-							console.log('图片2加载失败' + err);
-						})
-					}
-
-				}).catch(err => {
-					console.log('图片1加载失败' + err);
-				})
-			}
-
-			if (issuelist.ImgAfter1) {
-				this.initBaseDB.getimagedata(this.projid, issuelist.ImgAfter1).then((v1: any) => {
-					this.imagesfixed.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
-					console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
-					if (issuelist.ImgAfter2) {
-						this.initBaseDB.getimagedata(this.projid, issuelist.ImgAfter2).then((v2: any) => {
-							this.imagesfixed.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
-							if (issuelist.ImgAfter3) {
-								this.initBaseDB.getimagedata(this.projid, issuelist.ImgAfter3).then((v3: any) => {
-									this.imagesfixed.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
-								}).catch(err => {
-									console.log('图片3加载失败' + err);
-								})
-							}
-						}).catch(err => {
-							console.log('图片2加载失败' + err);
-						})
-					}
-
-				}).catch(err => {
-					console.log('图片1加载失败' + err);
-				})
-			}
+			} 
+			this.initimages();
 
 			if (this.status == '非正常关闭') {
-				if (issuelist.ImgClose1) {
-					this.initBaseDB.getimagedata(this.projid, issuelist.ImgClose1).then((v1: any) => {
+				if (this.issuelist.ImgClose1) {
+					this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgClose1).then((v1: any) => {
 						this.imagesclosed.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
 						console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
-						if (issuelist.ImgClose2) {
-							this.initBaseDB.getimagedata(this.projid, issuelist.ImgClose3).then((v2: any) => {
+						if (this.issuelist.ImgClose2) {
+							this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgClose3).then((v2: any) => {
 								this.imagesclosed.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
-								if (issuelist.ImgClose3) {
-									this.initBaseDB.getimagedata(this.projid, issuelist.ImgClose3).then((v3: any) => {
+								if (this.issuelist.ImgClose3) {
+									this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgClose3).then((v3: any) => {
 										this.imagesclosed.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
 									}).catch(err => {
 										console.log('图片3加载失败' + err);
@@ -484,6 +440,74 @@ export class IssueviewPage {
 			})
 		}
 	}
+
+    initimages(){
+		this.images = [];
+		if (this.issuelist.ImgBefore1) {
+			this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore1).then((v1: any) => {
+				if (v1 && v1.rows && v1.rows.length > 0){
+					this.images.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
+				}
+				if (this.issuelist.ImgBefore2) {
+					this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore2).then((v2: any) => {
+						if (v2 && v2.rows && v2.rows.length > 0){
+							this.images.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
+						}
+						if (this.issuelist.ImgBefore3) {
+							this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore3).then((v3: any) => {
+								if (v3 && v3.rows && v3.rows.length > 0){
+									this.images.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
+								}
+							}).catch(err => {
+								console.log('图片3加载失败' + err);
+							})
+						}
+					}).catch(err => {
+						console.log('图片2加载失败' + err);
+					})
+				}
+
+			}).catch(err => {
+				console.log('图片1加载失败' + err);
+			})
+		}
+        this.imagesfixed = [];
+		if (this.issuelist.ImgAfter1) {
+			this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter1).then((v1: any) => {
+				if (v1 && v1.rows && v1.rows.length > 0){
+				this.imagesfixed.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
+				}
+				console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
+				if (this.issuelist.ImgAfter2) {
+					this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter2).then((v2: any) => {
+						if (v2 && v2.rows && v2.rows.length > 0){
+						this.imagesfixed.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
+						}
+						if (this.issuelist.ImgAfter3) {
+							this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter3).then((v3: any) => {
+								if (v3 && v3.rows && v3.rows.length > 0){
+								this.imagesfixed.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
+								}
+							}).catch(err => {
+								console.log('图片3加载失败' + err);
+							})
+						}
+					}).catch(err => {
+						console.log('图片2加载失败' + err);
+					})
+				}
+
+			}).catch(err => {
+				console.log('图片1加载失败' + err);
+			})
+		}
+	}
+
+	imgdownload(){
+		this.initBaseDB.downloadissueimg(this.projid,this.issuelist,false).then(v=>{
+		  this.initimages();
+		})
+	  }
 
 	//点击图片放大
 	// showBigImage(imageName) {  //传递一个参数（图片的URl）

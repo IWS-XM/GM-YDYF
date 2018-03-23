@@ -2133,12 +2133,18 @@ export class initBaseDB {
   initbuilderData(data, projid): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
-        resolve(100);
+        resolve(this.dialogs.confirm('是否下载房间问题图片', '', ['取消下载', '确定下载']));
       });
+      let loadissueimg:boolean;
       console.log("initbuilderData");
       let tablename: Array<string>;
       tablename = [];
       resolve(promise.then((v1) => {
+        if (v1 == 2){
+          loadissueimg = true;
+        } else {
+          loadissueimg = false;
+        }
         let tmppromise = Promise.resolve([]);
         for (var i = 2; i < data.length; i += 2) {
           let items = data[i];
@@ -2210,6 +2216,9 @@ export class initBaseDB {
         }
         return tmppromise;
       }).then(v3 => {
+        if (loadissueimg == false){
+          return [10];
+        }
         //ImgBefore1,Imgbefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,ImgClose1,ImgClose2,ImgClose3
         let sql = "select imgbefore1 as fn from #tmptablename# where imgbefore1 != '' and imgbefore1 != 'NUll' and (IssueStatus = '待派单' or IssueStatus = '待整改' or IssueStatus = '已整改') and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename#.imgbefore1) ".replace('#tmptablename#', 'tmpPreCheckIssues').replace('#tmptablename#', 'tmpPreCheckIssues').replace('#projid#', projid);
         sql += " union select imgbefore2 as fn from #tmptablename# where imgbefore2 != '' and imgbefore2 != 'NUll' and (IssueStatus = '待派单' or IssueStatus = '待整改' or IssueStatus = '已整改') and not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = #tmptablename#.imgbefore2) ".replace('#tmptablename#', 'tmpPreCheckIssues').replace('#tmptablename#', 'tmpPreCheckIssues').replace('#projid#', projid);
@@ -2246,6 +2255,10 @@ export class initBaseDB {
         console.log(sql);
         return this.db.executeSql(sql, []);
       }).then((vv1:any)=>{
+        if (loadissueimg == false){
+          return vv1;
+        }
+
         if (vv1.rows.length && vv1.rows.length > 0){
           this.localStorage.setItem('imgcount',0).then(vv=>{
             this.nativeservice.showLoadingimg('加载房间问题图片',vv1.rows.length);
@@ -2253,6 +2266,9 @@ export class initBaseDB {
         }
         return vv1;
       }).then((v4: any) => {
+        if (loadissueimg == false){
+          return v4;
+        }
         console.log("v4:" + v4);
         let tmppromise = Promise.resolve([]);
         for (var j = 0; j < v4.rows.length; j++) {
@@ -2840,7 +2856,7 @@ export class initBaseDB {
       });
       let ret = [];
       resolve(promise.then((v1) => {
-        let sql = "select iss.fixedDesc,iss.ReFormDate,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.AppointDate,iss.LimitDate,iss.RegisterDate,iss.VendId,iss.PlusDesc from #tablename# iss where iss.Id = '#issueid#'";
+        let sql = "select iss.fixedDesc,iss.ReFormDate,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.AppointDate,iss.LimitDate,iss.RegisterDate,iss.VendId,iss.PlusDesc,iss.APImg from #tablename# iss where iss.Id = '#issueid#'";
 
         sql = sql.replace('#tablename#', this.getissuetablename(type));
 
@@ -3683,6 +3699,74 @@ export class initBaseDB {
     })
   }
 
+  //单问题图片下载
+  downloadissueimg(projid,issuelist,apimgflag:boolean): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(this.nativeservice.isConnecting());
+      });
+      console.log(issuelist);
+      resolve(promise.then((v)=>{        
+        if (v == false) {
+          return this.nativeservice.alert('当前没有网络无法上传。').then(v => {
+            throw '当前没有网络无法上传。'
+          })
+        } else {
+          let sql = " select '#imgb1#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb1#') ".replace('#projid#', projid).replace('#imgb1#',issuelist.ImgBefore1).replace('#imgb1#',issuelist.ImgBefore1);
+          if (issuelist.ImgBefore2){
+            sql += " union select '#imgb2#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb2#') ".replace('#projid#', projid).replace('#imgb2#',issuelist.ImgBefore2).replace('#imgb2#',issuelist.ImgBefore2);
+            if (issuelist.ImgBefore3){       
+              sql += " union select '#imgb3#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb3#') ".replace('#projid#', projid).replace('#imgb3#',issuelist.ImgBefore3).replace('#imgb3#',issuelist.ImgBefore3);    
+            }
+          }
+          if (issuelist.ImgAfter1){
+            sql += " union select '#imga1#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga1#') ".replace('#projid#', projid).replace('#imga1#',issuelist.ImgAfter1).replace('#imga1#',issuelist.ImgAfter1);
+          
+            if (issuelist.ImgAfter2){
+              sql += " union select '#imga2#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga2#') ".replace('#projid#', projid).replace('#imga2#',issuelist.ImgAfter2).replace('#imga2#',issuelist.ImgAfter2);
+              if (issuelist.ImgAfter3){
+                sql += " union select '#imga3#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga3#') ".replace('#projid#', projid).replace('#imga3#',issuelist.ImgAfter3).replace('#imga3#',issuelist.ImgAfter3);
+              }
+            }                
+          }
+          if (apimgflag == true && issuelist.APImg){
+            sql += " union select '#AP#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#AP#') ".replace('#projid#', projid).replace('#AP#',issuelist.APImg).replace('#AP#',issuelist.APImg);
+          }
+          console.log(sql);
+          return this.db.executeSql(sql, []);
+        }
+      }).then((vv1:any)=>{
+        if (vv1.rows.length && vv1.rows.length > 0){
+          this.localStorage.setItem('imgcount',0).then(vv=>{
+            this.nativeservice.showLoadingimg('加载房间问题图片',vv1.rows.length);
+          })
+        }
+        return vv1;
+      }).then((v4: any) => {
+        console.log("v4:" + v4);
+        let tmppromise = Promise.resolve([]);
+        for (var j = 0; j < v4.rows.length; j++) {
+          console.log(JSON.stringify(v4.rows.item(j)));
+          let fn = v4.rows.item(j).fn;
+          tmppromise = tmppromise.then(() => {
+            return this.downloadimg(fn);
+          }).then(val => {
+            return this.db.executeSql("insert into imagetable (projid,fn,src) values ('" + projid + "','" + fn + "','" + val + "')", []);
+          })
+        }
+        return tmppromise;
+      }).then(v=>{
+        this.localStorage.setItem('imgcount',-1);
+        return v;
+      }).catch(err => {
+        this.warn('图片下载失败:' + err);
+        resolve(0);
+      }))
+    })
+  }
+
+ 
+      
   //report
   //整改通过率
   reportZGTGL(projid): Promise<any> {
