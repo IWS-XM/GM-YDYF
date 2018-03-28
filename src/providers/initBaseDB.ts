@@ -1053,6 +1053,7 @@ export class initBaseDB {
           console.log(JSON.stringify(val.rows.item(i)))
           let filename = val.rows.item(i).fn;
           let src = val.rows.item(i).src;
+          console.log('fn0318:'+filename);
           tmppromise = tmppromise.then(() => {
             return this.uploadimg(src, filename);
           }).then((v) => {
@@ -1111,6 +1112,7 @@ export class initBaseDB {
         return this.updatebuildinginfo(token, projid, batchid, buildingid, type);
       }).catch(err => {
         console.log("楼栋上传失败:" + err);
+        this.localStorage.setItem('imgcount',-1);
         this.nativeservice.hideLoading();
       }))
     })
@@ -2573,6 +2575,7 @@ export class initBaseDB {
         return this.downloadbuilderdata(token, projid);
       }).catch(err => {
         this.nativeservice.hideLoading();
+        this.localStorage.setItem('imgcount',-1);
         console.log("楼栋上传失败:" + err);
         throw '';
       }))
@@ -3511,6 +3514,7 @@ export class initBaseDB {
         return this.httpService.getimg(FILE_SERVE_URL + "/ydyf_DownLoadFileString", { token: FILE_TOKEN, MD5: filename });
       }).catch(err => {
         this.warn('图片下载失败:' + err);
+        this.localStorage.setItem('imgcount',-1);
       }))
     })
   }
@@ -3530,6 +3534,7 @@ export class initBaseDB {
         return this.httpService.postimg(FILE_SERVE_URL + "/ydyf_UpLoadFileString", { token: FILE_TOKEN, FileName: src, MD5: filename });
       }).catch(err => {
         this.warn('图片上传失败:' + err);
+        this.localStorage.setItem('imgcount',-1);
         resolve(0);
       }))
     })

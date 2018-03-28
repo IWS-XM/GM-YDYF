@@ -46,11 +46,11 @@ export class HttpService {
   }
 
   public postimg(url: string, paramObj: any) {
-    let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });console.log(url);console.log(paramObj);
+    let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' }); console.log(url); console.log(paramObj);
     return this.http.post(url, this.toBodyString(paramObj), new RequestOptions({ headers: headers }))
       .toPromise()
       .then(res => this.handleSuccessImg(res))
-      .catch(error => this.handleError(error));
+      .catch(error => this.handleErrorImg(error));
   }
 
   public postBody(url: string, paramObj: any) {
@@ -65,14 +65,16 @@ export class HttpService {
     return url + this.toQueryString(paramObj);
   }
 
-  private handleSuccessImg(result) {console.log(result);
+  private handleSuccessImg(result) {console.log('success img');
+    console.log(result);
     let body = result._body;
     let data = JSON.parse(body);
     if (data.errcode == 0) {
-      return data.data.list;
+      return 1;
     }
     else {
       console.log(data.errmsg);
+      return 1;
     }
   }
 
@@ -120,9 +122,10 @@ export class HttpService {
       return result;
   }
 
-  private handleError(error: Response | any) {console.log(error);
+  private handleError(error: Response | any) {
+    console.log('error');
+    console.log(error);
     let msg = '请求失败';
-
     if (error.status == 0) {
       msg = '请求地址错误';
     }
@@ -139,6 +142,40 @@ export class HttpService {
     console.log(msg);//这里使用ToastController
     //return { success: false, msg: msg };
     throw msg;
+  }
+
+  private handleErrorImg(error: Response | any) {
+    console.log('error img');
+    console.log(error);
+    let msg = '请求失败';
+    console.log(msg);
+    console.log(error.status);
+    if (error.status == 200) {
+      let body = error._body;
+      console.log(body);
+      let data = JSON.parse(body);
+      console.log(data);
+      console.log(data.errcode);
+      if (data.errcode == 0) {
+        return 1
+      }
+    }
+    if (error.status == 0) {
+      msg = '请求地址错误';
+    }
+    if (error.status == 400) {
+      msg = '请求无效';
+      console.log('请检查参数类型是否匹配');
+    }
+    if (error.status == 404) {
+      msg = '请求资源不存在';
+      console.error(msg + '，请检查路径是否正确');
+    }
+    console.log(error);
+    //this.nativeservice.hideLoading();
+    console.log(msg);//这里使用ToastController
+    //return { success: false, msg: msg };
+    //throw msg;
   }
 
   /**
