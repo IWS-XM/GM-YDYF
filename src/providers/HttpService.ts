@@ -49,7 +49,7 @@ export class HttpService {
     let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' }); console.log(url); console.log(paramObj);
     return this.http.post(url, this.toBodyString(paramObj), new RequestOptions({ headers: headers }))
       .toPromise()
-      .then(res => this.handleSuccessImg(res))
+      .then(res => this.handleSuccessPImg(res))
       .catch(error => this.handleErrorImg(error));
   }
 
@@ -66,6 +66,18 @@ export class HttpService {
   }
 
   private handleSuccessImg(result) {console.log('success img');
+    console.log(result);
+    let body = result._body;
+    let data = JSON.parse(body);
+    if (data.errcode == 0) {
+      return data.data.list;
+    }
+    else {
+      console.log(data.errmsg);
+    }
+  }
+
+  private handleSuccessPImg(result) {console.log('success img');
     console.log(result);
     let body = result._body;
     let data = JSON.parse(body);
