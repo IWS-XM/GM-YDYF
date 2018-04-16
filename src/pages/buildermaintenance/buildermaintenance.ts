@@ -831,7 +831,7 @@ export class BuildermaintenancePage {
       this.returncolor = "light";
       this.returnarrow = "∨";
     }
-    this.refresh();
+    this.refresh(this.selectedTab);
   }
 /*
   refresh(): Promise<any> {
