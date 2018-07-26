@@ -49,17 +49,22 @@ export class FloorPage {
     } else if (this.type == 1){
       this.readystr = "待验收";
       this.passstr = "已验收";
-    } else {
+    } else if (this.type == 4){
+      this.passstr = "已通过";
+    }else {
       this.readystr = "待接待";
       this.passstr = "已接待";
     }
+    this.init();
   }
 
   itemSelected(room) {
-    this.navCtrl.push(RoomPage, { "projid":this.projid, "projname":this.projname ,"batchid":this.batchid,"buildingid":this.buildingid,"buildingname":this.buildingname,"type":this.type,"roomid": room.roomid,"roomname":room.name });
+    this.localStorage.setItem('reviewissue',{ issue: '', status: 'init' }).then(v=>{
+      this.navCtrl.push(RoomPage, { "projid":this.projid, "projname":this.projname ,"batchid":this.batchid,"buildingid":this.buildingid,"buildingname":this.buildingname,"type":this.type,"roomid": room.roomid,"roomname":room.name });
+    })
   }
 
-  ionViewWillEnter() {
+  init() {
     var tFloors: Array<any>;
     var tRooms: Array<any>;
     var thouses: any;
@@ -78,7 +83,9 @@ export class FloorPage {
       this.floorsfixed = val[3].items; this.fixedcounts = val[3].counts;
       this.floorspass = val[4].items; this.passcounts = val[4].counts;
     })
+  }
 
+  ionViewWillEnter() {
 
   }
 

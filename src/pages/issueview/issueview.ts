@@ -6,6 +6,7 @@ import { initBaseDB } from '../../providers/initBaseDB';
 import { ShowimgPage } from '../../pages/imageeditor/showimg';
 import { IssuereturnPage } from '../../pages/issuereturn/issuereturn';
 import { IssueclosedPage } from '../../pages/issueclosed/issueclosed';
+import { NativeService } from '../../providers/nativeservice';
 
 @Component({
 	selector: 'page-issueview',
@@ -48,7 +49,7 @@ export class IssueviewPage {
 	closedtime: string = '';
     issuelist: any;
 	constructor(public localStorage: LocalStorage, public initBaseDB: initBaseDB, public navCtrl: NavController, public alertCtrl: AlertController,
-		public params: NavParams, private modalCtrl: ModalController) {
+		public params: NavParams, private modalCtrl: ModalController, public nativeservice: NativeService) {
 		this.issueid = this.params.get('issueid');
 		this.projid = this.params.get('projid');
 		this.buildingname = this.params.get('buildingname');
@@ -64,6 +65,7 @@ export class IssueviewPage {
 		// this.arrow = "∨";
 		this.mousestouch = [];
 		this.showbutton = false;
+		this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'view' });
 		this.initBaseDB.getissueinfo(this.issueid, this.type).then((val: any) => {
 			
 			this.issuelist = val.rows.item(0);
@@ -202,6 +204,8 @@ export class IssueviewPage {
 			}).then(v => {
 				return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
 			}).then(v => {
+				return this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'pass' });
+			}).then(v => {
 				this.navCtrl.pop();
 			}).catch(err => {
 				console.log('通过失败:' + err);
@@ -276,6 +280,8 @@ export class IssueviewPage {
 						return this.initBaseDB.updateIssue(sqls);
 					}).then(v => {
 						return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
+					}).then(v => {
+						return this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'reject' });
 					}).then(v => {
 						this.navCtrl.pop();
 					}).catch(err => {
@@ -369,6 +375,8 @@ export class IssueviewPage {
 						}).then(v => {
 							return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
 						}).then(v => {
+							return this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'close' });
+						}).then(v => {
 							this.navCtrl.pop();
 						}).catch(err => {
 							console.log('非正常关闭:' + err);
@@ -433,6 +441,8 @@ export class IssueviewPage {
 				return this.initBaseDB.updateIssue(sqls);
 			}).then(v => {
 				return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
+			}).then(v => {
+				return this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'cancel' });
 			}).then(v => {
 				this.navCtrl.pop();
 			}).catch(err => {
@@ -532,6 +542,16 @@ export class IssueviewPage {
 			})
 		}
 	};
+
+	deleteclick() {
+		this.initBaseDB.deleteissue(this.issueid, this.type).then(v => {
+			this.nativeservice.showToast('删除成功');
+            this.navCtrl.pop();
+		}).catch(err => {
+			this.nativeservice.showToast('删除失败' + err, 4000);
+			this.navCtrl.pop();
+		})
+	}
 
 	// deleteimage(imagesrc) {
 	// 	let i = 0;

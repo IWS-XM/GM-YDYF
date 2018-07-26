@@ -12,13 +12,14 @@ import { LocalStorage } from '../providers/local-storage';
 import { Md5 } from "ts-md5/dist/md5";
 import { NativeService } from '../providers/nativeservice';
 import { Dialogs } from '@ionic-native/dialogs';
+import { resolveDep } from '../../node_modules/@angular/core/src/view/provider';
 
 @Injectable()
 export class initBaseDB {
   db: SQLiteObject;
   basedata: Array<any>;
   constructor(public http: Http, private sqlite: SQLite, public storage: Storage, private sqlitePorter: SQLitePorter, private httpService: HttpService,
-    public localStorage: LocalStorage, public nativeservice: NativeService,private dialogs: Dialogs) {
+    public localStorage: LocalStorage, public nativeservice: NativeService, private dialogs: Dialogs) {
 
   }
 
@@ -236,8 +237,8 @@ export class initBaseDB {
               let values: any; values = records[i];
               tmppromise = tmppromise.then(() => { //,,,,,,,,,,
                 return tmprecords.push({
-                  RoomId: values.RoomId, TransDate: values.TransDate, RoomStatus: values.RoomStatus, Remark: values.Remark,  EngineerId: values.EngineerId,
-                  EngineerPhone: values.EngineerPhone,ProjId: values.ProjId, VersionId: values.VersionId, ID: values.ID, BatchId: values.BatchId, BuildingId: values.BuildingId, EngineerName: values.EngineerName
+                  RoomId: values.RoomId, TransDate: values.TransDate, RoomStatus: values.RoomStatus, Remark: values.Remark, EngineerId: values.EngineerId,
+                  EngineerPhone: values.EngineerPhone, ProjId: values.ProjId, VersionId: values.VersionId, ID: values.ID, BatchId: values.BatchId, BuildingId: values.BuildingId, EngineerName: values.EngineerName
                 });
               }).then((v) => {
                 return tmprecords;
@@ -268,7 +269,7 @@ export class initBaseDB {
                   RoomId: values.RoomId, TransDate: values.TransDate, RoomStatus: values.RoomStatus, CustId: values.CustId, CustPhone: values.CustPhone, Remark: values.Remark, EngineerId: values.EngineerId,
                   EngineerPhone: values.EngineerPhone, ImgSign: values.ImgSign, ProjId: values.ProjId, VersionId: values.VersionId, ID: values.ID,
                   AmmeterNumber: values.AmmeterNumber, AmmeterReading: values.AmmeterReading, WaterMeterNumber: values.WaterMeterNumber, GasMeterNumber: values.GasMeterNumber, WaterMeterReading: values.WaterMeterReading,
-                  GasMeterReading: values.GasMeterReading, KeyRetentionStatus: values.KeyRetentionStatus, 
+                  GasMeterReading: values.GasMeterReading, KeyRetentionStatus: values.KeyRetentionStatus,
                   BatchId: values.BatchId, BuildingId: values.BuildingId, EngineerName: values.EngineerName
                 });
               }).then((v) => {
@@ -894,7 +895,7 @@ export class initBaseDB {
 
   initApartImage(projid, buildingid): Promise<any> {
     return new Promise((resolve) => {
-      let promise = new Promise((resolve) => {        
+      let promise = new Promise((resolve) => {
         resolve(100);
       });
       console.log('image');
@@ -903,34 +904,34 @@ export class initBaseDB {
         sql = sql.replace('#projid#', projid); sql = sql.replace('#projid#', projid); sql = sql.replace('#projid#', projid);
         sql = sql.replace('#buildingid#', buildingid);
         return this.db.executeSql(sql, []);
-      }).then((v:any)=>{
-        if (v.rows.length && v.rows.length > 0){
-          this.localStorage.setItem('imgcount',0).then(vv=>{
-            this.nativeservice.showLoadingimg('加载户型图',v.rows.length);
+      }).then((v: any) => {
+        if (v.rows.length && v.rows.length > 0) {
+          this.localStorage.setItem('imgcount', 0).then(vv => {
+            this.nativeservice.showLoadingimg('加载户型图', v.rows.length);
           })
         }
         return v;
       })
-      .then((v2: any) => {
-        let tmppromise = Promise.resolve([]);
-        for (var i = 0; i < v2.rows.length; i++) {
-          console.log(JSON.stringify(v2.rows.item(i)));
-          let fn = v2.rows.item(i).Image;
-          tmppromise = tmppromise.then(() => {
-            return this.downloadimg(fn);
-          }).then(val => {
-            let sql = "insert into imagetable (projid,fn,src) values('" + projid + "','" + fn + "','" + val + "')";
-            //console.log(sql);
-            return this.db.executeSql(sql, []);
-          })
-        }
-        return tmppromise;
-      }).then(v=>{
-        this.localStorage.setItem('imgcount',-1);
-        return v;
-      }).catch(err => {
-        console.log(err);
-      }))
+        .then((v2: any) => {
+          let tmppromise = Promise.resolve([]);
+          for (var i = 0; i < v2.rows.length; i++) {
+            console.log(JSON.stringify(v2.rows.item(i)));
+            let fn = v2.rows.item(i).Image;
+            tmppromise = tmppromise.then(() => {
+              return this.downloadimg(fn);
+            }).then(val => {
+              let sql = "insert into imagetable (projid,fn,src) values('" + projid + "','" + fn + "','" + val + "')";
+              //console.log(sql);
+              return this.db.executeSql(sql, []);
+            })
+          }
+          return tmppromise;
+        }).then(v => {
+          this.localStorage.setItem('imgcount', -1);
+          return v;
+        }).catch(err => {
+          console.log(err);
+        }))
     })
   }
 
@@ -1040,10 +1041,10 @@ export class initBaseDB {
         sql = sql.replace('#projid#', projid).replace('#batchid#', batchid).replace('#buildingid#', buildingid);
         console.log(sql);
         return this.db.executeSql(sql, []);
-      }).then((vv1:any)=>{
-        if (vv1.rows.length && vv1.rows.length > 0){
-          this.localStorage.setItem('imgcount',0).then(vv=>{
-            this.nativeservice.showLoadingimg('上传房间问题图片',vv1.rows.length);
+      }).then((vv1: any) => {
+        if (vv1.rows.length && vv1.rows.length > 0) {
+          this.localStorage.setItem('imgcount', 0).then(vv => {
+            this.nativeservice.showLoadingimg('上传房间问题图片', vv1.rows.length);
           })
         }
         return vv1;
@@ -1053,7 +1054,7 @@ export class initBaseDB {
           console.log(JSON.stringify(val.rows.item(i)))
           let filename = val.rows.item(i).fn;
           let src = val.rows.item(i).src;
-          console.log('fn0318:'+filename);
+          console.log('fn0318:' + filename);
           tmppromise = tmppromise.then(() => {
             return this.uploadimg(src, filename);
           }).then((v) => {
@@ -1066,8 +1067,8 @@ export class initBaseDB {
           })
         }
         return tmppromise;
-      }).then(v=>{
-        this.localStorage.setItem('imgcount',-1);
+      }).then(v => {
+        this.localStorage.setItem('imgcount', -1);
         return v;
       }).then((v1) => {
         if (type == 1) {
@@ -1112,7 +1113,7 @@ export class initBaseDB {
         return this.updatebuildinginfo(token, projid, batchid, buildingid, type);
       }).catch(err => {
         console.log("楼栋上传失败:" + err);
-        this.localStorage.setItem('imgcount',-1);
+        this.localStorage.setItem('imgcount', -1);
         this.nativeservice.hideLoading();
       }))
     })
@@ -1122,11 +1123,11 @@ export class initBaseDB {
     return new Promise((resolve) => {
       console.log('update bu info:' + projid);
       let promise = new Promise((resolve) => {
-        resolve(this.dialogs.confirm('是否下载房间问题图片', '', ['取消下载', '确定下载']));
+        resolve(this.dialogs.confirm('是否下载全部房间问题图片', '', ['取消下载', '确定下载']));
       });
-      let loadissueimg:boolean;
+      let loadissueimg: boolean;
       resolve(promise.then((v1) => {
-        if (v1 == 2){
+        if (v1 == 2) {
           loadissueimg = true;
         } else {
           loadissueimg = false;
@@ -1155,7 +1156,7 @@ export class initBaseDB {
     })
   }
 
-  updateDynamicsPack(data, projid, batchid, buildingid, type, loadissueimg:boolean): Promise<any> {
+  updateDynamicsPack(data, projid, batchid, buildingid, type, loadissueimg: boolean): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
@@ -1235,7 +1236,7 @@ export class initBaseDB {
         // return this.test(projid,type);
       }).then(v3 => {
         //ImgBefore1,Imgbefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,ImgClose1,ImgClose2,ImgClose3
-        if (loadissueimg == false){
+        if (loadissueimg == false) {
           return [10];
         }
         let tmptn = '';
@@ -1264,19 +1265,19 @@ export class initBaseDB {
         }
         console.log(sql);
         return this.db.executeSql(sql, []);
-      }).then((vv1:any)=>{
-        if (loadissueimg == false){
+      }).then((vv1: any) => {
+        if (loadissueimg == false) {
           return vv1;
         }
-        if (vv1.rows.length && vv1.rows.length > 0){
-          this.localStorage.setItem('imgcount',0).then(vv=>{
-            this.nativeservice.showLoadingimg('加载房间问题图片',vv1.rows.length);
+        if (vv1.rows.length && vv1.rows.length > 0) {
+          this.localStorage.setItem('imgcount', 0).then(vv => {
+            this.nativeservice.showLoadingimg('加载房间问题图片', vv1.rows.length);
           })
         }
         return vv1;
       }).then((v4: any) => {
         console.log("v4:" + v4);
-        if (loadissueimg == false){
+        if (loadissueimg == false) {
           return v4;
         }
         let tmppromise = Promise.resolve([]);
@@ -1299,8 +1300,8 @@ export class initBaseDB {
         sql = sql.replace('#version#', data[1][0]);
         console.log('updbvdata:' + sql);
         return this.db.executeSql(sql, []);
-      }).then(v=>{
-        this.localStorage.setItem('imgcount',-1);
+      }).then(v => {
+        this.localStorage.setItem('imgcount', -1);
         return v;
       }).catch(err => {
         console.log(err);
@@ -1699,6 +1700,10 @@ export class initBaseDB {
               pass.value.push({ roomid: items.Id, name: items.Name });
               color = "secondary";
               passcounts++;
+            } else if (type == 4) {
+              pass.value.push({ roomid: items.Id, name: items.Name });
+              color = "secondary";
+              passcounts++;
             } else {
               fixed.value.push({ roomid: items.Id, name: items.Name });
               color = "primary";
@@ -1863,7 +1868,7 @@ export class initBaseDB {
 
   getissueinfo(issueid, type): Promise<any> {
     // return new Promise((resolve) => {
-    let sql = "select iss.ResponsibleId,iss.versionid,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.ReFormDate,iss.LimitDate,iss.RegisterDate,iss.UrgencyId,iss.PlusDesc,iss.IssueDesc,iss.CloseReason,iss.ImgClose1,iss.ImgClose2,iss.ImgClose3,iss.CloseDate,posi.name as Position,ve.NameAlias as Vendor,reve.NameAlias as Resunit,pci.name as Checkitem from #tablename# as iss inner join projpositions AS posi on posi.Id = iss.PositionId inner join vend AS ve on ve.id = iss.vendid inner join vend AS reve on reve.id = iss.ResponVendId inner join projcheckitems AS pci on pci.id = iss.CheckItemId where iss.Id = '#issueid#'";
+    let sql = "select iss.IssueId,iss.ResponsibleId,iss.versionid,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.ReFormDate,iss.LimitDate,iss.RegisterDate,iss.UrgencyId,iss.PlusDesc,iss.IssueDesc,iss.CloseReason,iss.ImgClose1,iss.ImgClose2,iss.ImgClose3,iss.CloseDate,posi.name as Position,ve.NameAlias as Vendor,reve.NameAlias as Resunit,pci.name as Checkitem from #tablename# as iss inner join projpositions AS posi on posi.Id = iss.PositionId inner join vend AS ve on ve.id = iss.vendid inner join vend AS reve on reve.id = iss.ResponVendId inner join projcheckitems AS pci on pci.id = iss.CheckItemId where iss.Id = '#issueid#'";
     let tablename = ''; tablename = this.getissuetablename(type);
     sql = sql.replace('#tablename#', tablename);
     sql = sql.replace('#issueid#', issueid);
@@ -1876,6 +1881,32 @@ export class initBaseDB {
     })
     //return this.db.executeSql(sql, []);
     // })
+  }
+
+  deleteissue(issueid, type): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      resolve(promise.then((v1) => {
+        let sql = "delete from #tablename# where Id = '#issueid#'";
+        let tablename = ''; tablename = this.getissuetablename(type);
+        sql = sql.replace('#tablename#', tablename);
+        sql = sql.replace('#issueid#', issueid);
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).then((v2) => {
+        let sql = "delete from #tablename# where Id = '#issueid#'";
+        let tablename = ''; tablename = this.getuplissuetablename(type);
+        sql = sql.replace('#tablename#', tablename);
+        sql = sql.replace('#issueid#', issueid);
+        console.log(sql);
+        return this.db.executeSql(sql, []);
+      }).catch(err => {
+        console.log(err);
+        return err;
+      }))
+    })
   }
 
   getroomissueinfo(roomid, type): Promise<any> {
@@ -2135,14 +2166,14 @@ export class initBaseDB {
   initbuilderData(data, projid): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
-        resolve(this.dialogs.confirm('是否下载房间问题图片', '', ['取消下载', '确定下载']));
+        resolve(this.dialogs.confirm('是否下载全部房间问题图片', '', ['取消下载', '确定下载']));
       });
-      let loadissueimg:boolean;
+      let loadissueimg: boolean;
       console.log("initbuilderData");
       let tablename: Array<string>;
       tablename = [];
       resolve(promise.then((v1) => {
-        if (v1 == 2){
+        if (v1 == 2) {
           loadissueimg = true;
         } else {
           loadissueimg = false;
@@ -2218,7 +2249,7 @@ export class initBaseDB {
         }
         return tmppromise;
       }).then(v3 => {
-        if (loadissueimg == false){
+        if (loadissueimg == false) {
           return [10];
         }
         //ImgBefore1,Imgbefore2,ImgBefore3,ImgAfter1,ImgAfter2,ImgAfter3,ImgClose1,ImgClose2,ImgClose3
@@ -2256,19 +2287,19 @@ export class initBaseDB {
 
         console.log(sql);
         return this.db.executeSql(sql, []);
-      }).then((vv1:any)=>{
-        if (loadissueimg == false){
+      }).then((vv1: any) => {
+        if (loadissueimg == false) {
           return vv1;
         }
 
-        if (vv1.rows.length && vv1.rows.length > 0){
-          this.localStorage.setItem('imgcount',0).then(vv=>{
-            this.nativeservice.showLoadingimg('加载房间问题图片',vv1.rows.length);
+        if (vv1.rows.length && vv1.rows.length > 0) {
+          this.localStorage.setItem('imgcount', 0).then(vv => {
+            this.nativeservice.showLoadingimg('加载房间问题图片', vv1.rows.length);
           })
         }
         return vv1;
       }).then((v4: any) => {
-        if (loadissueimg == false){
+        if (loadissueimg == false) {
           return v4;
         }
         console.log("v4:" + v4);
@@ -2304,8 +2335,8 @@ export class initBaseDB {
           })
         }
         return tmppromise;
-      }).then(v=>{
-        this.localStorage.setItem('imgcount',-1);
+      }).then(v => {
+        this.localStorage.setItem('imgcount', -1);
         return v;
       }).catch(err => {
         console.log(err);
@@ -2505,10 +2536,10 @@ export class initBaseDB {
         sql = sql.replace('#projid#', projid);
         console.log(sql);
         return this.db.executeSql(sql, []);
-      }).then((vv1:any)=>{
-        if (vv1.rows.length && vv1.rows.length > 0){
-          this.localStorage.setItem('imgcount',0).then(vv=>{
-            this.nativeservice.showLoadingimg('上传房间问题图片',vv1.rows.length);
+      }).then((vv1: any) => {
+        if (vv1.rows.length && vv1.rows.length > 0) {
+          this.localStorage.setItem('imgcount', 0).then(vv => {
+            this.nativeservice.showLoadingimg('上传房间问题图片', vv1.rows.length);
           })
         }
         return vv1;
@@ -2530,8 +2561,8 @@ export class initBaseDB {
           })
         }
         return tmppromise;
-      }).then(v=>{
-        this.localStorage.setItem('imgcount',-1);
+      }).then(v => {
+        this.localStorage.setItem('imgcount', -1);
         return v;
       }).then((v1) => {
         return this.uploadbuilderdata(projid, ["PreCheckIssues", "PreCheckLogs", "OpenCheckIssues", "OpenCheckLogs", "FormalCheckIssues", "FormalCheckLogs", "ServiceCheckIssues", "ServiceCheckLogs"]);
@@ -2575,7 +2606,7 @@ export class initBaseDB {
         return this.downloadbuilderdata(token, projid);
       }).catch(err => {
         this.nativeservice.hideLoading();
-        this.localStorage.setItem('imgcount',-1);
+        this.localStorage.setItem('imgcount', -1);
         console.log("楼栋上传失败:" + err);
         throw '';
       }))
@@ -3506,15 +3537,15 @@ export class initBaseDB {
       let promise = new Promise((resolve) => {
         resolve(100);
       });
-      resolve(promise.then((v)=>{
-        return this.localStorage.getItem('imgcount').then(x=>{
-          this.localStorage.setItem('imgcount',x+1);
+      resolve(promise.then((v) => {
+        return this.localStorage.getItem('imgcount').then(x => {
+          this.localStorage.setItem('imgcount', x + 1);
         })
       }).then((v1) => {
         return this.httpService.getimg(FILE_SERVE_URL + "/ydyf_DownLoadFileString", { token: FILE_TOKEN, MD5: filename });
       }).catch(err => {
         this.warn('图片下载失败:' + err);
-        this.localStorage.setItem('imgcount',-1);
+        this.localStorage.setItem('imgcount', -1);
       }))
     })
   }
@@ -3526,15 +3557,15 @@ export class initBaseDB {
       let promise = new Promise((resolve) => {
         resolve(100);
       });
-      resolve(promise.then((v)=>{
-        return this.localStorage.getItem('imgcount').then(x=>{
-          this.localStorage.setItem('imgcount',x+1);
+      resolve(promise.then((v) => {
+        return this.localStorage.getItem('imgcount').then(x => {
+          this.localStorage.setItem('imgcount', x + 1);
         })
       }).then((v1) => {
         return this.httpService.postimg(FILE_SERVE_URL + "/ydyf_UpLoadFileString", { token: FILE_TOKEN, FileName: src, MD5: filename });
       }).catch(err => {
         this.warn('图片上传失败:' + err);
-        this.localStorage.setItem('imgcount',-1);
+        this.localStorage.setItem('imgcount', -1);
         resolve(0);
       }))
     })
@@ -3705,45 +3736,45 @@ export class initBaseDB {
   }
 
   //单问题图片下载
-  downloadissueimg(projid,issuelist,apimgflag:boolean): Promise<any> {
+  downloadissueimg(projid, issuelist, apimgflag: boolean): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(this.nativeservice.isConnecting());
       });
       console.log(issuelist);
-      resolve(promise.then((v)=>{        
+      resolve(promise.then((v) => {
         if (v == false) {
           return this.nativeservice.alert('当前没有网络无法上传。').then(v => {
             throw '当前没有网络无法上传。'
           })
         } else {
-          let sql = " select '#imgb1#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb1#') ".replace('#projid#', projid).replace('#imgb1#',issuelist.ImgBefore1).replace('#imgb1#',issuelist.ImgBefore1);
-          if (issuelist.ImgBefore2){
-            sql += " union select '#imgb2#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb2#') ".replace('#projid#', projid).replace('#imgb2#',issuelist.ImgBefore2).replace('#imgb2#',issuelist.ImgBefore2);
-            if (issuelist.ImgBefore3){       
-              sql += " union select '#imgb3#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb3#') ".replace('#projid#', projid).replace('#imgb3#',issuelist.ImgBefore3).replace('#imgb3#',issuelist.ImgBefore3);    
+          let sql = " select '#imgb1#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb1#') ".replace('#projid#', projid).replace('#imgb1#', issuelist.ImgBefore1).replace('#imgb1#', issuelist.ImgBefore1);
+          if (issuelist.ImgBefore2) {
+            sql += " union select '#imgb2#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb2#') ".replace('#projid#', projid).replace('#imgb2#', issuelist.ImgBefore2).replace('#imgb2#', issuelist.ImgBefore2);
+            if (issuelist.ImgBefore3) {
+              sql += " union select '#imgb3#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imgb3#') ".replace('#projid#', projid).replace('#imgb3#', issuelist.ImgBefore3).replace('#imgb3#', issuelist.ImgBefore3);
             }
           }
-          if (issuelist.ImgAfter1){
-            sql += " union select '#imga1#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga1#') ".replace('#projid#', projid).replace('#imga1#',issuelist.ImgAfter1).replace('#imga1#',issuelist.ImgAfter1);
-          
-            if (issuelist.ImgAfter2){
-              sql += " union select '#imga2#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga2#') ".replace('#projid#', projid).replace('#imga2#',issuelist.ImgAfter2).replace('#imga2#',issuelist.ImgAfter2);
-              if (issuelist.ImgAfter3){
-                sql += " union select '#imga3#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga3#') ".replace('#projid#', projid).replace('#imga3#',issuelist.ImgAfter3).replace('#imga3#',issuelist.ImgAfter3);
+          if (issuelist.ImgAfter1) {
+            sql += " union select '#imga1#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga1#') ".replace('#projid#', projid).replace('#imga1#', issuelist.ImgAfter1).replace('#imga1#', issuelist.ImgAfter1);
+
+            if (issuelist.ImgAfter2) {
+              sql += " union select '#imga2#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga2#') ".replace('#projid#', projid).replace('#imga2#', issuelist.ImgAfter2).replace('#imga2#', issuelist.ImgAfter2);
+              if (issuelist.ImgAfter3) {
+                sql += " union select '#imga3#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#imga3#') ".replace('#projid#', projid).replace('#imga3#', issuelist.ImgAfter3).replace('#imga3#', issuelist.ImgAfter3);
               }
-            }                
+            }
           }
-          if (apimgflag == true && issuelist.APImg){
-            sql += " union select '#AP#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#AP#') ".replace('#projid#', projid).replace('#AP#',issuelist.APImg).replace('#AP#',issuelist.APImg);
+          if (apimgflag == true && issuelist.APImg) {
+            sql += " union select '#AP#' as fn where not exists (select projid from imagetable where imagetable.projid = '#projid#' and imagetable.fn = '#AP#') ".replace('#projid#', projid).replace('#AP#', issuelist.APImg).replace('#AP#', issuelist.APImg);
           }
           console.log(sql);
           return this.db.executeSql(sql, []);
         }
-      }).then((vv1:any)=>{
-        if (vv1.rows.length && vv1.rows.length > 0){
-          this.localStorage.setItem('imgcount',0).then(vv=>{
-            this.nativeservice.showLoadingimg('加载房间问题图片',vv1.rows.length);
+      }).then((vv1: any) => {
+        if (vv1.rows.length && vv1.rows.length > 0) {
+          this.localStorage.setItem('imgcount', 0).then(vv => {
+            this.nativeservice.showLoadingimg('加载房间问题图片', vv1.rows.length);
           })
         }
         return vv1;
@@ -3760,8 +3791,8 @@ export class initBaseDB {
           })
         }
         return tmppromise;
-      }).then(v=>{
-        this.localStorage.setItem('imgcount',-1);
+      }).then(v => {
+        this.localStorage.setItem('imgcount', -1);
         return v;
       }).catch(err => {
         this.warn('图片下载失败:' + err);
@@ -3770,8 +3801,8 @@ export class initBaseDB {
     })
   }
 
- 
-      
+
+
   //report
   //整改通过率
   reportZGTGL(projid): Promise<any> {

@@ -29,7 +29,7 @@ export class MaintenancePage {
     this.localStorage.getItem('curuser').then(val => {
       this.token = val.token;
     })
-
+ 
     this.localStorage.getItem('curproj').then(val => {
       if (val && val.projid) {
         this.projid = val.projid;

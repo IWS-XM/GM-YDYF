@@ -59,7 +59,23 @@ export class RoomPage implements OnInit {
 			}
 		})
 		this.dwgInfo = {};
-		console.log("constructor");
+		console.log("constructor");		
+	}
+
+	init(){
+		this.issues = [];
+		this.readycounts = 0; this.forfixcounts = 0; this.fixedcounts = 0; this.passcounts = 0;
+		this.loadRommInfo();
+	}
+
+	ionViewDidEnter() {
+		this.localStorage.getItem('reviewissue').then(val=>{
+			if (val && val.status != 'init'){
+                console.log(val.status);
+			} else {
+				this.init();
+			}
+		})
 	}
 
 	listshowclick() {
@@ -122,14 +138,6 @@ export class RoomPage implements OnInit {
 			this.navCtrl.push(IssueviewPage, { issueid: issueid, projid: this.projid, batchid: this.batchid, buildingid: this.buildingid, buildingname: this.buildingname, roomid: this.roomid, roomname: this.roomname, type: this.type });
 		}
 		document.getElementById('stage').appendChild(div);
-	}
-
-
-
-	ionViewDidEnter() {
-		this.issues = [];
-		this.readycounts = 0; this.forfixcounts = 0; this.fixedcounts = 0; this.passcounts = 0;
-		this.loadRommInfo();
 	}
 
 	stageClick(e: MouseEvent) {

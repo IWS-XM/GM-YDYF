@@ -62,7 +62,7 @@ export class BuilderPage {
     fixdatearrow: string = "∨";
     checkitemarrow: string = "∨";
     sortingarrow: string = "∨";
-    userrole: Array<string> = [];
+    userrole: Array<string> = []; 
     vendids: Array<string> = [];
     constructor(public navCtrl: NavController, public navParams: NavParams, public actionSheetCtrl: ActionSheetController, public dialogs: Dialogs, private modalCtrl: ModalController,
         public initBaseDB: initBaseDB, public nativeservice: NativeService, public localStorage: LocalStorage, private clipboard: Clipboard) {
