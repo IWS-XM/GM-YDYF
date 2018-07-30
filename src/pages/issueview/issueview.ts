@@ -47,7 +47,8 @@ export class IssueviewPage {
 	closedreason: string = '';
 	imagesclosed: Array<string> = [];
 	closedtime: string = '';
-    issuelist: any;
+	issuelist: any;
+	imagesreturn: Array<string>;
 	constructor(public localStorage: LocalStorage, public initBaseDB: initBaseDB, public navCtrl: NavController, public alertCtrl: AlertController,
 		public params: NavParams, private modalCtrl: ModalController, public nativeservice: NativeService) {
 		this.issueid = this.params.get('issueid');
@@ -61,13 +62,14 @@ export class IssueviewPage {
 		this.type = this.params.get('type');
 		this.images = [];
 		this.imagesfixed = [];
+		this.imagesreturn = [];
 		this.hidden = true;
 		// this.arrow = "∨";
 		this.mousestouch = [];
 		this.showbutton = false;
-		this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'view' });
+		this.localStorage.setItem('reviewissue', { issue: this.issueid, status: 'view' });
 		this.initBaseDB.getissueinfo(this.issueid, this.type).then((val: any) => {
-			
+
 			this.issuelist = val.rows.item(0);
 			console.log(JSON.stringify(val.rows.item(0)));
 			this.position = this.issuelist.Position;
@@ -99,10 +101,10 @@ export class IssueviewPage {
 				dt = new Date(this.issuelist.CloseDate);
 				this.closedtime = this.initBaseDB.showdatetime(dt);//dt.toLocaleString();
 			}
-			
+
 			if (this.status == '待派单' || this.status == '待整改' || this.status == '已整改') {
 				this.showbutton = true;
-			} 
+			}
 			this.initimages();
 
 			if (this.status == '非正常关闭') {
@@ -204,7 +206,7 @@ export class IssueviewPage {
 			}).then(v => {
 				return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
 			}).then(v => {
-				return this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'pass' });
+				return this.localStorage.setItem('reviewissue', { issue: this.issueid, status: 'pass' });
 			}).then(v => {
 				this.navCtrl.pop();
 			}).catch(err => {
@@ -217,76 +219,180 @@ export class IssueviewPage {
 		let tablename = this.initBaseDB.getissuetablename(this.type);
 		let upltablename = this.initBaseDB.getuplissuetablename(this.type);
 		const modal = this.modalCtrl.create(IssuereturnPage, {
+			username: this.username, imagesreturn: this.imagesreturn, type: this.type
 		});
 		modal.onDidDismiss(result => {
-			if (result) {console.log('return result:'+result);
+			if (result) {
+				console.log('return result:' + result);
 				let now = new Date();
 				let curtime: string = now.toLocaleDateString() + " " + now.getHours().toString() + ":" + now.getMinutes() + ":" + now.getSeconds();
 
 				let status: string;
+				this.imagesreturn = result.imagesreturn;
 				if (this.ResponsibleId === '' || this.ResponsibleId === 'null') {
 					status = '待派单';
 				} else {
 					status = '待整改';
 				}
 				if (this.versionid == 0) {
-					let sql = "update #tablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "',ReturnReason = '#ReturnReason#', EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '',ReturnNum = ReturnNum+1 where Id = '#issueid#'";
-					sql = sql.replace("#tablename#", tablename).replace("#userid#", this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result).replace('#username#', this.username);
-					console.log(sql);
-					this.initBaseDB.updateIssue([sql]).then(v => {
-						console.log(sql);
-						this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type).then(v => {
+					let sql = "";
+					if (this.type == 4) {
+						let promise = new Promise((resolve) => {
+							resolve(100);
+						});
+						promise.then(v1 => {
+							return this.initBaseDB.updateImgData(this.projid, this.batchid, this.buildingid, this.imagesreturn);
+						}).then((imgfn: any) => {
+							sql = "update #tablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "',ReturnReason = '#ReturnReason#', EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '',ReturnNum = ReturnNum+1 #img# where Id = '#issueid#'";
+							sql = sql.replace("#tablename#", tablename).replace("#userid#", this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result.returndesc).replace('#username#', this.username);
+							let setimg = '';
+							if (imgfn) {
+								for (var i = 0; i < imgfn.length; i++) {
+									setimg += ",ImgReturn" + (i + 1).toString() + "='" + imgfn[i] + "'";
+									console.log(setimg);
+								}
+							}
+							sql = sql.replace('#img#', setimg);
+							console.log("reject:" + sql);
+							return this.initBaseDB.updateIssue([sql]);
+						}).then(v => {
+							return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
+						}).then(v => {
 							this.navCtrl.pop();
+						}).catch(err => {
+							console.log('退回失败:' + err);
 						})
-					}).catch(err => {
-						console.log('退回失败:' + err);
-					})
-				} else {
-					let sql = "update #tablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "', ReturnReason = '#ReturnReason#',EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '',ReturnNum = ReturnNum+1 where Id = '#issueid#' ";
-					sql = sql.replace("#tablename#", tablename).replace("#userid#", this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result).replace('#username#', this.username);
-					let uplsql = "select id from #upltablename# where id = '" + this.issueid + "'";
-					uplsql = uplsql.replace("#upltablename#", upltablename);
+					} else {
+						sql = "update #tablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "',ReturnReason = '#ReturnReason#', EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '',ReturnNum = ReturnNum+1 where Id = '#issueid#'";
+						sql = sql.replace("#tablename#", tablename).replace("#userid#", this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result.returndesc).replace('#username#', this.username);
 
-					let promise = new Promise((resolve) => {
-						resolve(100);
-					});
-					console.log(uplsql);
-					promise.then(v1 => {
-						return this.initBaseDB.currentdb().executeSql(uplsql, []);
-					}).then((val: any) => {
-						let sqls = [];
-						sqls.push(sql);
-						if (val && val.rows.length > 0) {
-							sql = "update #upltablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "', ReturnReason = '#ReturnReason#', EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '' where Id = '#issueid#' ";
-							sql = sql.replace("#upltablename#", upltablename).replace('#userid#', this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result).replace('#username#', this.username);
-						} else {
-							sql = "insert into #upltablename# (Id,BatchId,RoomId,ProjId,VersionId,BuildingId,IssueStatus,EngineerPhone,EngineerName,ReturnDate,ReturnReason) values (#values#)";
-							let value = [];
-							value.push("'" + this.issueid + "'");
-							value.push("'" + this.batchid + "'");
-							value.push("'" + this.roomid + "'");
-							value.push("'" + this.projid + "'");
-							value.push(this.versionid);
-							value.push("'" + this.buildingid + "'");
-							value.push("'" + status + "'");
-							value.push("'" + this.userid + "'");
-							value.push("'" + this.username + "'");
-							value.push("'" + curtime + "'");
-							value.push("'" + result + "'");
-							sql = sql.replace("#upltablename#", upltablename).replace('#values#', value.join(','));
-						}
-						sqls.push(sql);
-						console.log("reject:" + sqls);
-						return this.initBaseDB.updateIssue(sqls);
-					}).then(v => {
-						return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
-					}).then(v => {
-						return this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'reject' });
-					}).then(v => {
-						this.navCtrl.pop();
-					}).catch(err => {
-						console.log('退回失败:' + err);
-					})
+						console.log(sql);
+						this.initBaseDB.updateIssue([sql]).then(v => {
+							console.log(sql);
+							this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type).then(v => {
+								this.navCtrl.pop();
+							})
+						}).catch(err => {
+							console.log('退回失败:' + err);
+						})
+					}
+				} else {
+					let sql = "";
+					let uplsql = "";
+					if (this.type == 4) {
+						sql = "update #tablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "', ReturnReason = '#ReturnReason#',EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '',ReturnNum = ReturnNum+1 #img# where Id = '#issueid#' ";
+						sql = sql.replace("#tablename#", tablename).replace("#userid#", this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result.returndesc).replace('#username#', this.username);
+						uplsql = "select id from #upltablename# where id = '" + this.issueid + "'";
+						uplsql = uplsql.replace("#upltablename#", upltablename);
+						let setimg = '';
+						let imgfn: any;
+						let promise = new Promise((resolve) => {
+							resolve(100);
+						});
+						console.log(uplsql);
+						promise.then(v1 => {
+							return this.initBaseDB.updateImgData(this.projid, this.batchid, this.buildingid, this.imagesreturn);
+						}).then((v2: any) => {
+							imgfn = []; imgfn = v2;
+							if (imgfn) {
+								for (var i = 0; i < imgfn.length; i++) {
+									setimg += ",ImgReturn" + (i + 1).toString() + "='" + imgfn[i] + "'";
+									console.log(setimg);
+								}
+							}
+							sql = sql.replace('#img#', setimg);
+							console.log("reject:" + sql);
+							console.log("reject:" + sql);
+							return setimg;
+						}).then(v1 => {
+							return this.initBaseDB.currentdb().executeSql(uplsql, []);
+						}).then((val: any) => {
+							let sqls = [];
+							sqls.push(sql);
+							if (val && val.rows.length > 0) {
+								sql = "update #upltablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "', ReturnReason = '#ReturnReason#', EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '' #img#  where Id = '#issueid#' ";
+								sql = sql.replace("#upltablename#", upltablename).replace('#userid#', this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result.returndesc).replace('#username#', this.username).replace('#img#', setimg);
+							} else {
+								sql = "insert into #upltablename# (Id,BatchId,RoomId,ProjId,VersionId,BuildingId,IssueStatus,EngineerPhone,EngineerName,ReturnDate,ReturnReason #imgfields#) values (#values#)";
+								let value = [];
+								value.push("'" + this.issueid + "'");
+								value.push("'" + this.batchid + "'");
+								value.push("'" + this.roomid + "'");
+								value.push("'" + this.projid + "'");
+								value.push(this.versionid);
+								value.push("'" + this.buildingid + "'");
+								value.push("'" + status + "'");
+								value.push("'" + this.userid + "'");
+								value.push("'" + this.username + "'");
+								value.push("'" + curtime + "'");
+								value.push("'" + result.returndesc + "'");
+								let imgfields = '';
+								for (var i = 0; i < imgfn.length; i++) {
+									imgfields += ',ImgReturn' + (i + 1).toString();
+									value.push("'" + imgfn[i] + "'");
+									console.log(imgfields);
+								}
+								sql = sql.replace("#upltablename#", upltablename).replace('#imgfields#', imgfields).replace('#values#', value.join(','));
+							}
+							sqls.push(sql);
+							console.log("reject:" + sqls);
+							return this.initBaseDB.updateIssue(sqls);
+						}).then(v => {
+							return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
+						}).then(v => {
+							return this.localStorage.setItem('reviewissue', { issue: this.issueid, status: 'reject' });
+						}).then(v => {
+							this.navCtrl.pop();
+						}).catch(err => {
+							console.log('退回失败:' + err);
+						})
+					} else {
+						sql = "update #tablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "', ReturnReason = '#ReturnReason#',EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '',ReturnNum = ReturnNum+1 where Id = '#issueid#' ";
+						sql = sql.replace("#tablename#", tablename).replace("#userid#", this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result.returndesc).replace('#username#', this.username);
+						uplsql = "select id from #upltablename# where id = '" + this.issueid + "'";
+						uplsql = uplsql.replace("#upltablename#", upltablename);
+
+						let promise = new Promise((resolve) => {
+							resolve(100);
+						});
+						console.log(uplsql);
+						promise.then(v1 => {
+							return this.initBaseDB.currentdb().executeSql(uplsql, []);
+						}).then((val: any) => {
+							let sqls = [];
+							sqls.push(sql);
+							if (val && val.rows.length > 0) {
+								sql = "update #upltablename# set IssueStatus = '#status#', ReturnDate = '" + curtime + "', ReturnReason = '#ReturnReason#', EngineerName = '#username#',EngineerPhone = '#userid#',EngineerId = '' where Id = '#issueid#' ";
+								sql = sql.replace("#upltablename#", upltablename).replace('#userid#', this.userid).replace('#issueid#', this.issueid).replace('#status#', status).replace('#ReturnReason#', result.returndesc).replace('#username#', this.username);
+							} else {
+								sql = "insert into #upltablename# (Id,BatchId,RoomId,ProjId,VersionId,BuildingId,IssueStatus,EngineerPhone,EngineerName,ReturnDate,ReturnReason) values (#values#)";
+								let value = [];
+								value.push("'" + this.issueid + "'");
+								value.push("'" + this.batchid + "'");
+								value.push("'" + this.roomid + "'");
+								value.push("'" + this.projid + "'");
+								value.push(this.versionid);
+								value.push("'" + this.buildingid + "'");
+								value.push("'" + status + "'");
+								value.push("'" + this.userid + "'");
+								value.push("'" + this.username + "'");
+								value.push("'" + curtime + "'");
+								value.push("'" + result.returndesc + "'");
+								sql = sql.replace("#upltablename#", upltablename).replace('#values#', value.join(','));
+							}
+							sqls.push(sql);
+							console.log("reject:" + sqls);
+							return this.initBaseDB.updateIssue(sqls);
+						}).then(v => {
+							return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
+						}).then(v => {
+							return this.localStorage.setItem('reviewissue', { issue: this.issueid, status: 'reject' });
+						}).then(v => {
+							this.navCtrl.pop();
+						}).catch(err => {
+							console.log('退回失败:' + err);
+						})
+					}
 				}
 			}
 		});
@@ -375,7 +481,7 @@ export class IssueviewPage {
 						}).then(v => {
 							return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
 						}).then(v => {
-							return this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'close' });
+							return this.localStorage.setItem('reviewissue', { issue: this.issueid, status: 'close' });
 						}).then(v => {
 							this.navCtrl.pop();
 						}).catch(err => {
@@ -442,7 +548,7 @@ export class IssueviewPage {
 			}).then(v => {
 				return this.initBaseDB.updateuploadflag(this.projid, this.batchid, this.buildingid, this.type);
 			}).then(v => {
-				return this.localStorage.setItem('reviewissue',{ issue: this.issueid, status: 'cancel' });
+				return this.localStorage.setItem('reviewissue', { issue: this.issueid, status: 'cancel' });
 			}).then(v => {
 				this.navCtrl.pop();
 			}).catch(err => {
@@ -451,21 +557,21 @@ export class IssueviewPage {
 		}
 	}
 
-    initimages(){
+	initimages() {
 		this.images = [];
 		if (this.issuelist.ImgBefore1) {
 			this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore1).then((v1: any) => {
-				if (v1 && v1.rows && v1.rows.length > 0){
+				if (v1 && v1.rows && v1.rows.length > 0) {
 					this.images.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
 				}
 				if (this.issuelist.ImgBefore2) {
 					this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore2).then((v2: any) => {
-						if (v2 && v2.rows && v2.rows.length > 0){
+						if (v2 && v2.rows && v2.rows.length > 0) {
 							this.images.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
 						}
 						if (this.issuelist.ImgBefore3) {
 							this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore3).then((v3: any) => {
-								if (v3 && v3.rows && v3.rows.length > 0){
+								if (v3 && v3.rows && v3.rows.length > 0) {
 									this.images.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
 								}
 							}).catch(err => {
@@ -481,22 +587,22 @@ export class IssueviewPage {
 				console.log('图片1加载失败' + err);
 			})
 		}
-        this.imagesfixed = [];
+		this.imagesfixed = [];
 		if (this.issuelist.ImgAfter1) {
 			this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter1).then((v1: any) => {
-				if (v1 && v1.rows && v1.rows.length > 0){
-				this.imagesfixed.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
+				if (v1 && v1.rows && v1.rows.length > 0) {
+					this.imagesfixed.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
 				}
 				console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
 				if (this.issuelist.ImgAfter2) {
 					this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter2).then((v2: any) => {
-						if (v2 && v2.rows && v2.rows.length > 0){
-						this.imagesfixed.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
+						if (v2 && v2.rows && v2.rows.length > 0) {
+							this.imagesfixed.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
 						}
 						if (this.issuelist.ImgAfter3) {
 							this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter3).then((v3: any) => {
-								if (v3 && v3.rows && v3.rows.length > 0){
-								this.imagesfixed.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
+								if (v3 && v3.rows && v3.rows.length > 0) {
+									this.imagesfixed.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
 								}
 							}).catch(err => {
 								console.log('图片3加载失败' + err);
@@ -511,13 +617,34 @@ export class IssueviewPage {
 				console.log('图片1加载失败' + err);
 			})
 		}
+		this.imagesreturn = [];
+		if (this.issuelist.ImgReturn1) {
+			this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgReturn1).then((v1: any) => {
+				if (v1 && v1.rows && v1.rows.length > 0) {
+					this.imagesreturn.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
+				}
+				console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
+				if (this.issuelist.ImgReturn2) {
+					this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgReturn2).then((v2: any) => {
+						if (v2 && v2.rows && v2.rows.length > 0) {
+							this.imagesreturn.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
+						}
+					}).catch(err => {
+						console.log('图片2加载失败' + err);
+					})
+				}
+
+			}).catch(err => {
+				console.log('图片1加载失败' + err);
+			})
+		}
 	}
 
-	imgdownload(){
-		this.initBaseDB.downloadissueimg(this.projid,this.issuelist,false).then(v=>{
-		  this.initimages();
+	imgdownload() {
+		this.initBaseDB.downloadissueimg(this.projid, this.issuelist, false).then(v => {
+			this.initimages();
 		})
-	  }
+	}
 
 	//点击图片放大
 	// showBigImage(imageName) {  //传递一个参数（图片的URl）
@@ -533,10 +660,24 @@ export class IssueviewPage {
 				}
 				i++;
 			})
-		} else {
+		} else if (fixedflag == 1){
 			this.imagesfixed.forEach(element => {
 				if (element == imagesrc) {
 					this.navCtrl.push(ShowimgPage, { imgdata: this.imagesfixed, num: i });
+				}
+				i++;
+			})
+		} else if (fixedflag == 2){
+			this.imagesclosed.forEach(element => {
+				if (element == imagesrc) {
+					this.navCtrl.push(ShowimgPage, { imgdata: this.imagesclosed, num: i });
+				}
+				i++;
+			})
+		} else if (fixedflag == 3){
+			this.imagesreturn.forEach(element => {
+				if (element == imagesrc) {
+					this.navCtrl.push(ShowimgPage, { imgdata: this.imagesreturn, num: i });
 				}
 				i++;
 			})
@@ -546,7 +687,7 @@ export class IssueviewPage {
 	deleteclick() {
 		this.initBaseDB.deleteissue(this.issueid, this.type).then(v => {
 			this.nativeservice.showToast('删除成功');
-            this.navCtrl.pop();
+			this.navCtrl.pop();
 		}).catch(err => {
 			this.nativeservice.showToast('删除失败' + err, 4000);
 			this.navCtrl.pop();

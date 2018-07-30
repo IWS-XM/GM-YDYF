@@ -31,11 +31,11 @@ export class FormalinspectionPage {
     this.localStorage.getItem('curuser').then(val => {
       this.token = val.token;
       this.userrole = val.userrole;
-    }) 
+    })
 
     this.localStorage.getItem('curproj').then(val => {
       if (val && val.projid) {
-        console.log(this.projid);        
+        console.log(this.projid);
         this.projid = val.projid;
         this.projname = val.projname;
         this.versionid = val.versionid;
@@ -49,19 +49,19 @@ export class FormalinspectionPage {
             this.nodata = true;
           }
           console.log("initbatch" + this.nodata);
-          console.log(this.batchbuildings);  
-          this.localStorage.getItem('updatebasedata').then(v=>{
+          console.log(this.batchbuildings);
+          this.localStorage.getItem('updatebasedata').then(v => {
             console.log(v);
-            if (v == false){
+            if (v == false) {
               this.nativeservice.hideLoading();
             }
-          })              
+          })
         }).catch(e => {
           this.nativeservice.hideLoading();
         })
       } else {
         this.nodata = true;
-        this.nativeservice.alert("项目或App没授权，请联系系统管理员.");        
+        this.nativeservice.alert("项目或App没授权，请联系系统管理员.");
       }
     })
   }
@@ -78,13 +78,13 @@ export class FormalinspectionPage {
           this.nodata = true;
         }
         console.log("initbatch" + this.nodata);
-        console.log(this.batchbuildings);  
-        this.localStorage.getItem('updatebasedata').then(v=>{
+        console.log(this.batchbuildings);
+        this.localStorage.getItem('updatebasedata').then(v => {
           console.log(v);
-          if (v == false){
+          if (v == false) {
             this.nativeservice.hideLoading();
           }
-        })              
+        })
         refresher.complete();
       }).catch(e => {
         this.nativeservice.hideLoading();
@@ -111,6 +111,21 @@ export class FormalinspectionPage {
       this.nativeservice.hideLoading();
     }).catch(e => {
       this.nativeservice.hideLoading();
+    })
+  }
+
+  updateallclicked(): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      resolve(promise.then((val: boolean) => {
+        this.nativeservice.showLoading("更新中...");
+        return this.initBaseDB.updateallbuildings(this.token, this.projid, this.type, this.batchbuildings);
+      }).catch(err => {
+        this.nativeservice.hideLoading();
+        console.log('楼栋全部更新错误:' + err);
+      }))
     })
   }
 

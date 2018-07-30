@@ -1,5 +1,5 @@
-export const APP_SERVE_URL = 'http://yfapi.itgreal.com/api' ;//'http://172.25.18.62:6100/api';//'
-//export const APP_SERVE_URL = "http://yfapi1.itgreal.com/api";
+//export const APP_SERVE_URL = 'http://yfapi.itgreal.com/api' ;//'http://172.25.18.62:6100/api';//'
+export const APP_SERVE_URL = "http://yfapi1.itgreal.com/api";
 //export const APP_SERVE_URL = 'http://www.erp-ax.cn:7100/api';//'http://172.25.18.62:6100/api';//'http://117.29.177.122:6100/api';//'http://172.25.18.60:9000/api';
 //'http://localhost:8100/api';
 export const FILE_SERVE_URL = 'http://shenpi.itgreal.com/vipservice.asmx';

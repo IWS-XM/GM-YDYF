@@ -32,6 +32,18 @@
 </ion-item>
 </ion-list>
 
+<ion-item *ngIf=" type === 4">
+  <button *ngIf="imagesreturn && imagesreturn.length < 2" ion-button icon-only (click)="cameraclick()">
+<ion-icon ios="ios-camera" md="md-camera"></ion-icon>
+</button>
+  <ion-thumbnail item-left *ngFor="let item of imagesreturn" style="margin-left:7px; margin-right:7px;min-width:60px">
+    <div style="color:red">
+      <ion-icon item-right ios="ios-close" md="md-close" (click)="deleteimage(item)"></ion-icon>
+    </div>
+    <img [src]="item" (click)="showBigImage(item)" style="width:60px;">
+  </ion-thumbnail>
+</ion-item>
+
 </ion-content>
 
 <ion-footer>

@@ -1,6 +1,10 @@
 <ion-header>
   <ion-navbar color="primary">
 		<ion-title>工地开放</ion-title>
+		<ion-buttons left>
+			<button ion-button (click)="updateallclicked()">全部更新
+			</button>
+		</ion-buttons>
 		<ion-buttons right *ngIf="userrole.indexOf('A8') != -1">
 				<button ion-button (click)="ShowReport()">报表
 						<ion-icon name="pie"></ion-icon>

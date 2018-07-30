@@ -53,7 +53,17 @@
 
     <ion-item *ngIf="status==='非正常关闭'">
       关闭时照片
-      <img *ngFor="let item of imagesclosed" [src]="item" style="width:50px; margin-left:3px; margin-right:3px; height:50px" (click)="showBigImage(item,1)"
+      <img *ngFor="let item of imagesclosed" [src]="item" style="width:50px; margin-left:3px; margin-right:3px; height:50px" (click)="showBigImage(item,2)"
+      />
+      <!-- <ion-img width="50px" height="50px" *ngFor="let item2 of imagesfixed" src={{item2}}  (click)="showBigImage(item2,1)" style="margin:5px"></ion-img> -->
+      <!-- <ion-thumbnail item-right *ngFor="let item of imagesfixed" style="margin:5px;min-width:50px;min-height:50px">        
+        <img [src]="item" (click)="showBigImage(item,1)" style="width:50px; height:50px"/>
+      </ion-thumbnail> -->
+    </ion-item>
+ 
+    <ion-item *ngIf="status != '非正常关闭' && type === 4">
+      验房退回照片
+      <img *ngFor="let item of imagesreturn" [src]="item" style="width:50px; margin-left:3px; margin-right:3px; height:50px" (click)="showBigImage(item,3)"
       />
       <!-- <ion-img width="50px" height="50px" *ngFor="let item2 of imagesfixed" src={{item2}}  (click)="showBigImage(item2,1)" style="margin:5px"></ion-img> -->
       <!-- <ion-thumbnail item-right *ngFor="let item of imagesfixed" style="margin:5px;min-width:50px;min-height:50px">        

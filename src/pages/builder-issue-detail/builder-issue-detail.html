@@ -79,6 +79,15 @@
       <ion-input readonly value="{{fixeddesc}}" style=" white-space:normal"></ion-input>
       <!--<ion-textarea  [(ngModel)]="fixeddesc"></ion-textarea>-->
     </ion-item>
+    <ion-item *ngIf="issue.type === 4">
+      验房退回照片
+      <img *ngFor="let item of imagesreturn" [src]="item" style="width:50px; margin-left:3px; margin-right:3px; height:50px" (click)="showBigImage(item,3)"
+      />
+      <!-- <ion-img width="50px" height="50px" *ngFor="let item2 of imagesfixed" src={{item2}}  (click)="showBigImage(item2,1)" style="margin:5px"></ion-img> -->
+      <!-- <ion-thumbnail item-right *ngFor="let item of imagesfixed" style="margin:5px;min-width:50px;min-height:50px">        
+        <img [src]="item" (click)="showBigImage(item,1)" style="width:50px; height:50px"/>
+      </ion-thumbnail> -->
+    </ion-item>
     <ion-item>
       <ion-label fixed style="width:28%;min-width:28%;max-width:28%">登记时间</ion-label>
       <ion-input value="{{registertime}}" readonly></ion-input>

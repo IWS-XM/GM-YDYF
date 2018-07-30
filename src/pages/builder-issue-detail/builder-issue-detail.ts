@@ -41,6 +41,7 @@ export class BuilderIssueDetail {
   vendid: string = '';
   descplus: string = '';
   issuelist: any;
+  imagesreturn: Array<any>;
   constructor(public navCtrl: NavController, public navParams: NavParams, public initBaseDB: initBaseDB, public localStorage: LocalStorage, private modalCtrl: ModalController, public nativeservice: NativeService, public actionSheetCtrl: ActionSheetController) {
     this.issueid = navParams.get('Id');
     this.projid = navParams.get('projid');
@@ -51,12 +52,12 @@ export class BuilderIssueDetail {
     this.teammembers = []; this.teammembers = navParams.get('teammembers');
     this.userrole = navParams.get('userrole');
   }
- 
+
   loadissueinfo() {
     this.images = []; this.imagesfixed = [];
     this.return_log = [];
     this.initBaseDB.getbuilderissueinfo(this.issueid, this.issue.type).then((v: any) => {
-     console.log(v); console.log(v[1]);
+      console.log(v); console.log(v[1]);
       let val: any; val = v[0];
       this.issuelist = val.rows.item(0);
       console.log(JSON.stringify(val.rows.item(0)));
@@ -209,70 +210,91 @@ export class BuilderIssueDetail {
     modal.present();
   }
 
-  initimages(){
-		this.images = [];
-		if (this.issuelist.ImgBefore1) {
-			this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore1).then((v1: any) => {
-				if (v1 && v1.rows && v1.rows.length > 0){
-					this.images.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
-				}
-				if (this.issuelist.ImgBefore2) {
-					this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore2).then((v2: any) => {
-						if (v2 && v2.rows && v2.rows.length > 0){
-							this.images.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
-						}
-						if (this.issuelist.ImgBefore3) {
-							this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore3).then((v3: any) => {
-								if (v3 && v3.rows && v3.rows.length > 0){
-									this.images.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
-								}
-							}).catch(err => {
-								console.log('图片3加载失败' + err);
-							})
-						}
-					}).catch(err => {
-						console.log('图片2加载失败' + err);
-					})
-				}
+  initimages() {
+    this.images = [];
+    if (this.issuelist.ImgBefore1) {
+      this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore1).then((v1: any) => {
+        if (v1 && v1.rows && v1.rows.length > 0) {
+          this.images.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
+        }
+        if (this.issuelist.ImgBefore2) {
+          this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore2).then((v2: any) => {
+            if (v2 && v2.rows && v2.rows.length > 0) {
+              this.images.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
+            }
+            if (this.issuelist.ImgBefore3) {
+              this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgBefore3).then((v3: any) => {
+                if (v3 && v3.rows && v3.rows.length > 0) {
+                  this.images.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
+                }
+              }).catch(err => {
+                console.log('图片3加载失败' + err);
+              })
+            }
+          }).catch(err => {
+            console.log('图片2加载失败' + err);
+          })
+        }
 
-			}).catch(err => {
-				console.log('图片1加载失败' + err);
-			})
-		}
-        this.imagesfixed = [];
-		if (this.issuelist.ImgAfter1) {
-			this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter1).then((v1: any) => {
-				if (v1 && v1.rows && v1.rows.length > 0){
-				this.imagesfixed.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
-				}
-				console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
-				if (this.issuelist.ImgAfter2) {
-					this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter2).then((v2: any) => {
-						if (v2 && v2.rows && v2.rows.length > 0){
-						this.imagesfixed.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
-						}
-						if (this.issuelist.ImgAfter3) {
-							this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter3).then((v3: any) => {
-								if (v3 && v3.rows && v3.rows.length > 0){
-								this.imagesfixed.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
-								}
-							}).catch(err => {
-								console.log('图片3加载失败' + err);
-							})
-						}
-					}).catch(err => {
-						console.log('图片2加载失败' + err);
-					})
-				}
+      }).catch(err => {
+        console.log('图片1加载失败' + err);
+      })
+    }
+    this.imagesfixed = [];
+    if (this.issuelist.ImgAfter1) {
+      this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter1).then((v1: any) => {
+        if (v1 && v1.rows && v1.rows.length > 0) {
+          this.imagesfixed.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
+        }
+        console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
+        if (this.issuelist.ImgAfter2) {
+          this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter2).then((v2: any) => {
+            if (v2 && v2.rows && v2.rows.length > 0) {
+              this.imagesfixed.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
+            }
+            if (this.issuelist.ImgAfter3) {
+              this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgAfter3).then((v3: any) => {
+                if (v3 && v3.rows && v3.rows.length > 0) {
+                  this.imagesfixed.push('data:image/jpeg;base64,' + v3.rows.item(0).src);
+                }
+              }).catch(err => {
+                console.log('图片3加载失败' + err);
+              })
+            }
+          }).catch(err => {
+            console.log('图片2加载失败' + err);
+          })
+        }
 
-			}).catch(err => {
-				console.log('图片1加载失败' + err);
-			})
-		}
-	}
+      }).catch(err => {
+        console.log('图片1加载失败' + err);
+      })
+    }
+    this.imagesreturn = [];
+    if (this.issuelist.ImgReturn1) {
+      this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgReturn1).then((v1: any) => {
+        if (v1 && v1.rows && v1.rows.length > 0) {
+          this.imagesreturn.push('data:image/jpeg;base64,' + v1.rows.item(0).src);
+        }
+        console.log('data:image/jpeg;base64,' + v1.rows.item(0).src);
+        if (this.issuelist.ImgReturn2) {
+          this.initBaseDB.getimagedata(this.projid, this.issuelist.ImgReturn2).then((v2: any) => {
+            if (v2 && v2.rows && v2.rows.length > 0) {
+              this.imagesreturn.push('data:image/jpeg;base64,' + v2.rows.item(0).src);
+            }
+          }).catch(err => {
+            console.log('图片2加载失败' + err);
+          })
+        }
 
-  imgdownload(){
-    this.initBaseDB.downloadissueimg(this.projid,this.issuelist,true).then(v=>{
+      }).catch(err => {
+        console.log('图片1加载失败' + err);
+      })
+    }
+  }
+
+  imgdownload() {
+    this.initBaseDB.downloadissueimg(this.projid, this.issuelist, true).then(v => {
       this.initimages();
     })
   }
@@ -288,7 +310,7 @@ export class BuilderIssueDetail {
         }
         i++;
       })
-    } else {
+    } else if (fixedflag == 1){
       this.imagesfixed.forEach(element => {
         if (element == imagesrc) {
           console.log('ee');
@@ -296,7 +318,14 @@ export class BuilderIssueDetail {
         }
         i++;
       })
-    }
+    } else if (fixedflag == 3){
+			this.imagesreturn.forEach(element => {
+				if (element == imagesrc) {
+					this.navCtrl.push(ShowimgPage, { imgdata: this.imagesreturn, num: i });
+				}
+				i++;
+			})
+		}
   };
 
 }

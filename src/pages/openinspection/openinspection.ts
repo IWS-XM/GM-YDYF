@@ -113,6 +113,21 @@ export class OpeninspectionPage {
     }, 2000);
   }
 
+  updateallclicked(): Promise<any> {
+    return new Promise((resolve) => {
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      resolve(promise.then((val: boolean) => {
+        this.nativeservice.showLoading("更新中...");
+        return this.initBaseDB.updateallbuildings(this.token, this.projid, this.type, this.batchbuildings);
+      }).catch(err => {
+        this.nativeservice.hideLoading();
+        console.log('楼栋全部更新错误:' + err);
+      }))
+    })
+  }
+
   itemSelected(batchid, building) {
     if (building.needtype == 1) {
       this.downloadclicked(batchid, building).then(v => {
