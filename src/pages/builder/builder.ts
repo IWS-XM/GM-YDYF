@@ -199,7 +199,7 @@ export class BuilderPage {
             this.nativeservice.isConnecting().then(val => {
                 if (val == true) {
                     this.initBaseDB.uploadbuilderinfo(this.token, this.projid).then(v => {
-                        this.loadIssues().then(val => {
+                        this.loadIssuesNotDownload().then(val => {
                             console.log('Async operation has ended');
                             refresher.complete();
                         }).catch(e => {
@@ -591,6 +591,48 @@ export class BuilderPage {
                             return 1;
                         }
                     })
+                }
+            }).then((v2) => {
+                return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, "全部");
+            }).then((val: any) => {
+                if (val) {
+                    this.issuelist = val;
+                    this.needupd = val[8];
+                    this.asscounts = val[4];
+                    this.forfixcounts = val[5];
+                    this.fixedcounts = val[6];
+                    this.returncounts = val[7];
+                }
+                return 10;//this.initBaseDB.getProjTeam(this.projid);
+            }).then((v: any) => {
+                //this.teammembers = v;
+                this.nativeservice.hideLoading();
+                return 1;
+            }).catch(err => {
+                this.nativeservice.hideLoading();
+                console.log('问题加载失败:' + err);
+                throw '问题加载失败';
+            }))
+        })
+    }
+
+    loadIssuesNotDownload(): Promise<any> {
+        return new Promise((resolve) => {
+            this.issuelist = []; this.teammembers = [];
+            let promise = new Promise((resolve) => {
+                resolve(100);
+            });
+            console.log("loadIssues");
+            resolve(promise.then((v1) => {
+                return this.localStorage.getItem("curproj");
+            }).then((val: any) => {
+                console.log(val);
+                if (val && val != null) {
+                    this.projid = val.projid; this.projname = val.projname;
+                    return this.localStorage.getItem('needupload' + this.projid);
+                } else {
+                    this.nativeservice.showToast("没有需要整改的项目问题")
+                    throw '';
                 }
             }).then((v2) => {
                 return this.initBaseDB.getbuilderissuelist(this.projid, 1, this.assignfilterstr, this.buildingfilterstr, this.floorfilterstr, this.duedatefilterstr, this.returntimesfilterstr, this.fixdatefilterstr, this.checkitemfilterstr, this.sortingname, "全部");
