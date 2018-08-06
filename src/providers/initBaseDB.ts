@@ -934,7 +934,7 @@ export class initBaseDB {
     })
   }
 
-  updatebuildings(token, projid, type, batchid, batchname, buildings): Promise<any> {
+  updatebuildings(token, projid, type, batchid, batchname, buildings, loadimg = 0): Promise<any> {
     return new Promise((resolve) => {
       let promise = new Promise((resolve) => {
         resolve(100);
@@ -948,13 +948,13 @@ export class initBaseDB {
           tmppromise = tmppromise.then(() => {
             if (building.needtype == 1){
               this.nativeservice.showLoading(batchname+"--"+building.buildingname+"--"+"下载中...");
-              return this.downloadbuildinginfo(token, projid, batchid, building.buildingid, type, v1);
+              return this.downloadbuildinginfo(token, projid, batchid, building.buildingid, type, loadimg);
             } else if (building.needtype == 2){
               this.nativeservice.showLoading(batchname+"--"+building.buildingname+"--"+"上传中...");
-              return this.uploadbuildinginfo(token, projid, batchid, building.buildingid, type, v1);
+              return this.uploadbuildinginfo(token, projid, batchid, building.buildingid, type, loadimg);
             } else if (building.needtype == 3){
               this.nativeservice.showLoading(batchname+"--"+building.buildingname+"--"+"更新中...");
-              return this.updatebuildinginfo(token, projid, batchid, building.buildingid, type, v1);
+              return this.updatebuildinginfo(token, projid, batchid, building.buildingid, type, loadimg);
             }
           }).then(val => {
             building.needtype = 0;
@@ -990,7 +990,7 @@ export class initBaseDB {
           console.log(JSON.stringify((batchbuildings[i])));
           let buildings = batchbuildings[i];
           tmppromise = tmppromise.then(() => {
-            return this.updatebuildings(token,projid,type,buildings.batchid,buildings.batchname,buildings.buildings);
+            return this.updatebuildings(token,projid,type,buildings.batchid,buildings.batchname,buildings.buildings,v1);
           }).then(val => {
             console.log('buildings: '+ buildings.buildings)
             return batchbuildings;
