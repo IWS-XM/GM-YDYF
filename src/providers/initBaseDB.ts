@@ -2153,7 +2153,7 @@ export class initBaseDB {
         if (v2 && v2.rows.length > 0) {
           return v2;
         } else {
-          let sql = "select name as Dim, 0 as Score from custsatisfaction where type = #type# order by sortcode";
+          let sql = "select name as Dim, 0 as Score from custsatisfaction where type = #type# group by name order by sortcode";
           sql = sql.replace('#type#', type.toString());
           console.log(sql);
           return this.db.executeSql(sql, []);
