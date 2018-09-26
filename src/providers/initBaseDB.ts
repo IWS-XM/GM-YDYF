@@ -1948,7 +1948,7 @@ export class initBaseDB {
 
   getissueinfo(issueid, type): Promise<any> {
     // return new Promise((resolve) => {
-    let sql = "select iss.IssueId,iss.ResponsibleId,iss.versionid,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.ReFormDate,iss.LimitDate,iss.RegisterDate,iss.UrgencyId,iss.PlusDesc,iss.IssueDesc,iss.CloseReason,iss.ImgClose1,iss.ImgClose2,iss.ImgClose3,iss.CloseDate,iss.ImgReturn1,iss.ImgReturn2,posi.name as Position,ve.NameAlias as Vendor,reve.NameAlias as Resunit,pci.name as Checkitem from #tablename# as iss inner join projpositions AS posi on posi.Id = iss.PositionId inner join vend AS ve on ve.id = iss.vendid inner join vend AS reve on reve.id = iss.ResponVendId inner join projcheckitems AS pci on pci.id = iss.CheckItemId where iss.Id = '#issueid#'";
+    let sql = "select iss.IssueId,iss.ResponsibleId,iss.versionid,iss.ImgBefore1,iss.ImgBefore2,iss.ImgBefore3,iss.ImgAfter1,iss.ImgAfter2,iss.ImgAfter3,iss.IssueStatus,iss.ReFormDate,iss.LimitDate,iss.RegisterDate,iss.UrgencyId,iss.PlusDesc,iss.IssueDesc,iss.CloseReason,iss.ImgClose1,iss.ImgClose2,iss.ImgClose3,iss.CloseDate,iss.ImgReturn1,iss.ImgReturn2,posi.name as Position,ve.NameAlias as Vendor,reve.NameAlias as Resunit,pci.name as Checkitem from #tablename# as iss inner join projpositions AS posi on posi.Id = iss.PositionId left join vend AS ve on ve.id = iss.vendid left join vend AS reve on reve.id = iss.ResponVendId inner join projcheckitems AS pci on pci.id = iss.CheckItemId where iss.Id = '#issueid#'";
     let tablename = ''; tablename = this.getissuetablename(type);
     sql = sql.replace('#tablename#', tablename);
     sql = sql.replace('#issueid#', issueid);

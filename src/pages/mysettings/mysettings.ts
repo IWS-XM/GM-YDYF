@@ -70,18 +70,19 @@ export class MysettingsPage {
     console.log(this.versionids);
     let i = this.projnames.indexOf(this.projname, 0);
     
-    this.localStorage.setItem('curproj', { projid: this.projids[i], projname: this.projname, versionid: this.versionids[i], needupd: this.needupds[i] }).then(val => {
-      this.localStorage.getItem('curuser').then(v => {
-        this.nativeservice.showLoading('处理中，请稍侯...')
-        this.initBaseDB.checkandupdprojversion(this.projids[i], v.token, this.versionids[i], v.vendrole).then(v => {
-          console.log(v);
-          this.nativeservice.hideLoading();
-          this.nativeservice.showToast("设置成功");
-        }).catch(err=>{
-          this.nativeservice.hideLoading();
-        })
-      })
-    }).catch(e => alert(e));
+    this.localStorage.setItem('curproj', { projid: this.projids[i], projname: this.projname, versionid: this.versionids[i], needupd: this.needupds[i] });
+    // .then(val => {
+      // this.localStorage.getItem('curuser').then(v => {
+      //   this.nativeservice.showLoading('处理中，请稍侯...')
+      //   this.initBaseDB.checkandupdprojversion(this.projids[i], v.token, this.versionids[i], v.vendrole).then(v => {
+      //     console.log(v);
+      //     this.nativeservice.hideLoading();
+      //     this.nativeservice.showToast("设置成功");
+      //   }).catch(err=>{
+      //     this.nativeservice.hideLoading();
+      //   })
+    //   })
+    // }).catch(e => alert(e));
   }
 
   aboutclick() {
