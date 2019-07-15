@@ -34,6 +34,7 @@ export class initBaseDB {
         location: 'default'
       }).then((val: SQLiteObject) => {
         this.db = val;
+        this.nativeservice.detectionUpgrade();
         resolve(this.db);
       }).catch(e => console.log(e));
     })
@@ -172,10 +173,10 @@ export class initBaseDB {
       resolve(promise.then((v1) => {
         let jsonstr = JSON.stringify(records);
         console.log(jsonstr.substr(3, 1));
-        if (jsonstr.substr(3, 1) == 'X')
-          return 1;
-        else
+        if (jsonstr.substr(3, 7) == 'BatchId')
           return 0;
+        else
+          return 1;
       }).then((v) => {
         console.log(v);
         if (v == 1) {
@@ -3619,7 +3620,7 @@ export class initBaseDB {
     })
   }
 
-  downloadimg(filename): Promise<any> {
+  downloadimgold(filename): Promise<any> {
     return new Promise((resolve) => {
       console.log('downloading' + filename);
       let promise = new Promise((resolve) => {
@@ -3638,7 +3639,7 @@ export class initBaseDB {
     })
   }
 
-  uploadimg(src, filename): Promise<any> {
+  uploadimgold(src, filename): Promise<any> {
     return new Promise((resolve) => {
       //let filename = Md5.hashStr(src).toString() + ext;//'11.jpg';//
       console.log(filename);
@@ -3651,6 +3652,50 @@ export class initBaseDB {
         })
       }).then((v1) => {
         return this.httpService.postimg(FILE_SERVE_URL + "/ydyf_UpLoadFileString", { token: FILE_TOKEN, FileName: src, MD5: filename });
+      }).catch(err => {
+        this.warn('图片上传失败:' + err);
+        this.localStorage.setItem('imgcount', -1);
+        resolve(0);
+      }))
+    })
+  }
+
+  downloadimg(filename): Promise<any> {
+    return new Promise((resolve) => {
+      console.log('downloading' + filename);
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      resolve(promise.then((v) => {
+        return this.localStorage.getItem('imgcount').then(x => {
+          this.localStorage.setItem('imgcount', x + 1);
+        })
+      }).then((v1)=>{
+        return this.localStorage.getItem('curproj');
+      }).then((val:any) => {
+        return this.httpService.getimg(FILE_SERVE_URL + "/ydyf_DownLoadFileStringNew", { token: FILE_TOKEN, MD5: filename, ProjectName: val.projname });
+      }).catch(err => {
+        this.warn('图片下载失败:' + err);
+        this.localStorage.setItem('imgcount', -1);
+      }))
+    })
+  }
+
+  uploadimg(src, filename): Promise<any> {
+    return new Promise((resolve) => {
+      //let filename = Md5.hashStr(src).toString() + ext;//'11.jpg';//
+      console.log(filename);
+      let promise = new Promise((resolve) => {
+        resolve(100);
+      });
+      resolve(promise.then((v) => {
+        return this.localStorage.getItem('imgcount').then(x => {
+          this.localStorage.setItem('imgcount', x + 1);
+        })
+      }).then((v1)=>{
+        return this.localStorage.getItem('curproj');
+      }).then((val:any) => {
+        return this.httpService.postimg(FILE_SERVE_URL + "/ydyf_UpLoadFileStringNew", { token: FILE_TOKEN, FileName: src, MD5: filename, ProjectName: val.projname });
       }).catch(err => {
         this.warn('图片上传失败:' + err);
         this.localStorage.setItem('imgcount', -1);

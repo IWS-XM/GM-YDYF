@@ -15,6 +15,7 @@ import { LocalStorage } from './local-storage';
 import { APP_DOWNLOAD, APK_DOWNLOAD, APP_SERVE_URL } from "./Constants";
 import { HttpService } from './HttpService';
 import { FileOpener } from '@ionic-native/file-opener';
+import { createRendererV1 } from '@angular/core/src/view/refs';
 
 declare var LocationPlugin;
 declare var AMapNavigation;
@@ -79,43 +80,71 @@ export class NativeService {
     })
   }
 
-  // detectionUpgrade(token) {
-  //   //这里连接后台判断是否需要升级,不需要升级就return
-  //   let devstr = "";
-  //   if (this.isAndroid()) {
-  //     devstr = "android";
-  //   } else if (this.isIos()) {
-  //     devstr = "ios";
-  //   } else {
-  //     return '';
-  //   }
-  //   let appversion = "";
-  //   this.getVersionNumber().then(v => {
-  //     appversion = v;
-  //     this.httpService.get(APP_SERVE_URL + '/AppPack', { Token: token, type: devstr }).then(val => {
-  //       console.log(val);
-  //       let newversion = "";
-  //       if (val && val.length > 0) {
-  //         newversion = val[0][1][1];
-  //         console.log(appversion); console.log(newversion);
-  //         if (newversion != appversion) {
-  //           this.alertCtrl.create({
-  //             title: '升级',
-  //             subTitle: '发现新版本,是否立即升级？',
-  //             buttons: [{ text: '取消' },
-  //             {
-  //               text: '确定',
-  //               handler: () => {
-  //                 this.downloadApp(token);
-  //               }
-  //             }
-  //             ]
-  //           }).present();
-  //         }
-  //       }
-  //     })
-  //   })
-  // }
+  detectionUpgrade() {
+    //这里连接后台判断是否需要升级,不需要升级就return
+    let token = "";
+    this.localStorage.getItem('curuser').then((v1:any)=>{
+      if (v1 && v1.token){
+        token = v1.token;
+        this.getVersionNumber().then(val => {
+          let appversion = "";
+          appversion = val;
+          this.detection(token).then(v => {
+            if (v && v != '') {
+              if (v != appversion) {
+                this.alertCtrl.create({
+                  title: '升级',
+                  subTitle: '发现新版本,是否立即升级？',
+                  buttons: [{ text: '取消' },
+                  {
+                    text: '确定',
+                    handler: () => {
+                      this.downloadApp(token);
+                    }
+                  }
+                  ]
+                }).present();
+              }
+            }
+          })    
+        })
+      }
+    })
+    // let devstr = "";
+    // if (this.isAndroid()) {
+    //   devstr = "android";
+    // } else if (this.isIos()) {
+    //   devstr = "ios";
+    // } else {
+    //   return '';
+    // }
+    // let appversion = "";
+    // this.getVersionNumber().then(v => {
+    //   appversion = v;
+    //   this.httpService.get(APP_SERVE_URL + '/AppPack', { Token: token, type: devstr }).then(val => {
+    //     console.log(val);
+    //     let newversion = "";
+    //     if (val && val.length > 0) {
+    //       newversion = val[0][1][1];
+    //       console.log(appversion); console.log(newversion);
+    //       if (newversion != appversion) {
+    //         this.alertCtrl.create({
+    //           title: '升级',
+    //           subTitle: '发现新版本,是否立即升级？',
+    //           buttons: [{ text: '取消' },
+    //           {
+    //             text: '确定',
+    //             handler: () => {
+    //               this.downloadApp(token);
+    //             }
+    //           }
+    //           ]
+    //         }).present();
+    //       }
+    //     }
+    //   })
+    //})
+  }
 
   /**
    * 下载安装app

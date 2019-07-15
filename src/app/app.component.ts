@@ -24,7 +24,7 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide(); console.log("start app2");
-      // this.nativeservice.detectionUpgrade();
+      //this.nativeservice.detectionUpgrade();
       this.checklogin();
     });
   }

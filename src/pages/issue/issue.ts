@@ -121,11 +121,12 @@ export class IssuePage {
 	}
 
 	Cansubmit(): boolean {
+		console.log(this.itdesc);
 		if (this.positionid == '') {
 			this.nativeService.alert('部位不能为空'); return false;
 		} else if (this.checkitem == "") {
 			this.nativeService.alert('检查项不能为空'); return false;
-		} else if (this.itdesc == "") {
+		} else if (this.itdesc == "" || this.itdesc == "undefind") {
 			this.nativeService.alert('描述不能为空'); return false;
 		} else if (this.vend == "") {
 			this.nativeService.alert('承建商不能为空'); return false;
